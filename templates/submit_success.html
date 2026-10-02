@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Gửi bài thành công</title>
+    <style>
+        body { text-align: center; font-family: sans-serif; padding: 50px 20px; background: #f8f9fa; }
+        .card { background: white; max-width: 450px; margin: 0 auto; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        a { display: inline-block; margin-top: 15px; background: #ff5722; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2 style="color: #28a745;">🎉 Cảm ơn bạn đã chia sẻ!</h2>
+    <p style="margin-top: 10px; color: #555;">
+        {% if is_admin %}
+            Bài viết của bạn đã được xuất bản lên trang chủ!
+        {% else %}
+            Bài viết của bạn đang được **Quản trị viên chờ duyệt**. Ngay khi kiểm duyệt xong bài sẽ xuất hiện trên trang chủ!
+        {% endif %}
+    </p>
+    <a href="/">Trở về trang chủ</a>
+</div>
+</body>
+</html>
