@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import markupsafe
+from email_validator import validate_email, EmailNotValidError
 
 app = Flask(__name__)
 app.secret_key = 'bepnhabong_secret_key_2026'
@@ -23,7 +24,7 @@ db = SQLAlchemy(app)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=True) # <--- Thêm dòng này để lưu email
+    email = db.Column(db.String(120), unique=True, nullable=True)
     password = db.Column(db.String(200), nullable=True)
     full_name = db.Column(db.String(100), nullable=True)
     avatar = db.Column(db.String(500), default="https://cdn-icons-png.flaticon.com/512/847/847969.png")
@@ -37,13 +38,12 @@ class Food(db.Model):
     servings = db.Column(db.String(50), default="2 người")
     image = db.Column(db.String(500), nullable=False)
     ingredients = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(20), default="approved") # 'approved' hoặc 'pending'
+    status = db.Column(db.String(20), default="approved")
     author_name = db.Column(db.String(100), default="Bếp Nhà Bông")
     steps = db.relationship('RecipeStep', backref='food', cascade="all, delete-orphan", lazy=True)
     likes = db.relationship('Like', backref='food', cascade="all, delete-orphan", lazy=True)
     comments = db.relationship('Comment', backref='food', cascade="all, delete-orphan", lazy=True)
 
-# Bảng Các bước nấu
 class RecipeStep(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     food_id = db.Column(db.Integer, db.ForeignKey('food.id'), nullable=False)
@@ -51,13 +51,11 @@ class RecipeStep(db.Model):
     description = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(500), nullable=True)
 
-# Bảng Thả tim
 class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     food_id = db.Column(db.Integer, db.ForeignKey('food.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-# Bảng Bình luận
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     food_id = db.Column(db.Integer, db.ForeignKey('food.id'), nullable=False)
@@ -74,11 +72,10 @@ def nl2br_filter(s):
 
 with app.app_context():
     db.create_all()
-    # Tạo tài khoản Admin mặc định
     admin_user = User.query.filter_by(username='admin').first()
     if not admin_user:
         hashed_pw = generate_password_hash('admin123')
-        new_admin = User(username='admin', password=hashed_pw, full_name="Quản Trị Viên", role="admin")
+        new_admin = User(username='admin', email='admin@bepnhabong.com', password=hashed_pw, full_name="Quản Trị Viên", role="admin")
         db.session.add(new_admin)
         db.session.commit()
 
@@ -91,7 +88,6 @@ def save_uploaded_file(file):
         return f"/static/uploads/{filename}"
     return None
 
-# 1. TRANG CHỦ
 @app.route('/')
 def index():
     query = request.args.get('query', '').strip()
@@ -101,10 +97,8 @@ def index():
         foods = Food.query.filter_by(status='approved').order_by(Food.id.desc()).all()
     return render_template('index.html', foods=foods, query=query)
 
-# 2. ĐĂNG BÀI (Cho cả Admin và Khách hàng)
 @app.route('/submit-recipe', methods=['GET', 'POST'])
 def submit_recipe():
-    # Nếu chưa đăng nhập thì bắt đăng nhập
     if not session.get('user_logged_in'):
         return redirect(url_for('login'))
 
@@ -116,7 +110,6 @@ def submit_recipe():
 
         main_image = save_uploaded_file(request.files.get('image_file')) or "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500"
 
-        # Nếu là ADMIN thì tự động duyệt (approved), nếu là KHÁCH thì (pending)
         is_admin = session.get('role') == 'admin'
         status = 'approved' if is_admin else 'pending'
 
@@ -154,12 +147,9 @@ def submit_recipe():
 
     return render_template('submit_recipe.html')
 
-# 3. TRANG CHI TIẾT MÓN ĂN (Cho phép Admin xem cả bài chờ duyệt)
 @app.route('/detail/<int:food_id>')
 def detail(food_id):
     food = Food.query.get_or_404(food_id)
-    
-    # Kiểm tra: nếu bài chưa duyệt (pending) mà không phải Admin thì không cho xem
     if food.status == 'pending' and session.get('role') != 'admin':
         return "Bài viết này đang chờ duyệt!", 403
 
@@ -169,7 +159,6 @@ def detail(food_id):
         user_liked = Like.query.filter_by(food_id=food_id, user_id=session.get('user_id')).first() is not None
     return render_template('detail.html', food=food, related_foods=related_foods, user_liked=user_liked)
 
-# 4. TRANG QUẢN TRỊ ADMIN (Xem & Duyệt bài)
 @app.route('/admin')
 def admin_dashboard():
     if session.get('role') != 'admin':
@@ -177,7 +166,19 @@ def admin_dashboard():
 
     pending_foods = Food.query.filter_by(status='pending').order_by(Food.id.desc()).all()
     approved_foods = Food.query.filter_by(status='approved').order_by(Food.id.desc()).all()
-    return render_template('admin.html', pending_foods=pending_foods, approved_foods=approved_foods)
+    users_list = User.query.order_by(User.id.desc()).all()
+    
+    return render_template('admin.html', pending_foods=pending_foods, approved_foods=approved_foods, users=users_list)
+
+@app.route('/admin/delete-user/<int:user_id>')
+def delete_user(user_id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    user = User.query.get_or_404(user_id)
+    if user.role != 'admin':
+        db.session.delete(user)
+        db.session.commit()
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/approve/<int:food_id>')
 def approve_food(food_id):
@@ -188,8 +189,6 @@ def approve_food(food_id):
     db.session.commit()
     return redirect(url_for('admin_dashboard'))
 
-# 5. XỬ LÝ ĐĂNG NHẬP & TỰ ĐỘNG TẠO TÀI KHỎAN CHO KHÁCH
-# 5. XỬ LÝ ĐĂNG NHẬP & ĐĂNG KÝ TÀI KHỎAN CHUẨN
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -199,30 +198,31 @@ def login():
 
         if action == 'register':
             full_name = request.form.get('full_name', '').strip()
-            email = request.form.get('email', '').strip().lower()
+            email_input = request.form.get('email', '').strip().lower()
             confirm_pw = request.form.get('confirm_password', '').strip()
 
-            # 1. Kiểm tra mật khẩu nhập lại có khớp không
+            try:
+                valid = validate_email(email_input, check_deliverability=True)
+                email_input = valid.normalized
+            except EmailNotValidError as e:
+                return render_template('login.html', error=f"Email không tồn tại hoặc sai định dạng! ({str(e)})")
+
             if password != confirm_pw:
-                return render_template('login.html', error="Mật khẩu và Nhập lại mật khẩu không khớp!")
+                return render_template('login.html', error="Mật khẩu và Xác nhận mật khẩu không khớp!")
             
-            # 2. Kiểm tra mật khẩu có đủ 6 ký tự không
             if len(password) < 6:
-                return render_template('login.html', error="Mật khẩu phải có ít nhất 6 ký tự!")
+                return render_template('login.html', error="Mật khẩu phải chứa ít nhất 6 ký tự!")
 
-            # 3. Kiểm tra Tên đăng nhập đã trùng chưa
             if User.query.filter_by(username=username_input).first():
-                return render_template('login.html', error="Tên đăng nhập này đã tồn tại, vui lòng chọn tên khác!")
+                return render_template('login.html', error="Tên đăng nhập này đã được sử dụng!")
 
-            # 4. Kiểm tra Email đã được dùng chưa
-            if User.query.filter_by(email=email).first():
-                return render_template('login.html', error="Email này đã được đăng ký tài khoản khác!")
+            if User.query.filter_by(email=email_input).first():
+                return render_template('login.html', error="Địa chỉ Email này đã được đăng ký tài khoản khác!")
 
-            # Lưu tài khoản mới vào CSDL
             hashed_pw = generate_password_hash(password)
             new_user = User(
                 username=username_input,
-                email=email,
+                email=email_input,
                 password=hashed_pw,
                 full_name=full_name or username_input,
                 role="user"
@@ -230,7 +230,6 @@ def login():
             db.session.add(new_user)
             db.session.commit()
 
-            # Đăng ký thành công -> Tự động đăng nhập
             session['user_logged_in'] = True
             session['user_id'] = new_user.id
             session['user_name'] = new_user.full_name
@@ -238,7 +237,7 @@ def login():
             session['role'] = new_user.role
             return redirect(url_for('index'))
 
-        else: # Đăng nhập (Cho phép nhập Tên tài khoản HOẶC Email)
+        else:
             user = User.query.filter((User.username == username_input) | (User.email == username_input.lower())).first()
             if user and user.password and check_password_hash(user.password, password):
                 session['user_logged_in'] = True
@@ -251,77 +250,15 @@ def login():
                     return redirect(url_for('admin_dashboard'))
                 return redirect(url_for('index'))
             else:
-                return render_template('login.html', error="Tên đăng nhập / Email hoặc mật khẩu không chính xác!")
+                return render_template('login.html', error="Email / Tên đăng nhập hoặc mật khẩu không chính xác!")
 
     return render_template('login.html')
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username').strip()
-        password = request.form.get('password').strip()
-        
-        user = User.query.filter_by(username=username).first()
-        
-        if user:
-            if user.password and check_password_hash(user.password, password):
-                session['user_logged_in'] = True
-                session['user_id'] = user.id
-                session['user_name'] = user.full_name or user.username
-                session['user_avatar'] = user.avatar
-                session['role'] = user.role
-                
-                if user.role == 'admin':
-                    return redirect(url_for('admin_dashboard'))
-                return redirect(url_for('index'))
-            else:
-                return render_template('login.html', error="Mật khẩu không chính xác!")
-        else:
-            # Nếu chưa có tài khoản, tự động tạo mới tài khoản Khách hàng
-            hashed_pw = generate_password_hash(password)
-            new_user = User(username=username, password=hashed_pw, full_name=username, role="user")
-            db.session.add(new_user)
-            db.session.commit()
-
-            session['user_logged_in'] = True
-            session['user_id'] = new_user.id
-            session['user_name'] = new_user.full_name
-            session['user_avatar'] = new_user.avatar
-            session['role'] = new_user.role
-            return redirect(url_for('index'))
-
-    return render_template('login.html')
-
-# 6. ĐĂNG NHẬP NHANH GOOGLE / FACEBOOK
-@app.route('/login-social/<provider>')
-def login_social(provider):
-    if provider == 'google':
-        username = "google_user"
-        full_name = "Thành viên Google"
-        avatar = "https://cdn-icons-png.flaticon.com/512/300/300221.png"
-    else:
-        username = "facebook_user"
-        full_name = "Thành viên Facebook"
-        avatar = "https://cdn-icons-png.flaticon.com/512/5968/5968764.png"
-
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        user = User(username=username, full_name=full_name, avatar=avatar, role="user")
-        db.session.add(user)
-        db.session.commit()
-
-    session['user_logged_in'] = True
-    session['user_id'] = user.id
-    session['user_name'] = user.full_name
-    session['user_avatar'] = user.avatar
-    session['role'] = user.role
-
-    return redirect(url_for('index'))
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
 
-# 7. THẢ TIM & BÌNH LUẬN
 @app.route('/like/<int:food_id>', methods=['POST'])
 def like_food(food_id):
     if not session.get('user_logged_in'):
@@ -359,38 +296,6 @@ def add_comment(food_id):
         db.session.commit()
 
     return redirect(url_for('detail', food_id=food_id))
-
-@app.route('/edit/<int:food_id>', methods=['GET', 'POST'])
-def edit_food(food_id):
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-    food = Food.query.get_or_404(food_id)
-    if request.method == 'POST':
-        food.name = request.form.get('name')
-        food.time = request.form.get('time')
-        food.servings = request.form.get('servings')
-        food.ingredients = request.form.get('ingredients')
-        main_img = save_uploaded_file(request.files.get('image_file'))
-        if main_img:
-            food.image = main_img
-
-        RecipeStep.query.filter_by(food_id=food.id).delete()
-        step_descriptions = request.form.getlist('step_description[]')
-        step_images = request.files.getlist('step_image[]')
-
-        for idx, desc in enumerate(step_descriptions):
-            if desc.strip():
-                step_img_url = save_uploaded_file(step_images[idx]) if idx < len(step_images) else None
-                step = RecipeStep(
-                    food_id=food.id,
-                    step_number=idx + 1,
-                    description=desc.strip(),
-                    image_url=step_img_url
-                )
-                db.session.add(step)
-        db.session.commit()
-        return redirect(url_for('admin_dashboard'))
-    return render_template('edit.html', food=food)
 
 @app.route('/delete/<int:food_id>')
 def delete_food(food_id):
