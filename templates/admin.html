@@ -4,31 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản trị Bếp Nhà Bông</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background: #f4f6f9; padding: 20px; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
         input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        button { background: #ff5722; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
-        .btn-logout { background: #dc3545; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px; }
+        button { background: #ff5722; color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
+        .btn-add-step { background: #e0e0e0; color: #333; margin-bottom: 15px; padding: 8px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; width: auto; font-size: 13px; border: 1px solid #ccc; }
+        .step-block { background: #fafafa; border: 1px dashed #bbb; padding: 12px; border-radius: 6px; margin-bottom: 12px; position: relative; }
         .table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .table th, .table td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
-        .btn-edit { color: #007bff; text-decoration: none; margin-right: 10px; font-weight: bold; }
-        .btn-delete { color: #dc3545; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 style="color: #ff5722;">👨‍🍳 QUẢN TRỊ BÀI VIẾT NẤU ĂN</h2>
+        <h2 style="color: #ff5722;"><i class="fa-solid fa-utensils"></i> QUẢN TRỊ BẾP NHÀ BÔNG</h2>
         <div>
-            <a href="/" style="margin-right: 15px; text-decoration: none; color: #007bff; font-weight: bold;">Xem Web Khách ↗</a>
-            <a href="/logout" class="btn-logout">Đăng Xuất</a>
+            <a href="/" target="_blank" style="margin-right: 15px; text-decoration: none; color: #007bff; font-weight: bold;">Xem Web ↗</a>
+            <a href="/logout" style="background: #dc3545; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px;">Đăng Xuất</a>
         </div>
     </div>
 
@@ -53,18 +53,27 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Tải ảnh món ăn từ thiết bị *</label>
+                    <label>Ảnh đại diện chính của món ăn *</label>
                     <input type="file" name="image_file" accept="image/*" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Nguyên liệu chuẩn bị *</label>
-                    <textarea name="ingredients" rows="3" placeholder="Thịt ba chỉ, trứng cút..." required></textarea>
+                    <label>Nguyên liệu chuẩn bị * (Mỗi loại 1 dòng)</label>
+                    <textarea name="ingredients" rows="3" placeholder="500g Thịt ba chỉ&#10;10 Quả trứng cút..." required></textarea>
                 </div>
 
+                <!-- KHU VỰC THÊM CÁC BƯỚC NẤU KÈM ẢNH -->
                 <div class="form-group">
-                    <label>Các bước dạy nấu ăn *</label>
-                    <textarea name="steps" rows="4" placeholder="Bước 1: Sơ chế..." required></textarea>
+                    <label style="color: #ff5722;">🍳 Các bước thực hiện (Kèm ảnh minh họa từng bước)</label>
+                    <div id="stepsContainer">
+                        <div class="step-block">
+                            <b>Bước 1</b>
+                            <textarea name="step_description[]" rows="2" placeholder="Nội dung hướng dẫn Bước 1..." style="margin: 6px 0;" required></textarea>
+                            <label style="font-size: 12px; font-weight: normal;">Ảnh minh họa Bước 1 (Nếu có):</label>
+                            <input type="file" name="step_image[]" accept="image/*">
+                        </div>
+                    </div>
+                    <button type="button" class="btn-add-step" onclick="addStep()"><i class="fa-solid fa-plus"></i> Thêm bước tiếp theo</button>
                 </div>
 
                 <button type="submit">Đăng Món Ăn</button>
@@ -87,8 +96,8 @@
                         <td><img src="{{ food.image }}" width="50" height="50" style="object-fit: cover; border-radius: 4px;"></td>
                         <td><b>{{ food.name }}</b></td>
                         <td>
-                            <a href="/edit/{{ food.id }}" class="btn-edit">Sửa</a>
-                            <a href="/delete/{{ food.id }}" class="btn-delete" onclick="return confirm('Bạn có chắc chắn muốn xóa món này?')">Xóa</a>
+                            <a href="/edit/{{ food.id }}" style="color: #007bff; text-decoration: none; font-weight: bold; margin-right: 10px;">Sửa</a>
+                            <a href="/delete/{{ food.id }}" style="color: #dc3545; text-decoration: none; font-weight: bold;" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">Xóa</a>
                         </td>
                     </tr>
                     {% else %}
@@ -101,5 +110,21 @@
         </div>
     </div>
 
+    <script>
+        let stepCount = 1;
+        function addStep() {
+            stepCount++;
+            const container = document.getElementById('stepsContainer');
+            const div = document.createElement('div');
+            div.className = 'step-block';
+            div.innerHTML = `
+                <b>Bước ${stepCount}</b>
+                <textarea name="step_description[]" rows="2" placeholder="Nội dung hướng dẫn Bước ${stepCount}..." style="margin: 6px 0;" required></textarea>
+                <label style="font-size: 12px; font-weight: normal;">Ảnh minh họa Bước ${stepCount} (Nếu có):</label>
+                <input type="file" name="step_image[]" accept="image/*">
+            `;
+            container.appendChild(div);
+        }
+    </script>
 </body>
 </html>
