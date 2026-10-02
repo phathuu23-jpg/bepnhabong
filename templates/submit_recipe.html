@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đóng Góp Công Thức - Bếp Nhà Bông</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: #f4f6f9; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #ff5722; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .step-block { background: #fafafa; border: 1px dashed #ccc; padding: 10px; margin-bottom: 10px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 style="color: #ff5722; text-align: center; margin-bottom: 20px;">🍳 Chia Sẻ Công Thức Nấu Ăn</h2>
+    <form action="/submit-recipe" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Tên món ăn *</label>
+            <input type="text" name="name" required placeholder="Ví dụ: Canh chua cá lóc">
+        </div>
+        <div class="form-group">
+            <label>Ảnh đại diện chính món ăn *</label>
+            <input type="file" name="image_file" accept="image/*" required>
+        </div>
+        <div class="form-group">
+            <label>Nguyên liệu chuẩn bị *</label>
+            <textarea name="ingredients" rows="3" required placeholder="Ghi rõ từng nguyên liệu..."></textarea>
+        </div>
+        <div class="form-group">
+            <label style="color: #ff5722;">Các bước nấu (Kèm ảnh)</label>
+            <div id="stepsContainer">
+                <div class="step-block">
+                    <b>Bước 1</b>
+                    <textarea name="step_description[]" rows="2" style="margin: 5px 0;" required></textarea>
+                    <input type="file" name="step_image[]" accept="image/*">
+                </div>
+            </div>
+            <button type="button" onclick="addStep()" style="background: #e0e0e0; color: #333; margin-bottom: 15px; padding: 6px;">+ Thêm bước nấu</button>
+        </div>
+        <button type="submit">Gửi Bài Để Duyệt</button>
+    </form>
+</div>
+<script>
+    let stepCount = 1;
+    function addStep() {
+        stepCount++;
+        const container = document.getElementById('stepsContainer');
+        const div = document.createElement('div');
+        div.className = 'step-block';
+        div.innerHTML = `<b>Bước ${stepCount}</b><textarea name="step_description[]" rows="2" style="margin: 5px 0;" required></textarea><input type="file" name="step_image[]" accept="image/*">`;
+        container.appendChild(div);
+    }
+</script>
+</body>
+</html>
