@@ -1,127 +1,108 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Trị Bài Viết - Bếp Nhà Bông</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f6f9; color: #333; padding: 20px; }
+import os
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+
+app = Flask(__name__)
+app.secret_key = 'bepnhabong_secret_key_2026'
+
+# Cấu hình Cơ sở dữ liệu SQLite
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'bepnhabong.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# 1. Bảng lưu tài khoản Người dùng / Admin
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
+# 2. Bảng lưu Bài viết / Món ăn
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    image_url = db.Column(db.String(500), nullable=True)
+
+# TỰ ĐỘNG TẠO CSDL VÀ TÀI KHOẢN ADMIN KHI CHẠY WEB
+with app.app_context():
+    db.create_all()
+    # Kiểm tra nếu chưa có tài khoản admin thì tự động tạo
+    admin_user = User.query.filter_by(username='admin').first()
+    if not admin_user:
+        hashed_pw = generate_password_hash('admin123')
+        new_admin = User(username='admin', password=hashed_pw, is_admin=True)
+        db.session.add(new_admin)
+        db.session.commit()
+        print("---> Đã tự động tạo tài khoản Admin mặc định: tk=admin, mk=admin123")
+
+# --- TRANG DÀNH CHO KHÁCH HÀNG ---
+@app.route('/')
+def index():
+    # Lấy tất cả bài viết đã đăng để hiển thị cho khách xem
+    posts = Post.query.order_by(Post.id.desc()).all()
+    return render_template('index.html', posts=posts)
+
+@app.route('/post/<int:post_id>')
+def detail(post_id):
+    post = Post.query.get_or_404(post_id)
+    return render_template('detail.html', post=post)
+
+# --- TRANG ĐĂNG NHẬP ADMIN ---
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
         
-        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 30px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .header h1 { font-size: 20px; color: #ff5722; display: flex; align-items: center; gap: 10px; }
-        .header-actions { display: flex; gap: 15px; align-items: center; }
-        .btn-view { color: #007bff; text-decoration: none; font-weight: 600; }
-        .btn-logout { background: #dc3545; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; }
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            session['user_id'] = user.id
+            session['username'] = user.username
+            session['is_admin'] = user.is_admin
+            flash('Đăng nhập thành công!', 'success')
+            return redirect(url_for('admin'))
+        else:
+            flash('Tên đăng nhập hoặc mật khẩu không chính xác!', 'danger')
+            
+    return render_template('login.html')
 
-        .main-content { display: flex; gap: 20px; }
-        .form-section, .list-section { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .form-section { flex: 1; }
-        .list-section { flex: 1; }
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
 
-        h2 { font-size: 18px; margin-bottom: 20px; border-bottom: 2px solid #ff5722; padding-bottom: 8px; display: inline-block; }
+# --- TRANG QUẢN LÝ ĐĂNG BÀI (DÀNH CHO ADMIN) ---
+@app.route('/admin')
+def admin():
+    if not session.get('is_admin'):
+        flash('Bạn cần đăng nhập quyền Admin để truy cập trang này!', 'warning')
+        return redirect(url_for('login'))
+    
+    posts = Post.query.order_by(Post.id.desc()).all()
+    return render_template('admin.html', posts=posts)
+
+@app.route('/create', methods=['GET', 'POST'])
+def create():
+    if not session.get('is_admin'):
+        return redirect(url_for('login'))
         
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 5px; }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 6px; font-size: 14px; outline: none; }
-        .form-row { display: flex; gap: 10px; }
-        .form-row .form-group { flex: 1; }
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        image_url = request.form.get('image_url')
+        
+        if title and content:
+            new_post = Post(title=title, content=content, image_url=image_url)
+            db.session.add(new_post)
+            db.session.commit()
+            flash('Đăng bài viết mới thành công!', 'success')
+            return redirect(url_for('admin'))
+            
+    return render_template('create.html')
 
-        .btn-submit { background: #ff5722; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
-        .btn-submit:hover { background: #e64a19; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: left; font-size: 14px; }
-        th { background: #f8f9fa; }
-        .img-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
-        .btn-delete { color: #dc3545; text-decoration: none; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-    <!-- Header Quản Trị -->
-    <div class="header">
-        <h1>👨‍🍳 QUẢN TRỊ BÀI VIẾT NẤU ĂN</h1>
-        <div class="header-actions">
-            <a href="/" class="btn-view" target="_blank">Xem Web Khách ↗</a>
-            <a href="/logout" class="btn-logout">Đăng Xuất</a>
-        </div>
-    </div>
-
-    <div class="main-content">
-        <!-- Form Đăng Bài Mới -->
-        <div class="form-section">
-            <h2>➕ Đăng Món Ăn Mới</h2>
-            <form action="/admin" method="POST">
-                <div class="form-group">
-                    <label>Tên món ăn *</label>
-                    <input type="text" name="title" placeholder="Ví dụ: Thịt kho tàu" required>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Thời gian nấu</label>
-                        <input type="text" name="time" placeholder="45 phút">
-                    </div>
-                    <div class="form-group">
-                        <label>Khẩu phần</label>
-                        <input type="text" name="servings" placeholder="3 người">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Đường dẫn hình ảnh (URL)</label>
-                    <input type="text" name="image" placeholder="Dán link ảnh món ăn...">
-                </div>
-
-                <div class="form-group">
-                    <label>Nguyên liệu chuẩn bị *</label>
-                    <textarea name="ingredients" rows="3" placeholder="Thịt ba chỉ, trứng cút, nước dừa..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Các bước dạy nấu ăn *</label>
-                    <textarea name="steps" rows="4" placeholder="Bước 1: Sơ chế...&#10;Bước 2: Ướp...&#10;Bước 3: Kho..."></textarea>
-                </div>
-
-                <button type="submit" class="btn-submit">Đăng Bài Ngay</button>
-            </form>
-        </div>
-
-        <!-- Danh Sách Bài Đã Đăng -->
-        <div class="list-section">
-            <h2>📋 Món Ăn Đã Đăng ({{ foods|length }})</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Ảnh</th>
-                        <th>Tên Món</th>
-                        <th>Hành Động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for food in foods %}
-                    <tr>
-                        <td>
-                            <img src="{{ food.image }}" class="img-thumb" onerror="this.src='https://via.placeholder.com/50'">
-                        </td>
-                        <td>
-                            <strong>{{ food.name }}</strong>
-                            <div style="font-size: 12px; color: #6c757d;">⏱️ {{ food.time }}</div>
-                        </td>
-                        <td>
-                            <a href="/delete/{{ food.id }}" class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="3" style="text-align: center; color: #6c757d;">Chưa có bài viết nào!</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-</body>
-</html>
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
