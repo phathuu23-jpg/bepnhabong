@@ -1,4 +1,5 @@
 Flask
 Flask-SQLAlchemy
+Flask-Mail
 Werkzeug
 email-validator
