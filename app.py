@@ -188,7 +188,55 @@ def approve_food(food_id):
     return redirect(url_for('admin_dashboard'))
 
 # 5. XỬ LÝ ĐĂNG NHẬP & TỰ ĐỘNG TẠO TÀI KHỎAN CHO KHÁCH
+# 5. XỬ LÝ ĐĂNG NHẬP & ĐĂNG KÝ TÀI KHỎAN CHUẨN
 @app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        action = request.form.get('action')
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+
+        if action == 'register':
+            full_name = request.form.get('full_name', '').strip()
+            # Kiểm tra xem tên đăng nhập đã tồn tại chưa
+            existing_user = User.query.filter_by(username=username).first()
+            if existing_user:
+                return render_template('login.html', error="Tên đăng nhập này đã có người dùng, vui lòng chọn tên khác!")
+            
+            hashed_pw = generate_password_hash(password)
+            new_user = User(
+                username=username,
+                password=hashed_pw,
+                full_name=full_name or username,
+                role="user"
+            )
+            db.session.add(new_user)
+            db.session.commit()
+
+            # Đăng ký xong tự động đăng nhập luôn
+            session['user_logged_in'] = True
+            session['user_id'] = new_user.id
+            session['user_name'] = new_user.full_name
+            session['user_avatar'] = new_user.avatar
+            session['role'] = new_user.role
+            return redirect(url_for('index'))
+
+        else: # Đăng nhập
+            user = User.query.filter_by(username=username).first()
+            if user and user.password and check_password_hash(user.password, password):
+                session['user_logged_in'] = True
+                session['user_id'] = user.id
+                session['user_name'] = user.full_name or user.username
+                session['user_avatar'] = user.avatar
+                session['role'] = user.role
+
+                if user.role == 'admin':
+                    return redirect(url_for('admin_dashboard'))
+                return redirect(url_for('index'))
+            else:
+                return render_template('login.html', error="Tên đăng nhập hoặc mật khẩu không chính xác!")
+
+    return render_template('login.html')
 def login():
     if request.method == 'POST':
         username = request.form.get('username').strip()
