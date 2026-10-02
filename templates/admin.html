@@ -3,128 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản trị Bếp Nhà Bông</title>
+    <title>Duyệt Bài & Quản Trị - Bếp Nhà Bông</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
         body { background: #f4f6f9; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        button { background: #ff5722; color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
-        .btn-add-step { background: #e0e0e0; color: #333; margin-bottom: 15px; padding: 8px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; width: auto; font-size: 13px; border: 1px solid #ccc; }
-        .step-block { background: #fafafa; border: 1px dashed #bbb; padding: 12px; border-radius: 6px; margin-bottom: 12px; position: relative; }
-        .table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .table th, .table td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .btn-approve { background: #28a745; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px; }
+        .btn-delete { background: #dc3545; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 style="color: #ff5722;"><i class="fa-solid fa-utensils"></i> QUẢN TRỊ BẾP NHÀ BÔNG</h2>
-        <div>
-            <a href="/" target="_blank" style="margin-right: 15px; text-decoration: none; color: #007bff; font-weight: bold;">Xem Web ↗</a>
-            <a href="/logout" style="background: #dc3545; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px;">Đăng Xuất</a>
-        </div>
+        <h2 style="color: #ff5722;"><i class="fa-solid fa-shield-halved"></i> TRANG QUẢN TRỊ BẾP NHÀ BÔNG</h2>
+        <a href="/logout" style="color: red; text-decoration: none; font-weight: bold;">Đăng xuất</a>
     </div>
 
-    <div class="grid">
-        <div class="card">
-            <h3 style="margin-bottom: 15px;">➕ Đăng Món Ăn Mới</h3>
-            <form action="/admin" method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label>Tên món ăn *</label>
-                    <input type="text" name="name" placeholder="Ví dụ: Thịt kho tàu" required>
-                </div>
-
-                <div style="display: flex; gap: 10px;">
-                    <div class="form-group" style="flex: 1;">
-                        <label>Thời gian nấu</label>
-                        <input type="text" name="time" placeholder="45 phút">
-                    </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label>Khẩu phần</label>
-                        <input type="text" name="servings" placeholder="3 người">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Ảnh đại diện chính của món ăn *</label>
-                    <input type="file" name="image_file" accept="image/*" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Nguyên liệu chuẩn bị * (Mỗi loại 1 dòng)</label>
-                    <textarea name="ingredients" rows="3" placeholder="500g Thịt ba chỉ&#10;10 Quả trứng cút..." required></textarea>
-                </div>
-
-                <!-- KHU VỰC THÊM CÁC BƯỚC NẤU KÈM ẢNH -->
-                <div class="form-group">
-                    <label style="color: #ff5722;">🍳 Các bước thực hiện (Kèm ảnh minh họa từng bước)</label>
-                    <div id="stepsContainer">
-                        <div class="step-block">
-                            <b>Bước 1</b>
-                            <textarea name="step_description[]" rows="2" placeholder="Nội dung hướng dẫn Bước 1..." style="margin: 6px 0;" required></textarea>
-                            <label style="font-size: 12px; font-weight: normal;">Ảnh minh họa Bước 1 (Nếu có):</label>
-                            <input type="file" name="step_image[]" accept="image/*">
-                        </div>
-                    </div>
-                    <button type="button" class="btn-add-step" onclick="addStep()"><i class="fa-solid fa-plus"></i> Thêm bước tiếp theo</button>
-                </div>
-
-                <button type="submit">Đăng Món Ăn</button>
-            </form>
-        </div>
-
-        <div class="card">
-            <h3 style="margin-bottom: 15px;">📋 Món Ăn Đã Đăng ({{ foods|length }})</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Ảnh</th>
-                        <th>Tên Món</th>
-                        <th>Hành Động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for food in foods %}
-                    <tr>
-                        <td><img src="{{ food.image }}" width="50" height="50" style="object-fit: cover; border-radius: 4px;"></td>
-                        <td><b>{{ food.name }}</b></td>
-                        <td>
-                            <a href="/edit/{{ food.id }}" style="color: #007bff; text-decoration: none; font-weight: bold; margin-right: 10px;">Sửa</a>
-                            <a href="/delete/{{ food.id }}" style="color: #dc3545; text-decoration: none; font-weight: bold;" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">Xóa</a>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="3" style="text-align: center; color: #777;">Chưa có bài viết nào!</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <!-- KHU VỰC BÀI VIẾT CHỜ DUYỆT -->
+    <div class="card" style="border-left: 5px solid #ff9800;">
+        <h3 style="color: #e65100;">⏳ Bài Viết Đang Chờ Duyệt ({{ pending_foods|length }})</h3>
+        <table>
+            <thead>
+                <tr><th>Ảnh</th><th>Tên món</th><th>Người đăng</th><th>Thao tác</th></tr>
+            </thead>
+            <tbody>
+                {% for food in pending_foods %}
+                <tr>
+                    <td><img src="{{ food.image }}" width="50" height="50" style="object-fit: cover;"></td>
+                    <td><b>{{ food.name }}</b></td>
+                    <td>{{ food.author_name }}</td>
+                    <td>
+                        <a href="/admin/approve/{{ food.id }}" class="btn-approve"><i class="fa-solid fa-check"></i> Duyệt Bài</a>
+                        <a href="/delete/{{ food.id }}" class="btn-delete" onclick="return confirm('Từ chối và xóa bài này?')">Xóa</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" style="text-align: center; color: #888;">Không có bài viết nào đang chờ duyệt.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
-    <script>
-        let stepCount = 1;
-        function addStep() {
-            stepCount++;
-            const container = document.getElementById('stepsContainer');
-            const div = document.createElement('div');
-            div.className = 'step-block';
-            div.innerHTML = `
-                <b>Bước ${stepCount}</b>
-                <textarea name="step_description[]" rows="2" placeholder="Nội dung hướng dẫn Bước ${stepCount}..." style="margin: 6px 0;" required></textarea>
-                <label style="font-size: 12px; font-weight: normal;">Ảnh minh họa Bước ${stepCount} (Nếu có):</label>
-                <input type="file" name="step_image[]" accept="image/*">
-            `;
-            container.appendChild(div);
-        }
-    </script>
+    <!-- BÀI VIẾT ĐÃ HIỂN THỊ -->
+    <div class="card">
+        <h3>✅ Danh Sách Món Ăn Đã Duyệt ({{ approved_foods|length }})</h3>
+        <table>
+            <thead>
+                <tr><th>Ảnh</th><th>Tên món</th><th>Tác giả</th><th>Thao tác</th></tr>
+            </thead>
+            <tbody>
+                {% for food in approved_foods %}
+                <tr>
+                    <td><img src="{{ food.image }}" width="50" height="50" style="object-fit: cover;"></td>
+                    <td><b>{{ food.name }}</b></td>
+                    <td>{{ food.author_name }}</td>
+                    <td>
+                        <a href="/edit/{{ food.id }}" style="color: #007bff; font-weight: bold; margin-right: 10px;">Sửa</a>
+                        <a href="/delete/{{ food.id }}" style="color: red; font-weight: bold;" onclick="return confirm('Xóa bài này?')">Xóa</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 </body>
 </html>
