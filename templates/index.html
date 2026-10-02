@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bếp Nhà Bông</title>
-    <!-- Font Awesome dùng cho icon 3 sọc -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -24,7 +23,7 @@
 
         .header-left { display: flex; align-items: center; gap: 15px; }
         
-        /* Nút 3 sọc */
+        /* Nút 3 sọc góc trái */
         .menu-btn {
             font-size: 22px;
             cursor: pointer;
@@ -37,7 +36,7 @@
         .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #e65100; font-weight: bold; font-size: 20px; }
         .logo i { font-size: 22px; }
 
-        /* Menu xổ xuống từ 3 sọc */
+        /* Menu xổ xuống */
         .dropdown-menu {
             display: none;
             position: absolute;
@@ -63,10 +62,10 @@
         }
         .dropdown-menu a:hover { background: #f0f0f0; color: #e65100; }
 
-        /* BANNER (ĐÃ TỐI ƯU CHO ĐIỆN THOẠI) */
+        /* BANNER (GỌN GÀNG TRÊN MÀN HÌNH ĐIỆN THOẠI) */
         .banner {
             background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200') center/cover;
-            height: 220px; /* Chiều cao thu gọn */
+            height: 200px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -77,12 +76,12 @@
         }
 
         .banner h1 {
-            font-size: 22px;
+            font-size: 20px;
             margin-bottom: 12px;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
 
-        /* Khung tìm kiếm */
+        /* Khung tìm kiếm chuẩn form GET */
         .search-box {
             display: flex;
             width: 100%;
@@ -123,12 +122,11 @@
 
         .empty-msg { text-align: center; color: #777; margin-top: 40px; font-size: 14px; }
 
-        /* Tối ưu hiển thị màn hình nhỏ / Điện thoại */
         @media (max-width: 600px) {
             header { padding: 10px 15px; }
             .logo { font-size: 18px; }
-            .banner { height: 180px; }
-            .banner h1 { font-size: 18px; margin-bottom: 10px; }
+            .banner { height: 170px; }
+            .banner h1 { font-size: 17px; margin-bottom: 10px; }
             .search-box input { padding: 8px 12px; font-size: 13px; }
             .search-box button { padding: 8px 14px; font-size: 13px; }
         }
@@ -146,13 +144,13 @@
             </a>
         </div>
 
-        <!-- Menu Xổ Xuống chứa mục Quản trị viên -->
+        <!-- Menu 3 sọc có đường dẫn Quản trị viên -->
         <div class="dropdown-menu" id="dropdownMenu">
             <a href="/login"><i class="fa-solid fa-user-shield"></i> Quản trị viên</a>
         </div>
     </header>
 
-    <!-- BANNER KHÁM PHÁ -->
+    <!-- BANNER KHÁM PHÁ & TÌM KIẾM -->
     <div class="banner">
         <h1>Khám phá công thức nấu ăn</h1>
         <form class="search-box" action="/" method="GET">
@@ -161,17 +159,23 @@
         </form>
     </div>
 
-    <!-- NỘI DUNG CHÍNH -->
+    <!-- DANH SÁCH MÓN ĂN -->
     <div class="container">
-        <h2 class="section-title">Danh Sách Món Ăn</h2>
+        <h2 class="section-title">
+            {% if query %}
+                Kết quả tìm kiếm cho: "{{ query }}"
+            {% else %}
+                Danh Sách Món Ăn
+            {% endif %}
+        </h2>
 
         {% if foods %}
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px;">
                 {% for food in foods %}
                     <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                        <img src="{{ food.image }}" style="width: 100%; height: 160px; object-fit: cover;">
+                        <img src="{{ food.image }}" style="width: 100%; height: 150px; object-fit: cover;">
                         <div style="padding: 12px;">
-                            <h3 style="font-size: 16px; margin-bottom: 8px;">{{ food.name }}</h3>
+                            <h3 style="font-size: 15px; margin-bottom: 8px; font-weight: 600;">{{ food.name }}</h3>
                             <a href="/detail/{{ food.id }}" style="display: inline-block; background: #ff5722; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 13px;">Xem chi tiết</a>
                         </div>
                     </div>
@@ -182,18 +186,16 @@
         {% endif %}
     </div>
 
-    <!-- JavaScript Bật/Tắt Menu 3 sọc -->
     <script>
         function toggleMenu() {
             var menu = document.getElementById("dropdownMenu");
             menu.classList.toggle("active");
         }
 
-        // Đóng menu khi bấm ra ngoài
         window.onclick = function(event) {
             if (!event.target.matches('.menu-btn') && !event.target.matches('.fa-bars')) {
                 var dropdown = document.getElementById("dropdownMenu");
-                if (dropdown.classList.contains('active')) {
+                if (dropdown && dropdown.classList.contains('active')) {
                     dropdown.classList.remove('active');
                 }
             }
