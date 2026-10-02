@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bếp Nhà Bông - Công Thức Món Ăn</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f8f9fa; color: #333; line-height: 1.6; }
+        
+        /* 1. Thanh Header */
+        header { 
+            background: #ffffff; 
+            border-bottom: 1px solid #e9ecef; 
+            padding: 12px 5%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+            position: relative;
+            z-index: 10;
+        }
+        .logo { font-size: 22px; font-weight: bold; color: #ff5722; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .admin-link { 
+            color: #495057; 
+            text-decoration: none; 
+            font-size: 14px; 
+            font-weight: 600; 
+            padding: 8px 16px; 
+            border-radius: 8px; 
+            border: 1px solid #ced4da; 
+            transition: 0.3s; 
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .admin-link:hover { background-color: #f1f3f5; color: #ff5722; border-color: #ff5722; }
+
+        /* 2. Khung Banner chứa Ảnh Đầu Bếp */
+        .hero-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0 0 16px 16px;
+        }
+
+        /* Thẻ ảnh nền */
+        .hero-bg-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        /* Lớp phủ tối màu giúp chữ và ô tìm kiếm nổi bật */
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 2;
+        }
+
+        /* Nội dung bên trong Banner */
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            width: 90%;
+            max-width: 650px;
+        }
+
+        .hero-content h1 { 
+            font-size: 34px; 
+            font-weight: 800; 
+            margin-bottom: 20px; 
+            color: #ffffff;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.7); 
+        }
+
+        /* 3. Khung Tìm Kiếm */
+        .search-box { 
+            display: flex; 
+            background: rgba(255, 255, 255, 0.25);
+            padding: 6px;
+            border-radius: 12px;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .search-input { 
+            flex: 1; 
+            padding: 14px 20px; 
+            border: none; 
+            border-radius: 8px 0 0 8px; 
+            font-size: 16px; 
+            outline: none; 
+        }
+        .search-btn { 
+            padding: 14px 28px; 
+            background-color: #ff5722; 
+            color: white; 
+            border: none; 
+            border-radius: 0 8px 8px 0; 
+            font-weight: bold; 
+            font-size: 16px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+        }
+        .search-btn:hover { background-color: #e64a19; }
+
+        /* 4. Danh Sách Món Ăn */
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .section-title { 
+            font-size: 22px; 
+            margin-bottom: 25px; 
+            color: #212529; 
+            border-left: 5px solid #ff5722; 
+            padding-left: 12px; 
+        }
+        
+        .food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; }
+        .food-card { 
+            background: white; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+            border: 1px solid #f1f3f5; 
+            transition: all 0.3s ease; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .food-card:hover { transform: translateY(-6px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+        
+        .food-img { width: 100%; height: 170px; object-fit: cover; background-color: #eee; }
+        .food-info { padding: 18px; display: flex; flex-direction: column; flex-grow: 1; }
+        .food-title { font-size: 18px; font-weight: bold; color: #212529; margin-bottom: 10px; text-transform: capitalize; }
+        
+        .food-meta { font-size: 13px; color: #6c757d; margin-bottom: 15px; display: flex; gap: 15px; }
+        .food-btn { 
+            margin-top: auto; 
+            display: block; 
+            text-align: center; 
+            background-color: #28a745; 
+            color: white; 
+            text-decoration: none; 
+            padding: 10px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 14px; 
+            transition: 0.2s;
+        }
+        .food-btn:hover { background-color: #218838; }
+
+        .no-data { text-align: center; color: #6c757d; padding: 50px 0; font-size: 16px; width: 100%; grid-column: 1 / -1; }
+    </style>
+</head>
+<body>
+
+    <!-- Header chính với tên thương hiệu Bếp Nhà Bông -->
+    <header>
+        <a href="/" class="logo">🍳 Bếp Nhà Bông</a>
+        <a href="/login" class="admin-link">🔒 Admin Đăng Nhập</a>
+    </header>
+
+    <!-- Banner có hình ảnh chất lượng cao -->
+    <div class="hero-container">
+        <!-- Ảnh nền chất lượng cao (Tự động tải online hoặc dự phòng file máy) -->
+        <img class="hero-bg-img" 
+             src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200" 
+             onerror="this.src='/static/images/images.jfif'" 
+             alt="Đầu bếp nấu ăn">
+        
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+            <h1>Khám phá công thức nấu ăn</h1>
+            <form action="/" method="GET" class="search-box">
+                <input type="text" name="query" class="search-input" value="{{ query if query else '' }}" placeholder="Nhập tên món ăn cần tìm...">
+                <button type="submit" class="search-btn">Tìm kiếm</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Danh sách các món ăn -->
+    <div class="container">
+        <h2 class="section-title">Danh Sách Món Ăn</h2>
+
+        <div class="food-grid">
+            {% for food in foods %}
+                <div class="food-card">
+                    <img src="{{ food.image }}" alt="{{ food.name }}" class="food-img" onerror="this.src='https://via.placeholder.com/300x170?text=Mon+An'">
+                    <div class="food-info">
+                        <div class="food-title">{{ food.name }}</div>
+                        
+                        <div class="food-meta">
+                            {% if food.time %}
+                                <span>⏱️ {{ food.time }} phút</span>
+                            {% endif %}
+                            {% if food.servings %}
+                                <span>👥 {{ food.servings }}</span>
+                            {% endif %}
+                        </div>
+
+                        <a href="/detail/{{ food.id }}" class="food-btn">Xem Công Thức</a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="no-data">
+                    <p>Chưa có món ăn nào hoặc không tìm thấy món phù hợp!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>
