@@ -19,7 +19,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 db = SQLAlchemy(app)
 
-# Bảng Người dùng (Hỗ trợ Admin & Khách hàng Google/FB)
+# Bảng Người dùng
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
@@ -28,7 +28,7 @@ class User(db.Model):
     avatar = db.Column(db.String(500), default="https://cdn-icons-png.flaticon.com/512/847/847969.png")
     role = db.Column(db.String(20), default="user") # 'admin' hoặc 'user'
 
-# Bảng Món ăn (Thêm trạng thái status: 'approved' hoặc 'pending')
+# Bảng Món ăn
 class Food(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
@@ -36,13 +36,13 @@ class Food(db.Model):
     servings = db.Column(db.String(50), default="2 người")
     image = db.Column(db.String(500), nullable=False)
     ingredients = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(20), default="approved") # admin đăng thì approved, user đăng thì pending
+    status = db.Column(db.String(20), default="approved") # 'approved' hoặc 'pending'
     author_name = db.Column(db.String(100), default="Bếp Nhà Bông")
     steps = db.relationship('RecipeStep', backref='food', cascade="all, delete-orphan", lazy=True)
     likes = db.relationship('Like', backref='food', cascade="all, delete-orphan", lazy=True)
     comments = db.relationship('Comment', backref='food', cascade="all, delete-orphan", lazy=True)
 
-# Bảng Các bước nấu ăn
+# Bảng Các bước nấu
 class RecipeStep(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     food_id = db.Column(db.Integer, db.ForeignKey('food.id'), nullable=False)
@@ -73,6 +73,7 @@ def nl2br_filter(s):
 
 with app.app_context():
     db.create_all()
+    # Tạo tài khoản Admin mặc định
     admin_user = User.query.filter_by(username='admin').first()
     if not admin_user:
         hashed_pw = generate_password_hash('admin123')
@@ -89,7 +90,7 @@ def save_uploaded_file(file):
         return f"/static/uploads/{filename}"
     return None
 
-# 1. TRANG CHỦ (Chỉ hiển thị bài đã duyệt)
+# 1. TRANG CHỦ
 @app.route('/')
 def index():
     query = request.args.get('query', '').strip()
@@ -99,9 +100,10 @@ def index():
         foods = Food.query.filter_by(status='approved').order_by(Food.id.desc()).all()
     return render_template('index.html', foods=foods, query=query)
 
-# 2. TRANG DÀNH CHO KHÁCH HÀNG ĐĂNG BÀI (Chờ duyệt)
+# 2. ĐĂNG BÀI (Cho cả Admin và Khách hàng)
 @app.route('/submit-recipe', methods=['GET', 'POST'])
 def submit_recipe():
+    # Nếu chưa đăng nhập thì bắt đăng nhập
     if not session.get('user_logged_in'):
         return redirect(url_for('login'))
 
@@ -113,7 +115,7 @@ def submit_recipe():
 
         main_image = save_uploaded_file(request.files.get('image_file')) or "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500"
 
-        # Nếu là admin thì duyệt luôn, nếu là khách thì để pending
+        # Nếu là ADMIN thì tự động duyệt (approved), nếu là KHÁCH thì (pending)
         is_admin = session.get('role') == 'admin'
         status = 'approved' if is_admin else 'pending'
 
@@ -144,12 +146,30 @@ def submit_recipe():
                 db.session.add(step)
 
         db.session.commit()
+        
+        if is_admin:
+            return redirect(url_for('admin_dashboard'))
         return render_template('submit_success.html', is_admin=is_admin)
 
     return render_template('submit_recipe.html')
 
-# 3. TRANG ADMIN QUẢN LÝ & DUYỆT BÀI
-@app.route('/admin', methods=['GET', 'POST'])
+# 3. TRANG CHI TIẾT MÓN ĂN (Cho phép Admin xem cả bài chờ duyệt)
+@app.route('/detail/<int:food_id>')
+def detail(food_id):
+    food = Food.query.get_or_404(food_id)
+    
+    # Kiểm tra: nếu bài chưa duyệt (pending) mà không phải Admin thì không cho xem
+    if food.status == 'pending' and session.get('role') != 'admin':
+        return "Bài viết này đang chờ duyệt!", 403
+
+    related_foods = Food.query.filter(Food.id != food_id, Food.status == 'approved').order_by(Food.id.desc()).limit(3).all()
+    user_liked = False
+    if session.get('user_id'):
+        user_liked = Like.query.filter_by(food_id=food_id, user_id=session.get('user_id')).first() is not None
+    return render_template('detail.html', food=food, related_foods=related_foods, user_liked=user_liked)
+
+# 4. TRANG QUẢN TRỊ ADMIN (Xem & Duyệt bài)
+@app.route('/admin')
 def admin_dashboard():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
@@ -167,7 +187,76 @@ def approve_food(food_id):
     db.session.commit()
     return redirect(url_for('admin_dashboard'))
 
-# 4. TÍNH NĂNG THẢ TIM (LIKE)
+# 5. XỬ LÝ ĐĂNG NHẬP & TỰ ĐỘNG TẠO TÀI KHỎAN CHO KHÁCH
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username').strip()
+        password = request.form.get('password').strip()
+        
+        user = User.query.filter_by(username=username).first()
+        
+        if user:
+            if user.password and check_password_hash(user.password, password):
+                session['user_logged_in'] = True
+                session['user_id'] = user.id
+                session['user_name'] = user.full_name or user.username
+                session['user_avatar'] = user.avatar
+                session['role'] = user.role
+                
+                if user.role == 'admin':
+                    return redirect(url_for('admin_dashboard'))
+                return redirect(url_for('index'))
+            else:
+                return render_template('login.html', error="Mật khẩu không chính xác!")
+        else:
+            # Nếu chưa có tài khoản, tự động tạo mới tài khoản Khách hàng
+            hashed_pw = generate_password_hash(password)
+            new_user = User(username=username, password=hashed_pw, full_name=username, role="user")
+            db.session.add(new_user)
+            db.session.commit()
+
+            session['user_logged_in'] = True
+            session['user_id'] = new_user.id
+            session['user_name'] = new_user.full_name
+            session['user_avatar'] = new_user.avatar
+            session['role'] = new_user.role
+            return redirect(url_for('index'))
+
+    return render_template('login.html')
+
+# 6. ĐĂNG NHẬP NHANH GOOGLE / FACEBOOK
+@app.route('/login-social/<provider>')
+def login_social(provider):
+    if provider == 'google':
+        username = "google_user"
+        full_name = "Thành viên Google"
+        avatar = "https://cdn-icons-png.flaticon.com/512/300/300221.png"
+    else:
+        username = "facebook_user"
+        full_name = "Thành viên Facebook"
+        avatar = "https://cdn-icons-png.flaticon.com/512/5968/5968764.png"
+
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        user = User(username=username, full_name=full_name, avatar=avatar, role="user")
+        db.session.add(user)
+        db.session.commit()
+
+    session['user_logged_in'] = True
+    session['user_id'] = user.id
+    session['user_name'] = user.full_name
+    session['user_avatar'] = user.avatar
+    session['role'] = user.role
+
+    return redirect(url_for('index'))
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
+# 7. THẢ TIM & BÌNH LUẬN
 @app.route('/like/<int:food_id>', methods=['POST'])
 def like_food(food_id):
     if not session.get('user_logged_in'):
@@ -188,7 +277,6 @@ def like_food(food_id):
     total_likes = Like.query.filter_by(food_id=food_id).count()
     return jsonify({'liked': liked, 'total_likes': total_likes})
 
-# 5. TÍNH NĂNG BÌNH LUẬN
 @app.route('/comment/<int:food_id>', methods=['POST'])
 def add_comment(food_id):
     if not session.get('user_logged_in'):
@@ -206,67 +294,6 @@ def add_comment(food_id):
         db.session.commit()
 
     return redirect(url_for('detail', food_id=food_id))
-
-# 6. ĐĂNG NHẬP BẰNG GOOGLE / FB (MÔ PHỎNG GIẢ LẬP ĐĂNG NHẬP NHANH GOOGLE/FB)
-@app.route('/login-social/<provider>')
-def login_social(provider):
-    if provider == 'google':
-        username = "google_user_demo"
-        full_name = "Thành viên Google"
-        avatar = "https://cdn-icons-png.flaticon.com/512/300/300221.png"
-    else:
-        username = "facebook_user_demo"
-        full_name = "Thành viên Facebook"
-        avatar = "https://cdn-icons-png.flaticon.com/512/5968/5968764.png"
-
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        user = User(username=username, full_name=full_name, avatar=avatar, role="user")
-        db.session.add(user)
-        db.session.commit()
-
-    session['user_logged_in'] = True
-    session['user_id'] = user.id
-    session['user_name'] = user.full_name
-    session['user_avatar'] = user.avatar
-    session['role'] = user.role
-
-    return redirect(url_for('index'))
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        
-        user = User.query.filter_by(username=username).first()
-        if user and user.password and check_password_hash(user.password, password):
-            session['user_logged_in'] = True
-            session['user_id'] = user.id
-            session['user_name'] = user.full_name or user.username
-            session['user_avatar'] = user.avatar
-            session['role'] = user.role
-            if user.role == 'admin':
-                return redirect(url_for('admin_dashboard'))
-            return redirect(url_for('index'))
-        else:
-            return render_template('login.html', error="Tên đăng nhập hoặc mật khẩu không chính xác!")
-            
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
-
-@app.route('/detail/<int:food_id>')
-def detail(food_id):
-    food = Food.query.get_or_404(food_id)
-    related_foods = Food.query.filter(Food.id != food_id, Food.status == 'approved').order_by(Food.id.desc()).limit(3).all()
-    user_liked = False
-    if session.get('user_id'):
-        user_liked = Like.query.filter_by(food_id=food_id, user_id=session.get('user_id')).first() is not None
-    return render_template('detail.html', food=food, related_foods=related_foods, user_liked=user_liked)
 
 @app.route('/edit/<int:food_id>', methods=['GET', 'POST'])
 def edit_food(food_id):
