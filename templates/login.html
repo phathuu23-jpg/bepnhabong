@@ -3,50 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Nhập - Bếp Nhà Bông</title>
+    <title>Đăng Nhập / Đăng Ký - Bếp Nhà Bông</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1830/1830839.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .login-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        h2 { color: #ff5722; margin-bottom: 20px; font-size: 22px; font-weight: 800; }
-        .social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-bottom: 12px; font-size: 14px; }
-        .btn-google { background: #ea4335; color: white; }
-        .btn-facebook { background: #1877f2; color: white; }
-        .divider { margin: 20px 0; color: #888; font-size: 13px; position: relative; }
-        .form-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; outline: none; }
-        button { background: #ff5722; color: white; border: none; padding: 12px; border-radius: 5px; width: 100%; font-weight: bold; cursor: pointer; font-size: 15px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f8f9fa; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .auth-container { background: white; padding: 35px 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); width: 100%; max-width: 400px; }
+        .logo-title { text-align: center; color: #e65100; font-size: 22px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .tab-buttons { display: flex; margin-bottom: 20px; border-bottom: 2px solid #eee; }
+        .tab-btn { flex: 1; padding: 10px; background: none; border: none; font-size: 15px; font-weight: bold; color: #888; cursor: pointer; }
+        .tab-btn.active { color: #ff9800; border-bottom: 3px solid #ff9800; margin-bottom: -2px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #444; }
+        .form-group input { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; }
+        .form-group input:focus { border-color: #ff9800; }
+        .btn-submit { width: 100%; padding: 12px; background: #ff9800; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; transition: background 0.2s; }
+        .btn-submit:hover { background: #f57c00; }
+        .error-alert { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; text-align: center; }
+        .success-alert { background: #d4edda; color: #155724; padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; text-align: center; }
     </style>
 </head>
 <body>
 
-<div class="login-card">
-    <h2>🍳 Đăng Nhập Bếp Nhà Bông</h2>
-    
-    <a href="/login-social/google" class="social-btn btn-google"><i class="fa-brands fa-google"></i> Đăng nhập bằng Google</a>
-    <a href="/login-social/facebook" class="social-btn btn-facebook"><i class="fa-brands fa-facebook"></i> Đăng nhập bằng Facebook</a>
+<div class="auth-container">
+    <a href="/" style="text-decoration: none;" class="logo-title">
+        <i class="fa-solid fa-utensils"></i> Bếp Nhà Bông
+    </a>
 
-    <div class="divider">HOẶC DÀNH CHO QUẢN TRỊ VIÊN</div>
+    <div class="tab-buttons">
+        <button class="tab-btn active" id="btn-login-tab" onclick="switchTab('login')">Đăng Nhập</button>
+        <button class="tab-btn" id="btn-register-tab" onclick="switchTab('register')">Đăng Ký Mới</button>
+    </div>
 
     {% if error %}
-        <div style="color: red; font-size: 13px; margin-bottom: 10px;">{{ error }}</div>
+        <div class="error-alert">{{ error }}</div>
+    {% endif %}
+    {% if success %}
+        <div class="success-alert">{{ success }}</div>
     {% endif %}
 
-    <form action="/login" method="POST">
+    <!-- FORM ĐĂNG NHẬP -->
+    <form id="login-form" action="/login" method="POST">
+        <input type="hidden" name="action" value="login">
         <div class="form-group">
-            <label>Tên đăng nhập Admin</label>
-            <input type="text" name="username" placeholder="admin" required>
+            <label>Tên đăng nhập / Email</label>
+            <input type="text" name="username" placeholder="Nhập tên đăng nhập..." required>
         </div>
         <div class="form-group">
-            <label>Mật khẩu Admin</label>
-            <input type="password" name="password" placeholder="••••••••" required>
+            <label>Mật khẩu</label>
+            <input type="password" name="password" placeholder="Nhập mật khẩu..." required>
         </div>
-        <button type="submit">Đăng Nhập Admin</button>
+        <button type="submit" class="btn-submit">Đăng Nhập</button>
+    </form>
+
+    <!-- FORM ĐĂNG KÝ -->
+    <form id="register-form" action="/login" method="POST" style="display: none;">
+        <input type="hidden" name="action" value="register">
+        <div class="form-group">
+            <label>Tên hiển thị (Tên tác giả)</label>
+            <input type="text" name="full_name" placeholder="Ví dụ: Anh Tuấn..." required>
+        </div>
+        <div class="form-group">
+            <label>Tên đăng nhập</label>
+            <input type="text" name="username" placeholder="Viết liền không dấu..." required>
+        </div>
+        <div class="form-group">
+            <label>Mật khẩu</label>
+            <input type="password" name="password" placeholder="Tạo mật khẩu..." required>
+        </div>
+        <button type="submit" class="btn-submit" style="background: #28a745;">Tạo Tài Khoản Mới</button>
     </form>
 </div>
+
+<script>
+    function switchTab(tab) {
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const btnLogin = document.getElementById('btn-login-tab');
+        const btnRegister = document.getElementById('btn-register-tab');
+
+        if (tab === 'login') {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            btnLogin.classList.add('active');
+            btnRegister.classList.remove('active');
+        } else {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+            btnRegister.classList.add('active');
+            btnLogin.classList.remove('active');
+        }
+    }
+</script>
 
 </body>
 </html>
