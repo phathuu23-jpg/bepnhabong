@@ -194,27 +194,43 @@ def approve_food(food_id):
 def login():
     if request.method == 'POST':
         action = request.form.get('action')
-        username = request.form.get('username', '').strip()
+        username_input = request.form.get('username', '').strip()
         password = request.form.get('password', '').strip()
 
         if action == 'register':
             full_name = request.form.get('full_name', '').strip()
-            # Kiểm tra xem tên đăng nhập đã tồn tại chưa
-            existing_user = User.query.filter_by(username=username).first()
-            if existing_user:
-                return render_template('login.html', error="Tên đăng nhập này đã có người dùng, vui lòng chọn tên khác!")
+            email = request.form.get('email', '').strip().lower()
+            confirm_pw = request.form.get('confirm_password', '').strip()
+
+            # 1. Kiểm tra mật khẩu nhập lại có khớp không
+            if password != confirm_pw:
+                return render_template('login.html', error="Mật khẩu và Nhập lại mật khẩu không khớp!")
             
+            # 2. Kiểm tra mật khẩu có đủ 6 ký tự không
+            if len(password) < 6:
+                return render_template('login.html', error="Mật khẩu phải có ít nhất 6 ký tự!")
+
+            # 3. Kiểm tra Tên đăng nhập đã trùng chưa
+            if User.query.filter_by(username=username_input).first():
+                return render_template('login.html', error="Tên đăng nhập này đã tồn tại, vui lòng chọn tên khác!")
+
+            # 4. Kiểm tra Email đã được dùng chưa
+            if User.query.filter_by(email=email).first():
+                return render_template('login.html', error="Email này đã được đăng ký tài khoản khác!")
+
+            # Lưu tài khoản mới vào CSDL
             hashed_pw = generate_password_hash(password)
             new_user = User(
-                username=username,
+                username=username_input,
+                email=email,
                 password=hashed_pw,
-                full_name=full_name or username,
+                full_name=full_name or username_input,
                 role="user"
             )
             db.session.add(new_user)
             db.session.commit()
 
-            # Đăng ký xong tự động đăng nhập luôn
+            # Đăng ký thành công -> Tự động đăng nhập
             session['user_logged_in'] = True
             session['user_id'] = new_user.id
             session['user_name'] = new_user.full_name
@@ -222,8 +238,8 @@ def login():
             session['role'] = new_user.role
             return redirect(url_for('index'))
 
-        else: # Đăng nhập
-            user = User.query.filter_by(username=username).first()
+        else: # Đăng nhập (Cho phép nhập Tên tài khoản HOẶC Email)
+            user = User.query.filter((User.username == username_input) | (User.email == username_input.lower())).first()
             if user and user.password and check_password_hash(user.password, password):
                 session['user_logged_in'] = True
                 session['user_id'] = user.id
@@ -235,7 +251,7 @@ def login():
                     return redirect(url_for('admin_dashboard'))
                 return redirect(url_for('index'))
             else:
-                return render_template('login.html', error="Tên đăng nhập hoặc mật khẩu không chính xác!")
+                return render_template('login.html', error="Tên đăng nhập / Email hoặc mật khẩu không chính xác!")
 
     return render_template('login.html')
 def login():
