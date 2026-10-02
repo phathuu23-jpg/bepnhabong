@@ -63,7 +63,15 @@ def login():
         return "Sai tài khoản hoặc mật khẩu!"
     return render_template('login.html')
 
-# 4. XÓA MÓN ĂN
+
+# 4. ĐĂNG XUẤT (BỔ SUNG ĐỂ SỬA LỖI 404)
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
+
+# 5. XÓA MÓN ĂN
 @app.route('/delete/<int:food_id>')
 def delete_food(food_id):
     if not session.get('admin_logged_in'):
@@ -72,7 +80,9 @@ def delete_food(food_id):
     global foods_list
     foods_list = [f for f in foods_list if f['id'] != food_id]
     return redirect(url_for('admin_dashboard'))
-# 5. TRANG CHI TIẾT MÓN ĂN (Sửa lỗi 404 Không tìm thấy)
+
+
+# 6. TRANG CHI TIẾT MÓN ĂN
 @app.route('/detail/<int:food_id>')
 def detail(food_id):
     # Tìm món ăn theo ID
@@ -81,6 +91,7 @@ def detail(food_id):
         return "Không tìm thấy công thức món ăn này!", 404
     
     return render_template('detail.html', food=food)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
