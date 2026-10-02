@@ -7,153 +7,62 @@
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1830/1830839.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background-color: #f8f9fa; color: #333; }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
-            background: #ffffff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            position: relative;
-            z-index: 100;
-        }
-
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .menu-btn { font-size: 22px; cursor: pointer; background: none; border: none; color: #333; padding: 5px; }
-        .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #e65100; font-weight: 800; font-size: 20px; }
-
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 55px;
-            left: 15px;
-            background: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border-radius: 8px;
-            width: 180px;
-            overflow: hidden;
-        }
-        .dropdown-menu.active { display: block; }
-        .dropdown-menu a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            text-decoration: none;
-            color: #333;
-            font-size: 15px;
-        }
-        .dropdown-menu a:hover { background: #f0f0f0; color: #e65100; }
-
-        .banner {
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200') center/cover;
-            height: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            text-align: center;
-            padding: 15px;
-        }
-
-        .banner h1 { font-size: 22px; font-weight: 800; margin-bottom: 12px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
-
-        .search-box {
-            display: flex;
-            width: 100%;
-            max-width: 480px;
-            background: white;
-            border-radius: 25px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        .search-box input { flex: 1; border: none; padding: 10px 16px; outline: none; font-size: 14px; }
-        .search-box button { background: #ff5722; color: white; border: none; padding: 10px 18px; cursor: pointer; font-weight: bold; font-size: 14px; }
-
-        .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
-        .section-title { font-size: 18px; font-weight: 800; border-left: 5px solid #ff5722; padding-left: 10px; margin-bottom: 15px; color: #222; }
-
-        .food-card {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .food-card:hover { transform: translateY(-4px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
-
-        /* TÊN MÓN ĂN TRANG CHỦ IN ĐẬM RÕ NÉT */
-        .food-title {
-            font-size: 16px;
-            font-weight: 800;
-            color: #111;
-            margin-bottom: 10px;
-            line-height: 1.3;
-        }
-
-        @media (max-width: 600px) {
-            header { padding: 10px 15px; }
-            .logo { font-size: 18px; }
-            .banner { height: 170px; }
-            .banner h1 { font-size: 18px; }
-        }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .logo { text-decoration: none; color: #e65100; font-weight: 800; font-size: 20px; }
+        .user-nav { display: flex; align-items: center; gap: 15px; }
+        .btn-post { background: #ff5722; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 14px; }
+        .food-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="header-left">
-            <button class="menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
-            <a href="/" class="logo">
-                <i class="fa-solid fa-utensils"></i>
-                <span>Bếp Nhà Bông</span>
-            </a>
-        </div>
+        <a href="/" class="logo"><i class="fa-solid fa-utensils"></i> Bếp Nhà Bông</a>
+        
+        <div class="user-nav">
+            <a href="/submit-recipe" class="btn-post"><i class="fa-solid fa-plus"></i> Đăng Công Thức</a>
 
-        <div class="dropdown-menu" id="dropdownMenu">
-            <a href="/login"><i class="fa-solid fa-user-shield"></i> Quản trị viên</a>
+            {% if session.get('user_logged_in') %}
+                <span style="font-weight: 600; font-size: 14px;">Hi, {{ session.get('user_name') }}</span>
+                {% if session.get('role') == 'admin' %}
+                    <a href="/admin" style="color: #ff5722; font-weight: bold; font-size: 13px;">[Quản Trị]</a>
+                {% endif %}
+                <a href="/logout" style="color: #777; font-size: 13px;"><i class="fa-solid fa-right-from-bracket"></i></a>
+            {% else %}
+                <a href="/login" style="text-decoration: none; color: #333; font-weight: bold; font-size: 14px;">Đăng nhập</a>
+            {% endif %}
         </div>
     </header>
 
-    <div class="banner">
-        <h1>Khám phá công thức nấu ăn ngon</h1>
-        <form class="search-box" action="/" method="GET">
-            <input type="text" name="query" placeholder="Nhập tên món ăn cần tìm..." value="{{ query if query else '' }}">
-            <button type="submit">Tìm kiếm</button>
+    <div style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200') center/cover; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white;">
+        <h1 style="font-size: 22px; font-weight: 800; margin-bottom: 10px;">Khám Phá & Chia Sẻ Công Thức Nấu Ăn</h1>
+        <form action="/" method="GET" style="display: flex; background: white; border-radius: 20px; overflow: hidden; width: 90%; max-width: 400px;">
+            <input type="text" name="query" placeholder="Tìm món ăn..." style="border: none; padding: 10px 15px; flex: 1; outline: none;">
+            <button type="submit" style="background: #ff5722; color: white; border: none; padding: 0 15px; font-weight: bold;">Tìm</button>
         </form>
     </div>
 
-    <div class="container">
-        <h2 class="section-title">
-            {% if query %} Kết quả tìm kiếm cho: "{{ query }}" {% else %} Danh Sách Món Ăn {% endif %}
-        </h2>
+    <div style="max-width: 1000px; margin: 25px auto; padding: 0 15px;">
+        <h2 style="font-size: 18px; font-weight: 800; border-left: 5px solid #ff5722; padding-left: 10px; margin-bottom: 20px;">Danh Sách Món Ăn</h2>
 
-        {% if foods %}
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px;">
-                {% for food in foods %}
-                    <div class="food-card">
-                        <img src="{{ food.image }}" style="width: 100%; height: 150px; object-fit: cover;">
-                        <div style="padding: 12px;">
-                            <!-- TÊN MÓN ĐẬM NỔI BẬT -->
-                            <h3 class="food-title">{{ food.name }}</h3>
-                            <a href="/detail/{{ food.id }}" style="display: block; text-align: center; background: #ff5722; color: white; padding: 7px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">Xem chi tiết</a>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px;">
+            {% for food in foods %}
+                <div class="food-card">
+                    <img src="{{ food.image }}" style="width: 100%; height: 150px; object-fit: cover;">
+                    <div style="padding: 12px;">
+                        <h3 style="font-size: 16px; font-weight: 800; color: #111; margin-bottom: 8px;">{{ food.name }}</h3>
+                        <div style="font-size: 12px; color: #777; margin-bottom: 10px; display: flex; justify-content: space-between;">
+                            <span><i class="fa-solid fa-heart" style="color: #e91e63;"></i> {{ food.likes|length }}</span>
+                            <span><i class="fa-solid fa-comment"></i> {{ food.comments|length }}</span>
                         </div>
+                        <a href="/detail/{{ food.id }}" style="display: block; text-align: center; background: #ff5722; color: white; padding: 7px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">Xem chi tiết</a>
                     </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p style="text-align: center; color: #777; margin-top: 40px;">Chưa có món ăn nào hoặc không tìm thấy món phù hợp!</p>
-        {% endif %}
+                </div>
+            {% endfor %}
+        </div>
     </div>
 
-    <script>
-        function toggleMenu() {
-            document.getElementById("dropdownMenu").classList.toggle("active");
-        }
-    </script>
 </body>
 </html>
