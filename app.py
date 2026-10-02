@@ -1,7 +1,9 @@
 import os
 import time
+import random
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import markupsafe
@@ -9,6 +11,17 @@ from email_validator import validate_email, EmailNotValidError
 
 app = Flask(__name__)
 app.secret_key = 'bepnhabong_secret_key_2026'
+
+# Cấu hình gửi Mail (Ví dụ sử dụng Gmail SMTP)
+# Để gửi được mail thật, bạn có thể thay bằng Email & App Password của bạn
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'your-email@gmail.com')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'your-app-password')
+app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
+
+mail = Mail(app)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'bepnhabong.db')
@@ -29,6 +42,7 @@ class User(db.Model):
     full_name = db.Column(db.String(100), nullable=True)
     avatar = db.Column(db.String(500), default="https://cdn-icons-png.flaticon.com/512/847/847969.png")
     role = db.Column(db.String(20), default="user")
+    reset_otp = db.Column(db.String(6), nullable=True) # Lưu mã OTP quên mật khẩu
 
 # Bảng Món ăn
 class Food(db.Model):
@@ -170,6 +184,19 @@ def admin_dashboard():
     
     return render_template('admin.html', pending_foods=pending_foods, approved_foods=approved_foods, users=users_list)
 
+# ADMIN ĐẶT LẠI MẬT KHẨU TRỰC TIẾP CHO KHÁCH HÀNG
+@app.route('/admin/reset-user-password/<int:user_id>', methods=['POST'])
+def admin_reset_user_password(user_id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    
+    new_password = request.form.get('new_password', '').strip()
+    if new_password and len(new_password) >= 6:
+        user = User.query.get_or_404(user_id)
+        user.password = generate_password_hash(new_password)
+        db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
 @app.route('/admin/delete-user/<int:user_id>')
 def delete_user(user_id):
     if session.get('role') != 'admin':
@@ -253,6 +280,65 @@ def login():
                 return render_template('login.html', error="Email / Tên đăng nhập hoặc mật khẩu không chính xác!")
 
     return render_template('login.html')
+
+# TÍNH NĂNG KHÔI PHỤC MẬT KHẨU (FORGOT PASSWORD)
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            return render_template('forgot_password.html', error="Email này chưa đăng ký trên hệ thống!")
+
+        # Tạo mã OTP 6 số
+        otp = str(random.randint(100000, 999999))
+        user.reset_otp = otp
+        db.session.commit()
+
+        # Thử gửi Mail OTP (Nếu server cấu hình mail đầy đủ)
+        try:
+            msg = Message("Mã xác nhận khôi phục mật khẩu - Bếp Nhà Bông", recipients=[email])
+            msg.body = f"Mã OTP để khôi phục mật khẩu của bạn là: {otp}"
+            mail.send(msg)
+        except Exception:
+            pass # Nếu chưa cấu hình mail server thì sẽ chuyển sang bước nhập OTP luôn (Admin hỗ trợ cấp OTP hoặc tự nhập)
+
+        session['reset_email'] = email
+        return redirect(url_for('reset_password'))
+
+    return render_template('forgot_password.html')
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    email = session.get('reset_email')
+    if not email:
+        return redirect(url_for('forgot_password'))
+
+    if request.method == 'POST':
+        otp = request.form.get('otp', '').strip()
+        new_password = request.form.get('password', '').strip()
+        confirm_pw = request.form.get('confirm_password', '').strip()
+
+        user = User.query.filter_by(email=email).first()
+
+        if not user or user.reset_otp != otp:
+            return render_template('reset_password.html', error="Mã OTP không chính xác!")
+
+        if new_password != confirm_pw:
+            return render_template('reset_password.html', error="Mật khẩu không khớp!")
+
+        if len(new_password) < 6:
+            return render_template('reset_password.html', error="Mật khẩu tối thiểu 6 ký tự!")
+
+        user.password = generate_password_hash(new_password)
+        user.reset_otp = None # Xóa mã OTP sau khi dùng xong
+        db.session.commit()
+
+        session.pop('reset_email', None)
+        return render_template('login.html', success="Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại.")
+
+    return render_template('reset_password.html', email=email)
 
 @app.route('/logout')
 def logout():
