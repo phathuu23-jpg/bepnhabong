@@ -3,223 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bếp Nhà Bông - Công Thức Món Ăn</title>
+    <title>Bếp Nhà Bông</title>
+    <!-- Font Awesome dùng cho icon 3 sọc -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f8f9fa; color: #333; line-height: 1.6; }
-        
-        /* 1. Thanh Header */
-        header { 
-            background: #ffffff; 
-            border-bottom: 1px solid #e9ecef; 
-            padding: 12px 5%; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-            position: relative;
-            z-index: 10;
-        }
-        .logo { font-size: 22px; font-weight: bold; color: #ff5722; text-decoration: none; display: flex; align-items: center; gap: 8px; }
-        .admin-link { 
-            color: #495057; 
-            text-decoration: none; 
-            font-size: 14px; 
-            font-weight: 600; 
-            padding: 8px 16px; 
-            border-radius: 8px; 
-            border: 1px solid #ced4da; 
-            transition: 0.3s; 
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .admin-link:hover { background-color: #f1f3f5; color: #ff5722; border-color: #ff5722; }
+        body { background-color: #f8f9fa; color: #333; }
 
-        /* 2. Khung Banner chứa Ảnh Đầu Bếp */
-        .hero-container {
+        /* HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             position: relative;
-            width: 100%;
-            height: 320px;
+            z-index: 100;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        
+        /* Nút 3 sọc */
+        .menu-btn {
+            font-size: 22px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #333;
+            padding: 5px;
+        }
+
+        .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #e65100; font-weight: bold; font-size: 20px; }
+        .logo i { font-size: 22px; }
+
+        /* Menu xổ xuống từ 3 sọc */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 55px;
+            left: 15px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            width: 180px;
             overflow: hidden;
+        }
+
+        .dropdown-menu.active { display: block; }
+        .dropdown-menu a {
             display: flex;
             align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #333;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+        .dropdown-menu a:hover { background: #f0f0f0; color: #e65100; }
+
+        /* BANNER (ĐÃ TỐI ƯU CHO ĐIỆN THOẠI) */
+        .banner {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200') center/cover;
+            height: 220px; /* Chiều cao thu gọn */
+            display: flex;
+            flex-direction: column;
             justify-content: center;
-            border-radius: 0 0 16px 16px;
-        }
-
-        /* Thẻ ảnh nền */
-        .hero-bg-img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
-
-        /* Lớp phủ tối màu giúp chữ và ô tìm kiếm nổi bật */
-        .hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.55);
-            z-index: 2;
-        }
-
-        /* Nội dung bên trong Banner */
-        .hero-content {
-            position: relative;
-            z-index: 3;
+            align-items: center;
+            color: white;
             text-align: center;
-            width: 90%;
-            max-width: 650px;
+            padding: 15px;
         }
 
-        .hero-content h1 { 
-            font-size: 34px; 
-            font-weight: 800; 
-            margin-bottom: 20px; 
-            color: #ffffff;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.7); 
+        .banner h1 {
+            font-size: 22px;
+            margin-bottom: 12px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
 
-        /* 3. Khung Tìm Kiếm */
-        .search-box { 
-            display: flex; 
-            background: rgba(255, 255, 255, 0.25);
-            padding: 6px;
-            border-radius: 12px;
-            backdrop-filter: blur(6px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        /* Khung tìm kiếm */
+        .search-box {
+            display: flex;
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
-        .search-input { 
-            flex: 1; 
-            padding: 14px 20px; 
-            border: none; 
-            border-radius: 8px 0 0 8px; 
-            font-size: 16px; 
-            outline: none; 
-        }
-        .search-btn { 
-            padding: 14px 28px; 
-            background-color: #ff5722; 
-            color: white; 
-            border: none; 
-            border-radius: 0 8px 8px 0; 
-            font-weight: bold; 
-            font-size: 16px; 
-            cursor: pointer; 
-            transition: 0.3s; 
-        }
-        .search-btn:hover { background-color: #e64a19; }
 
-        /* 4. Danh Sách Món Ăn */
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-        .section-title { 
-            font-size: 22px; 
-            margin-bottom: 25px; 
-            color: #212529; 
-            border-left: 5px solid #ff5722; 
-            padding-left: 12px; 
+        .search-box input {
+            flex: 1;
+            border: none;
+            padding: 10px 16px;
+            outline: none;
+            font-size: 14px;
         }
-        
-        .food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; }
-        .food-card { 
-            background: white; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
-            border: 1px solid #f1f3f5; 
-            transition: all 0.3s ease; 
-            display: flex; 
-            flex-direction: column; 
-        }
-        .food-card:hover { transform: translateY(-6px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
-        
-        .food-img { width: 100%; height: 170px; object-fit: cover; background-color: #eee; }
-        .food-info { padding: 18px; display: flex; flex-direction: column; flex-grow: 1; }
-        .food-title { font-size: 18px; font-weight: bold; color: #212529; margin-bottom: 10px; text-transform: capitalize; }
-        
-        .food-meta { font-size: 13px; color: #6c757d; margin-bottom: 15px; display: flex; gap: 15px; }
-        .food-btn { 
-            margin-top: auto; 
-            display: block; 
-            text-align: center; 
-            background-color: #28a745; 
-            color: white; 
-            text-decoration: none; 
-            padding: 10px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            font-size: 14px; 
-            transition: 0.2s;
-        }
-        .food-btn:hover { background-color: #218838; }
 
-        .no-data { text-align: center; color: #6c757d; padding: 50px 0; font-size: 16px; width: 100%; grid-column: 1 / -1; }
+        .search-box button {
+            background: #ff5722;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* DANH SÁCH MÓN ĂN */
+        .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
+        .section-title {
+            font-size: 18px;
+            border-left: 4px solid #ff5722;
+            padding-left: 10px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .empty-msg { text-align: center; color: #777; margin-top: 40px; font-size: 14px; }
+
+        /* Tối ưu hiển thị màn hình nhỏ / Điện thoại */
+        @media (max-width: 600px) {
+            header { padding: 10px 15px; }
+            .logo { font-size: 18px; }
+            .banner { height: 180px; }
+            .banner h1 { font-size: 18px; margin-bottom: 10px; }
+            .search-box input { padding: 8px 12px; font-size: 13px; }
+            .search-box button { padding: 8px 14px; font-size: 13px; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Header chính với tên thương hiệu Bếp Nhà Bông -->
+    <!-- HEADER -->
     <header>
-        <a href="/" class="logo">🍳 Bếp Nhà Bông</a>
-        <a href="/login" class="admin-link">🔒 Admin Đăng Nhập</a>
+        <div class="header-left">
+            <button class="menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <a href="/" class="logo">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Bếp Nhà Bông</span>
+            </a>
+        </div>
+
+        <!-- Menu Xổ Xuống chứa mục Quản trị viên -->
+        <div class="dropdown-menu" id="dropdownMenu">
+            <a href="/login"><i class="fa-solid fa-user-shield"></i> Quản trị viên</a>
+        </div>
     </header>
 
-    <!-- Banner có hình ảnh chất lượng cao -->
-    <div class="hero-container">
-        <!-- Ảnh nền chất lượng cao (Tự động tải online hoặc dự phòng file máy) -->
-        <img class="hero-bg-img" 
-             src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200" 
-             onerror="this.src='/static/images/images.jfif'" 
-             alt="Đầu bếp nấu ăn">
-        
-        <div class="hero-overlay"></div>
-
-        <div class="hero-content">
-            <h1>Khám phá công thức nấu ăn</h1>
-            <form action="/" method="GET" class="search-box">
-                <input type="text" name="query" class="search-input" value="{{ query if query else '' }}" placeholder="Nhập tên món ăn cần tìm...">
-                <button type="submit" class="search-btn">Tìm kiếm</button>
-            </form>
-        </div>
+    <!-- BANNER KHÁM PHÁ -->
+    <div class="banner">
+        <h1>Khám phá công thức nấu ăn</h1>
+        <form class="search-box" action="/" method="GET">
+            <input type="text" name="query" placeholder="Nhập tên món ăn cần tìm..." value="{{ query if query else '' }}">
+            <button type="submit">Tìm kiếm</button>
+        </form>
     </div>
 
-    <!-- Danh sách các món ăn -->
+    <!-- NỘI DUNG CHÍNH -->
     <div class="container">
         <h2 class="section-title">Danh Sách Món Ăn</h2>
 
-        <div class="food-grid">
-            {% for food in foods %}
-                <div class="food-card">
-                    <img src="{{ food.image }}" alt="{{ food.name }}" class="food-img" onerror="this.src='https://via.placeholder.com/300x170?text=Mon+An'">
-                    <div class="food-info">
-                        <div class="food-title">{{ food.name }}</div>
-                        
-                        <div class="food-meta">
-                            {% if food.time %}
-                                <span>⏱️ {{ food.time }} phút</span>
-                            {% endif %}
-                            {% if food.servings %}
-                                <span>👥 {{ food.servings }}</span>
-                            {% endif %}
+        {% if foods %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                {% for food in foods %}
+                    <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <img src="{{ food.image }}" style="width: 100%; height: 160px; object-fit: cover;">
+                        <div style="padding: 12px;">
+                            <h3 style="font-size: 16px; margin-bottom: 8px;">{{ food.name }}</h3>
+                            <a href="/detail/{{ food.id }}" style="display: inline-block; background: #ff5722; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 13px;">Xem chi tiết</a>
                         </div>
-
-                        <a href="/detail/{{ food.id }}" class="food-btn">Xem Công Thức</a>
                     </div>
-                </div>
-            {% else %}
-                <div class="no-data">
-                    <p>Chưa có món ăn nào hoặc không tìm thấy món phù hợp!</p>
-                </div>
-            {% endfor %}
-        </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-msg">Chưa có món ăn nào hoặc không tìm thấy món phù hợp!</p>
+        {% endif %}
     </div>
 
+    <!-- JavaScript Bật/Tắt Menu 3 sọc -->
+    <script>
+        function toggleMenu() {
+            var menu = document.getElementById("dropdownMenu");
+            menu.classList.toggle("active");
+        }
+
+        // Đóng menu khi bấm ra ngoài
+        window.onclick = function(event) {
+            if (!event.target.matches('.menu-btn') && !event.target.matches('.fa-bars')) {
+                var dropdown = document.getElementById("dropdownMenu");
+                if (dropdown.classList.contains('active')) {
+                    dropdown.classList.remove('active');
+                }
+            }
+        }
+    </script>
 </body>
 </html>
