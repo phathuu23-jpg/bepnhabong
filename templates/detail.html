@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ food.name }} - Bếp Nhà Bông</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f8f9fa; color: #333; line-height: 1.6; }
+        
+        header { background: #ffffff; padding: 15px 5%; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 22px; font-weight: bold; color: #ff5722; text-decoration: none; }
+        .btn-back { color: #495057; text-decoration: none; font-weight: 600; padding: 8px 16px; border-radius: 8px; border: 1px solid #ced4da; }
+        .btn-back:hover { background: #f1f3f5; }
+
+        .container { max-width: 800px; margin: 30px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .food-title { font-size: 32px; font-weight: bold; color: #212529; margin-bottom: 15px; }
+        .food-meta { display: flex; gap: 20px; font-size: 15px; color: #6c757d; margin-bottom: 25px; }
+        
+        .food-img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; margin-bottom: 30px; }
+        
+        .section-box { margin-bottom: 30px; }
+        .section-title { font-size: 20px; font-weight: bold; color: #ff5722; border-left: 4px solid #ff5722; padding-left: 10px; margin-bottom: 15px; }
+        
+        .content-box { background: #f8f9fa; padding: 20px; border-radius: 8px; font-size: 16px; white-space: pre-line; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo">🍳 Bếp Nhà Bông</a>
+        <a href="/" class="btn-back">⬅ Quay lại trang chủ</a>
+    </header>
+
+    <div class="container">
+        <h1 class="food-title">{{ food.name }}</h1>
+        <div class="food-meta">
+            {% if food.time %}<span>⏱️ Thời gian: {{ food.time }}</span>{% endif %}
+            {% if food.servings %}<span>👥 Khẩu phần: {{ food.servings }}</span>{% endif %}
+        </div>
+
+        <img src="{{ food.image }}" alt="{{ food.name }}" class="food-img" onerror="this.src='https://via.placeholder.com/800x400?text=Mon+An'">
+
+        <div class="section-box">
+            <h2 class="section-title">🛒 Nguyên Liệu Chuẩn Bị</h2>
+            <div class="content-box">
+                {{ food.ingredients if food.ingredients else "Chưa cập nhật nguyên liệu." }}
+            </div>
+        </div>
+
+        <div class="section-box">
+            <h2 class="section-title">👨‍🍳 Các Bước Thực Hiện</h2>
+            <div class="content-box">
+                {{ food.steps if food.steps else "Chưa cập nhật các bước nấu." }}
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
