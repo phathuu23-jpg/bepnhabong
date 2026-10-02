@@ -3,101 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bếp Nhà Bông - Công Thức Nấu Ăn Ngon</title>
+    <title>Bếp Nhà Bông - Công Thức Nấu Ăn</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1830/1830839.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f8f9fa; color: #333; }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 25px;
-            background: #ffffff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        /* HEADER RESPONSIVE */
+        header { 
+            background: white; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+        }
+        .header-container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 12px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .logo { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            color: #e65100; 
+            font-size: 22px; 
+            font-weight: 800; 
+            text-decoration: none; 
+            white-space: nowrap;
+        }
+        .nav-actions { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
+        .btn-add-recipe { 
+            background: #ff9800; 
+            color: white; 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 14px; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .btn-add-recipe:hover { background: #e65100; }
+        .user-auth { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            font-size: 14px; 
+            font-weight: bold; 
+        }
+        .user-auth a { color: #444; text-decoration: none; white-space: nowrap; }
+
+        /* HERO BANNER RESPONSIVE */
+        .hero { 
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200') center/cover no-repeat; 
+            color: white; 
+            text-align: center; 
+            padding: 50px 20px; 
+        }
+        .hero h1 { 
+            font-size: 32px; 
+            font-weight: 800; 
+            margin-bottom: 20px; 
+            line-height: 1.3;
+        }
+        .search-form { 
+            max-width: 500px; 
+            margin: 0 auto; 
+            display: flex; 
+            background: white; 
+            border-radius: 30px; 
+            overflow: hidden; 
+            padding: 3px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+        }
+        .search-form input { 
+            flex: 1; 
+            border: none; 
+            padding: 12px 20px; 
+            outline: none; 
+            font-size: 14px; 
+            min-width: 0;
+        }
+        .search-form button { 
+            background: #ff9800; 
+            color: white; 
+            border: none; 
+            padding: 10px 25px; 
+            border-radius: 25px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 14px;
+            white-space: nowrap;
         }
 
-        .logo { text-decoration: none; color: #e65100; font-weight: 800; font-size: 20px; display: flex; align-items: center; gap: 8px; }
-        .header-right { display: flex; align-items: center; gap: 15px; }
+        /* MAIN CONTENT */
+        .main-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .section-title { font-size: 20px; font-weight: 800; border-left: 4px solid #ff9800; padding-left: 10px; margin-bottom: 20px; }
 
-        /* NÚT + VIẾT MÓN MỚI GÓC PHẢI */
-        .btn-write-recipe {
-            background-color: #ff9800;
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 15px;
-            padding: 10px 20px;
-            border-radius: 12px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 2px 6px rgba(255, 152, 0, 0.3);
-            transition: background-color 0.2s, transform 0.1s;
+        .recipe-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
         }
-        .btn-write-recipe:hover {
-            background-color: #f57c00;
-            transform: translateY(-1px);
+        .recipe-card { 
+            background: white; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
+            text-decoration: none; 
+            color: inherit; 
+            display: flex; 
+            flex-direction: column;
+            transition: transform 0.2s;
         }
+        .recipe-card:hover { transform: translateY(-4px); }
+        .recipe-card img { width: 100%; height: 180px; object-fit: cover; }
+        .recipe-card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .recipe-card-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 10px; line-height: 1.4; }
+        .recipe-card-meta { display: flex; justify-content: space-between; font-size: 12px; color: #777; }
 
-        .food-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .food-title { font-size: 16px; font-weight: 800; color: #111; margin-bottom: 8px; }
+        /* CSS DÀNH RIÊNG CHO ĐIỆN THOẠI (Dưới 768px) */
+        @media (max-width: 768px) {
+            .header-container { padding: 10px 15px; }
+            .logo { font-size: 18px; }
+            .btn-add-recipe { padding: 6px 12px; font-size: 12px; }
+            .user-auth { font-size: 12px; }
+            .user-auth span { display: none; } /* Ẩn bớt text không cần thiết trên mobile */
+            
+            .hero { padding: 35px 15px; }
+            .hero h1 { font-size: 22px; margin-bottom: 15px; }
+            .search-form input { padding: 10px 12px; font-size: 13px; }
+            .search-form button { padding: 8px 16px; font-size: 13px; }
+            
+            .recipe-grid { grid-template-columns: 1fr; } /* Hiển thị 1 cột trên màn hình nhỏ */
+        }
     </style>
 </head>
 <body>
 
-    <header>
+<header>
+    <div class="header-container">
         <a href="/" class="logo">
-            <i class="fa-solid fa-utensils"></i>
-            <span>Bếp Nhà Bông</span>
+            <i class="fa-solid fa-utensils"></i> Bếp Nhà Bông
         </a>
-        
-        <div class="header-right">
-            <!-- Nút + Viết món mới ở góc phải -->
-            <a href="/submit-recipe" class="btn-write-recipe">
-                <span>+</span> Viết món mới
+        <div class="nav-actions">
+            <a href="/submit-recipe" class="btn-add-recipe">
+                <i class="fa-solid fa-plus"></i> Viết món
             </a>
-
-            {% if session.get('user_logged_in') %}
-                <span style="font-weight: 600; font-size: 14px; color: #555;">{{ session.get('user_name') }}</span>
-                {% if session.get('role') == 'admin' %}
-                    <a href="/admin" style="color: #ff5722; font-weight: bold; font-size: 13px; text-decoration: none;">[Admin]</a>
+            <div class="user-auth">
+                {% if session.get('user_logged_in') %}
+                    <a href="/logout" title="Đăng xuất"><i class="fa-solid fa-right-from-bracket"></i> <span>Thoát</span></a>
+                {% else %}
+                    <a href="/login"><i class="fa-solid fa-user"></i> <span>Đăng nhập</span></a>
                 {% endif %}
-                <a href="/logout" style="color: #888; text-decoration: none;"><i class="fa-solid fa-right-from-bracket"></i></a>
-            {% else %}
-                <a href="/login" style="text-decoration: none; color: #333; font-weight: bold; font-size: 14px;">Đăng nhập</a>
-            {% endif %}
+            </div>
         </div>
-    </header>
-
-    <div style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200') center/cover; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white;">
-        <h1 style="font-size: 22px; font-weight: 800; margin-bottom: 10px;">Khám Phá & Chia Sẻ Công Thức Nấu Ăn</h1>
-        <form action="/" method="GET" style="display: flex; background: white; border-radius: 20px; overflow: hidden; width: 90%; max-width: 400px;">
-            <input type="text" name="query" placeholder="Tìm kiếm món ăn..." value="{{ query if query else '' }}" style="border: none; padding: 10px 15px; flex: 1; outline: none;">
-            <button type="submit" style="background: #ff5722; color: white; border: none; padding: 0 15px; font-weight: bold;">Tìm</button>
-        </form>
     </div>
+</header>
 
-    <div style="max-width: 1000px; margin: 25px auto; padding: 0 15px;">
-        <h2 style="font-size: 18px; font-weight: 800; border-left: 5px solid #ff5722; padding-left: 10px; margin-bottom: 20px;">Danh Sách Món Ăn</h2>
+<section class="hero">
+    <h1>Khám Phá & Chia Sẻ Công Thức Nấu Ăn</h1>
+    <form class="search-form" action="/" method="GET">
+        <input type="text" name="query" placeholder="Tìm kiếm món ăn..." value="{{ query }}">
+        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i> Tìm</button>
+    </form>
+</section>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px;">
-            {% for food in foods %}
-                <div class="food-card">
-                    <img src="{{ food.image }}" style="width: 100%; height: 150px; object-fit: cover;">
-                    <div style="padding: 12px;">
-                        <h3 class="food-title">{{ food.name }}</h3>
-                        <a href="/detail/{{ food.id }}" style="display: block; text-align: center; background: #ff5722; color: white; padding: 7px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">Xem chi tiết</a>
-                    </div>
+<div class="main-container">
+    <div class="section-title">Danh Sách Món Ăn</div>
+    <div class="recipe-grid">
+        {% for food in foods %}
+        <a href="/detail/{{ food.id }}" class="recipe-card">
+            <img src="{{ food.image }}" alt="{{ food.name }}">
+            <div class="recipe-card-body">
+                <div class="recipe-card-title">{{ food.name }}</div>
+                <div class="recipe-card-meta">
+                    <span><i class="fa-regular fa-clock"></i> {{ food.time }}</span>
+                    <span><i class="fa-solid fa-user-group"></i> {{ food.servings }}</span>
                 </div>
-            {% endfor %}
-        </div>
+            </div>
+        </a>
+        {% else %}
+        <p style="grid-column: 1/-1; text-align: center; color: #777; padding: 40px 0;">Chưa có món ăn nào phù hợp.</p>
+        {% endfor %}
     </div>
+</div>
 
 </body>
 </html>
