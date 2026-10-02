@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chỉnh Sửa Món Ăn</title>
+    <title>Chỉnh Sửa Món Ăn - Bếp Nhà Bông</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
         body { background: #f4f6f9; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .container { max-width: 650px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
         input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
         button { background: #28a745; color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
-        .btn-cancel { display: block; text-align: center; margin-top: 10px; color: #6c757d; text-decoration: none; }
+        .btn-add-step { background: #e0e0e0; color: #333; margin-bottom: 15px; padding: 8px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; width: auto; font-size: 13px; border: 1px solid #ccc; }
+        .step-block { background: #fafafa; border: 1px dashed #bbb; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>✏️ Chỉnh Sửa Món Ăn: {{ food.name }}</h2>
+    <h2>✏️ Chỉnh Sửa: {{ food.name }}</h2>
     <br>
     <form action="/edit/{{ food.id }}" method="POST" enctype="multipart/form-data">
         <div class="form-group">
@@ -38,7 +40,7 @@
         </div>
 
         <div class="form-group">
-            <label>Đổi ảnh mới (Để trống nếu giữ ảnh cũ)</label>
+            <label>Đổi ảnh đại diện chính (Để trống nếu giữ ảnh cũ)</label>
             <input type="file" name="image_file" accept="image/*">
         </div>
 
@@ -48,14 +50,53 @@
         </div>
 
         <div class="form-group">
-            <label>Các bước dạy nấu ăn *</label>
-            <textarea name="steps" rows="6" required>{{ food.steps }}</textarea>
+            <label style="color: #ff5722;">🍳 Các bước thực hiện (Kèm ảnh)</label>
+            <div id="stepsContainer">
+                {% for step in food.steps %}
+                <div class="step-block">
+                    <b>Bước {{ loop.index }}</b>
+                    <textarea name="step_description[]" rows="2" style="margin: 6px 0;" required>{{ step.description }}</textarea>
+                    
+                    {% if step.image_url %}
+                        <div style="margin: 5px 0;"><img src="{{ step.image_url }}" width="80" style="border-radius: 4px;"></div>
+                        <input type="hidden" name="existing_step_image_{{ loop.index0 }}" value="{{ step.image_url }}">
+                    {% endif %}
+                    
+                    <label style="font-size: 12px; font-weight: normal;">Tải ảnh mới để thay thế (nếu muốn):</label>
+                    <input type="file" name="step_image[]" accept="image/*">
+                </div>
+                {% else %}
+                <div class="step-block">
+                    <b>Bước 1</b>
+                    <textarea name="step_description[]" rows="2" style="margin: 6px 0;" required></textarea>
+                    <input type="file" name="step_image[]" accept="image/*">
+                </div>
+                {% endfor %}
+            </div>
+            <button type="button" class="btn-add-step" onclick="addStep()"><i class="fa-solid fa-plus"></i> Thêm bước tiếp theo</button>
         </div>
 
-        <button type="submit">Cập Nhật Món Ăn</button>
-        <a href="/admin" class="btn-cancel">Hủy bỏ</a>
+        <button type="submit">Cập Nhật Bài Viết</button>
+        <a href="/admin" style="display: block; text-align: center; margin-top: 10px; color: #6c757d; text-decoration: none;">Hủy bỏ</a>
     </form>
 </div>
+
+<script>
+    let stepCount = {{ food.steps|length if food.steps|length > 0 else 1 }};
+    function addStep() {
+        stepCount++;
+        const container = document.getElementById('stepsContainer');
+        const div = document.createElement('div');
+        div.className = 'step-block';
+        div.innerHTML = `
+            <b>Bước ${stepCount}</b>
+            <textarea name="step_description[]" rows="2" style="margin: 6px 0;" required></textarea>
+            <label style="font-size: 12px; font-weight: normal;">Ảnh minh họa Bước ${stepCount}:</label>
+            <input type="file" name="step_image[]" accept="image/*">
+        `;
+        container.appendChild(div);
+    }
+</script>
 
 </body>
 </html>
