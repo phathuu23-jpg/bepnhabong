@@ -55,7 +55,7 @@
         .section-title {
             font-size: 18px;
             color: #333;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -71,16 +71,38 @@
             font-size: 15px;
             color: #444;
             border-radius: 4px;
+            line-height: 1.8;
         }
 
-        .steps-box {
+        /* THIẾT KẾ KHU VỰC CÁC BƯỚC NẤU KÈM ẢNH */
+        .step-item {
+            background: #ffffff;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .step-header {
+            font-weight: bold;
+            color: #ff5722;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .step-text {
             font-size: 15px;
             color: #333;
-            line-height: 1.8;
-            padding: 10px 0;
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+        .step-img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 5px;
         }
 
-        /* MÓN ĂN GỢI Ý */
         .related-section { margin-top: 40px; }
         .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
         .related-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06); text-decoration: none; color: #333; }
@@ -113,20 +135,28 @@
                     <span class="badge"><i class="fa-solid fa-users"></i> {{ food.servings }}</span>
                 </div>
 
-                <!-- TỰ ĐỘNG XUỐNG DÒNG VỚI BỘ LỌC nl2br -->
                 <div class="section">
                     <h2 class="section-title"><i class="fa-solid fa-basket-shopping"></i> Nguyên liệu chuẩn bị</h2>
                     <div class="ingredients-box">{{ food.ingredients | nl2br }}</div>
                 </div>
 
+                <!-- HIỂN THỊ CÁC BƯỚC NẤU KÈM ẢNH -->
                 <div class="section">
                     <h2 class="section-title"><i class="fa-solid fa-fire-burner"></i> Các bước dạy nấu ăn</h2>
-                    <div class="steps-box">{{ food.steps | nl2br }}</div>
+                    
+                    {% for step in food.steps %}
+                    <div class="step-item">
+                        <div class="step-header"><i class="fa-solid fa-circle-check"></i> Bước {{ step.step_number }}</div>
+                        <div class="step-text">{{ step.description | nl2br }}</div>
+                        {% if step.image_url %}
+                            <img src="{{ step.image_url }}" class="step-img" alt="Minh họa Bước {{ step.step_number }}">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
 
-        <!-- MÓN ĂN GỢI Ý KHIẾN KHÁCH XEM TIẾP -->
         {% if related_foods %}
         <div class="related-section">
             <h3 class="section-title"><i class="fa-solid fa-utensils"></i> Món ăn gợi ý khác</h3>
