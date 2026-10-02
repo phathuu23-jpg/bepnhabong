@@ -5,19 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản trị Bếp Nhà Bông</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: #f4f6f9; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 15px 20px; border-radius: 8px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
         input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        button { background: #ff5722; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
-        .btn-logout { background: #dc3545; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; }
+        button { background: #ff5722; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
+        .btn-logout { background: #dc3545; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px; }
         .table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
+        .table th, .table td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
+        .btn-edit { color: #007bff; text-decoration: none; margin-right: 10px; font-weight: bold; }
+        .btn-delete { color: #dc3545; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -25,17 +27,14 @@
     <div class="header">
         <h2 style="color: #ff5722;">👨‍🍳 QUẢN TRỊ BÀI VIẾT NẤU ĂN</h2>
         <div>
-            <a href="/" style="margin-right: 15px; text-decoration: none; color: #007bff;">Xem Web Khách ↗</a>
+            <a href="/" style="margin-right: 15px; text-decoration: none; color: #007bff; font-weight: bold;">Xem Web Khách ↗</a>
             <a href="/logout" class="btn-logout">Đăng Xuất</a>
         </div>
     </div>
 
     <div class="grid">
-        <!-- FORM ĐĂNG BÀI -->
         <div class="card">
-            <h3>➕ Đăng Món Ăn Mới</h3>
-            <br>
-            <!-- Sửa action thành /admin và thêm enctype để upload file ảnh -->
+            <h3 style="margin-bottom: 15px;">➕ Đăng Món Ăn Mới</h3>
             <form action="/admin" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>Tên món ăn *</label>
@@ -53,7 +52,6 @@
                     </div>
                 </div>
 
-                <!-- Thay ô nhập URL bằng ô Chọn file ảnh -->
                 <div class="form-group">
                     <label>Tải ảnh món ăn từ thiết bị *</label>
                     <input type="file" name="image_file" accept="image/*" required>
@@ -73,9 +71,8 @@
             </form>
         </div>
 
-        <!-- DANH SÁCH BÀI ĐÃ ĐĂNG -->
         <div class="card">
-            <h3>📋 Món Ăn Đã Đăng ({{ foods|length }})</h3>
+            <h3 style="margin-bottom: 15px;">📋 Món Ăn Đã Đăng ({{ foods|length }})</h3>
             <table class="table">
                 <thead>
                     <tr>
@@ -89,7 +86,10 @@
                     <tr>
                         <td><img src="{{ food.image }}" width="50" height="50" style="object-fit: cover; border-radius: 4px;"></td>
                         <td><b>{{ food.name }}</b></td>
-                        <td><a href="/delete/{{ food.id }}" style="color: red;" onclick="return confirm('Xóa món này?')">Xóa</a></td>
+                        <td>
+                            <a href="/edit/{{ food.id }}" class="btn-edit">Sửa</a>
+                            <a href="/delete/{{ food.id }}" class="btn-delete" onclick="return confirm('Bạn có chắc chắn muốn xóa món này?')">Xóa</a>
+                        </td>
                     </tr>
                     {% else %}
                     <tr>
