@@ -1,28 +1,171 @@
-<!-- KHU VỰC BÀI VIẾT CHỜ DUYỆT -->
-<div class="card" style="border-left: 5px solid #ff9800;">
-    <h3 style="color: #e65100;">⏳ Bài Viết Đang Chờ Duyệt ({{ pending_foods|length }})</h3>
-    <table>
-        <thead>
-            <tr><th>Ảnh</th><th>Tên món</th><th>Người đăng</th><th>Thao tác</th></tr>
-        </thead>
-        <tbody>
-            {% for food in pending_foods %}
-            <tr>
-                <td><img src="{{ food.image }}" width="50" height="50" style="object-fit: cover; border-radius: 4px;"></td>
-                <td>
-                    <b>{{ food.name }}</b>
-                    <br>
-                    <a href="/detail/{{ food.id }}" target="_blank" style="font-size: 12px; color: #007bff;"><i class="fa-solid fa-eye"></i> Xem trước chi tiết</a>
-                </td>
-                <td>{{ food.author_name }}</td>
-                <td>
-                    <a href="/admin/approve/{{ food.id }}" class="btn-approve"><i class="fa-solid fa-check"></i> Duyệt Bài</a>
-                    <a href="/delete/{{ food.id }}" class="btn-delete" onclick="return confirm('Từ chối và xóa bài này?')">Xóa</a>
-                </td>
-            </tr>
-            {% else %}
-            <tr><td colspan="4" style="text-align: center; color: #888;">Không có bài viết nào đang chờ duyệt.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duyệt Bài & Quản Trị - Bếp Nhà Bông</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1830/1830839.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f4f6f9; padding: 20px; color: #333; }
+        
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: white; 
+            padding: 15px 20px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .btn-approve { 
+            background: #28a745; 
+            color: white; 
+            padding: 6px 12px; 
+            text-decoration: none; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            font-size: 13px; 
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .btn-delete { 
+            background: #dc3545; 
+            color: white; 
+            padding: 6px 12px; 
+            text-decoration: none; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            font-size: 13px; 
+            display: inline-block;
+        }
+
+        .btn-edit {
+            background: #007bff; 
+            color: white; 
+            padding: 6px 12px; 
+            text-decoration: none; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            font-size: 13px; 
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #e0e0e0; padding: 12px; text-align: left; }
+        th { background: #f8f9fa; color: #555; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2 style="color: #ff5722; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-shield-halved"></i> TRANG QUẢN TRỊ BẾP NHÀ BÔNG
+        </h2>
+        <div>
+            <a href="/" style="margin-right: 15px; color: #555; text-decoration: none; font-weight: bold;">
+                <i class="fa-solid fa-house"></i> Trang chủ
+            </a>
+            <a href="/logout" style="color: red; text-decoration: none; font-weight: bold;">
+                <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+            </a>
+        </div>
+    </div>
+
+    <!-- KHU VỰC BÀI VIẾT CHỜ DUYỆT -->
+    <div class="card" style="border-left: 5px solid #ff9800;">
+        <h3 style="color: #e65100;">⏳ Bài Viết Đang Chờ Duyệt ({{ pending_foods|length }})</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 70px;">Ảnh</th>
+                    <th>Tên món</th>
+                    <th>Người đăng</th>
+                    <th style="width: 200px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for food in pending_foods %}
+                <tr>
+                    <td><img src="{{ food.image }}" width="50" height="50" style="object-fit: cover; border-radius: 4px;"></td>
+                    <td>
+                        <b style="font-size: 15px;">{{ food.name }}</b>
+                        <br>
+                        <a href="/detail/{{ food.id }}" target="_blank" style="font-size: 12px; color: #007bff; text-decoration: none;">
+                            <i class="fa-solid fa-eye"></i> Xem trước chi tiết
+                        </a>
+                    </td>
+                    <td>{{ food.author_name }}</td>
+                    <td>
+                        <a href="/admin/approve/{{ food.id }}" class="btn-approve">
+                            <i class="fa-solid fa-check"></i> Duyệt Bài
+                        </a>
+                        <a href="/delete/{{ food.id }}" class="btn-delete" onclick="return confirm('Từ chối và xóa bài này?')">
+                            <i class="fa-solid fa-trash"></i> Xóa
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #888; padding: 20px;">
+                        Không có bài viết nào đang chờ duyệt.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- BÀI VIẾT ĐÃ HIỂN THỊ TRÊN TRANG CHỦ -->
+    <div class="card">
+        <h3 style="color: #28a745;">✅ Danh Sách Món Ăn Đã Duyệt ({{ approved_foods|length }})</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 70px;">Ảnh</th>
+                    <th>Tên món</th>
+                    <th>Tác giả</th>
+                    <th style="width: 180px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for food in approved_foods %}
+                <tr>
+                    <td><img src="{{ food.image }}" width="50" height="50" style="object-fit: cover; border-radius: 4px;"></td>
+                    <td><b>{{ food.name }}</b></td>
+                    <td>{{ food.author_name }}</td>
+                    <td>
+                        <a href="/edit/{{ food.id }}" class="btn-edit">
+                            <i class="fa-solid fa-pen-to-square"></i> Sửa
+                        </a>
+                        <a href="/delete/{{ food.id }}" class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa món này?')">
+                            <i class="fa-solid fa-trash"></i> Xóa
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #888; padding: 20px;">
+                        Chưa có món ăn nào được đăng.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
