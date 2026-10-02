@@ -23,10 +23,11 @@ db = SQLAlchemy(app)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=True) # <--- Thêm dòng này để lưu email
     password = db.Column(db.String(200), nullable=True)
     full_name = db.Column(db.String(100), nullable=True)
     avatar = db.Column(db.String(500), default="https://cdn-icons-png.flaticon.com/512/847/847969.png")
-    role = db.Column(db.String(20), default="user") # 'admin' hoặc 'user'
+    role = db.Column(db.String(20), default="user")
 
 # Bảng Món ăn
 class Food(db.Model):
