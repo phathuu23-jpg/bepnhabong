@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duyệt Bài & Quản Trị - Bếp Nhà Bông</title>
+    <title>Duyệt Bài & Quản Lý Email - Bếp Nhà Bông</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1830/1830839.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -29,44 +29,14 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
-        .btn-approve { 
-            background: #28a745; 
-            color: white; 
-            padding: 6px 12px; 
-            text-decoration: none; 
-            border-radius: 4px; 
-            font-weight: bold; 
-            font-size: 13px; 
-            display: inline-block;
-            margin-right: 5px;
-        }
-        
-        .btn-delete { 
-            background: #dc3545; 
-            color: white; 
-            padding: 6px 12px; 
-            text-decoration: none; 
-            border-radius: 4px; 
-            font-weight: bold; 
-            font-size: 13px; 
-            display: inline-block;
-        }
-
-        .btn-edit {
-            background: #007bff; 
-            color: white; 
-            padding: 6px 12px; 
-            text-decoration: none; 
-            border-radius: 4px; 
-            font-weight: bold; 
-            font-size: 13px; 
-            display: inline-block;
-            margin-right: 5px;
-        }
+        .btn-approve { background: #28a745; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px; display: inline-block; margin-right: 5px; }
+        .btn-delete { background: #dc3545; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px; display: inline-block; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { border: 1px solid #e0e0e0; padding: 12px; text-align: left; }
         th { background: #f8f9fa; color: #555; }
+        .badge-admin { background: #007bff; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .badge-user { background: #6c757d; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -85,7 +55,50 @@
         </div>
     </div>
 
-    <!-- KHU VỰC BÀI VIẾT CHỜ DUYỆT -->
+    <!-- KHU VỰC 1: QUẢN LÝ EMAIL & THÀNH VIÊN -->
+    <div class="card" style="border-left: 5px solid #007bff;">
+        <h3 style="color: #0056b3;"><i class="fa-solid fa-users"></i> Danh Sách Thành Viên & Quản Lý Email ({{ users|length }})</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;">ID</th>
+                    <th>Tên hiển thị</th>
+                    <th>Tên đăng nhập</th>
+                    <th>Địa chỉ Email</th>
+                    <th style="width: 100px;">Vai trò</th>
+                    <th style="width: 100px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td><b>{{ user.full_name }}</b></td>
+                    <td><code>{{ user.username }}</code></td>
+                    <td><b style="color: #007bff;">{{ user.email if user.email else 'Chưa cập nhật' }}</b></td>
+                    <td>
+                        {% if user.role == 'admin' %}
+                            <span class="badge-admin">Admin</span>
+                        {% else %}
+                            <span class="badge-user">Thành viên</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.role != 'admin' %}
+                            <a href="/admin/delete-user/{{ user.id }}" class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa tài khoản này?')">
+                                <i class="fa-solid fa-user-xmark"></i> Xóa
+                            </a>
+                        {% else %}
+                            <span style="color: #aaa; font-size: 12px;">Gốc</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- KHU VỰC 2: BÀI VIẾT CHỜ DUYỆT -->
     <div class="card" style="border-left: 5px solid #ff9800;">
         <h3 style="color: #e65100;">⏳ Bài Viết Đang Chờ Duyệt ({{ pending_foods|length }})</h3>
         <table>
@@ -102,7 +115,7 @@
                 <tr>
                     <td><img src="{{ food.image }}" width="50" height="50" style="object-fit: cover; border-radius: 4px;"></td>
                     <td>
-                        <b style="font-size: 15px;">{{ food.name }}</b>
+                        <b>{{ food.name }}</b>
                         <br>
                         <a href="/detail/{{ food.id }}" target="_blank" style="font-size: 12px; color: #007bff; text-decoration: none;">
                             <i class="fa-solid fa-eye"></i> Xem trước chi tiết
@@ -129,7 +142,7 @@
         </table>
     </div>
 
-    <!-- BÀI VIẾT ĐÃ HIỂN THỊ TRÊN TRANG CHỦ -->
+    <!-- KHU VỰC 3: MÓN ĂN ĐÃ DUYỆT -->
     <div class="card">
         <h3 style="color: #28a745;">✅ Danh Sách Món Ăn Đã Duyệt ({{ approved_foods|length }})</h3>
         <table>
@@ -138,7 +151,7 @@
                     <th style="width: 70px;">Ảnh</th>
                     <th>Tên món</th>
                     <th>Tác giả</th>
-                    <th style="width: 180px;">Thao tác</th>
+                    <th style="width: 120px;">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
@@ -148,9 +161,6 @@
                     <td><b>{{ food.name }}</b></td>
                     <td>{{ food.author_name }}</td>
                     <td>
-                        <a href="/edit/{{ food.id }}" class="btn-edit">
-                            <i class="fa-solid fa-pen-to-square"></i> Sửa
-                        </a>
                         <a href="/delete/{{ food.id }}" class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa món này?')">
                             <i class="fa-solid fa-trash"></i> Xóa
                         </a>
@@ -159,7 +169,7 @@
                 {% else %}
                 <tr>
                     <td colspan="4" style="text-align: center; color: #888; padding: 20px;">
-                        Chưa có món ăn nào được đăng.
+                        Chưa có món ăn nào trên hệ thống.
                     </td>
                 </tr>
                 {% endfor %}
