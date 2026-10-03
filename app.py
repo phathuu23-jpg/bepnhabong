@@ -13,7 +13,6 @@ app = Flask(__name__)
 app.secret_key = 'bepnhabong_secret_key_2026'
 
 # Cấu hình gửi Mail (Ví dụ sử dụng Gmail SMTP)
-# Để gửi được mail thật, bạn có thể thay bằng Email & App Password của bạn
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -44,12 +43,14 @@ class User(db.Model):
     role = db.Column(db.String(20), default="user")
     reset_otp = db.Column(db.String(6), nullable=True) # Lưu mã OTP quên mật khẩu
 
-# Bảng Món ăn
+# Bảng Món ăn (Đã bổ sung thuộc tính category và difficulty)
 class Food(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(100), default="Cơm gia đình") # Phân loại danh mục
     time = db.Column(db.String(50), default="30 phút")
     servings = db.Column(db.String(50), default="2 người")
+    difficulty = db.Column(db.String(50), default="Dễ")
     image = db.Column(db.String(500), nullable=False)
     ingredients = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default="approved")
@@ -102,14 +103,30 @@ def save_uploaded_file(file):
         return f"/static/uploads/{filename}"
     return None
 
+# DANH SÁCH DANH MỤC DÙNG CHUNG
+CATEGORIES = [
+    "Tất cả",
+    "Cơm gia đình",
+    "Món sáng & Món nước",
+    "Ăn vặt & Tráng miệng",
+    "Món đãi tiệc & Cuối tuần"
+]
+
 @app.route('/')
 def index():
     query = request.args.get('query', '').strip()
+    category = request.args.get('category', 'Tất cả').strip()
+
+    foods_query = Food.query.filter_by(status='approved')
+
     if query:
-        foods = Food.query.filter(Food.status == 'approved', Food.name.ilike(f"%{query}%")).order_by(Food.id.desc()).all()
-    else:
-        foods = Food.query.filter_by(status='approved').order_by(Food.id.desc()).all()
-    return render_template('index.html', foods=foods, query=query)
+        foods_query = foods_query.filter(Food.name.ilike(f"%{query}%"))
+    
+    if category and category != 'Tất cả':
+        foods_query = foods_query.filter(Food.category == category)
+
+    foods = foods_query.order_by(Food.id.desc()).all()
+    return render_template('index.html', foods=foods, query=query, selected_category=category, categories=CATEGORIES)
 
 @app.route('/submit-recipe', methods=['GET', 'POST'])
 def submit_recipe():
@@ -118,8 +135,10 @@ def submit_recipe():
 
     if request.method == 'POST':
         name = request.form.get('name')
+        category = request.form.get('category') or "Cơm gia đình"
         time_req = request.form.get('time') or "30 phút"
         servings = request.form.get('servings') or "2 người"
+        difficulty = request.form.get('difficulty') or "Dễ"
         ingredients = request.form.get('ingredients')
 
         main_image = save_uploaded_file(request.files.get('image_file')) or "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500"
@@ -129,8 +148,10 @@ def submit_recipe():
 
         new_food = Food(
             name=name.strip(),
+            category=category,
             time=time_req,
             servings=servings,
+            difficulty=difficulty,
             image=main_image,
             ingredients=ingredients,
             status=status,
@@ -159,7 +180,7 @@ def submit_recipe():
             return redirect(url_for('admin_dashboard'))
         return render_template('submit_success.html', is_admin=is_admin)
 
-    return render_template('submit_recipe.html')
+    return render_template('submit_recipe.html', categories=CATEGORIES[1:])
 
 @app.route('/detail/<int:food_id>')
 def detail(food_id):
@@ -167,7 +188,7 @@ def detail(food_id):
     if food.status == 'pending' and session.get('role') != 'admin':
         return "Bài viết này đang chờ duyệt!", 403
 
-    related_foods = Food.query.filter(Food.id != food_id, Food.status == 'approved').order_by(Food.id.desc()).limit(3).all()
+    related_foods = Food.query.filter(Food.id != food_id, Food.status == 'approved', Food.category == food.category).order_by(Food.id.desc()).limit(3).all()
     user_liked = False
     if session.get('user_id'):
         user_liked = Like.query.filter_by(food_id=food_id, user_id=session.get('user_id')).first() is not None
@@ -184,7 +205,6 @@ def admin_dashboard():
     
     return render_template('admin.html', pending_foods=pending_foods, approved_foods=approved_foods, users=users_list)
 
-# ADMIN ĐẶT LẠI MẬT KHẨU TRỰC TIẾP CHO KHÁCH HÀNG
 @app.route('/admin/reset-user-password/<int:user_id>', methods=['POST'])
 def admin_reset_user_password(user_id):
     if session.get('role') != 'admin':
@@ -281,7 +301,6 @@ def login():
 
     return render_template('login.html')
 
-# TÍNH NĂNG KHÔI PHỤC MẬT KHẨU (FORGOT PASSWORD)
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
@@ -291,18 +310,16 @@ def forgot_password():
         if not user:
             return render_template('forgot_password.html', error="Email này chưa đăng ký trên hệ thống!")
 
-        # Tạo mã OTP 6 số
         otp = str(random.randint(100000, 999999))
         user.reset_otp = otp
         db.session.commit()
 
-        # Thử gửi Mail OTP (Nếu server cấu hình mail đầy đủ)
         try:
             msg = Message("Mã xác nhận khôi phục mật khẩu - Bếp Nhà Bông", recipients=[email])
             msg.body = f"Mã OTP để khôi phục mật khẩu của bạn là: {otp}"
             mail.send(msg)
         except Exception:
-            pass # Nếu chưa cấu hình mail server thì sẽ chuyển sang bước nhập OTP luôn (Admin hỗ trợ cấp OTP hoặc tự nhập)
+            pass
 
         session['reset_email'] = email
         return redirect(url_for('reset_password'))
@@ -332,7 +349,7 @@ def reset_password():
             return render_template('reset_password.html', error="Mật khẩu tối thiểu 6 ký tự!")
 
         user.password = generate_password_hash(new_password)
-        user.reset_otp = None # Xóa mã OTP sau khi dùng xong
+        user.reset_otp = None
         db.session.commit()
 
         session.pop('reset_email', None)
