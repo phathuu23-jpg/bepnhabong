@@ -14,7 +14,7 @@ app = Flask(__name__)
 # 1. BẢO MẬT SECRET KEY
 app.secret_key = os.environ.get('SECRET_KEY', 'bepnhabong_secret_key_2026')
 
-# 2. CẤU HÌNH DATABASE (Tự động thích ứng PostgreSQL trên Render & SQLite ở Local)
+# 2. CẤU HÌNH DATABASE
 db_url = os.environ.get('DATABASE_URL')
 if db_url:
     if db_url.startswith("postgres://"):
@@ -95,14 +95,111 @@ def nl2br_filter(s):
     escaped_text = str(markupsafe.escape(s))
     return markupsafe.Markup(escaped_text.replace('\n', '<br>\n'))
 
+# HÀM NẠP DỮ LIỆU MÓN ĂN SẴN NẾU TRỐNG
+def seed_initial_data():
+    if Food.query.count() == 0:
+        sample_foods = [
+            {
+                "name": "Thịt Kho Tàu Trứng Cút",
+                "category": "Cơm gia đình",
+                "time": "45 phút",
+                "servings": "4 người",
+                "difficulty": "Dễ",
+                "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800",
+                "ingredients": "- 500g thịt ba chỉ\n- 15 quả trứng cút\n- 1 trái dừa tươi\n- Hành, tỏi, ớt, gia vị thông thường",
+                "steps": [
+                    "Sơ chế thịt ba chỉ rửa sạch, thái miếng vuông vừa ăn.",
+                    "Luộc chín trứng cút, bóc vỏ. Ướp thịt với hành tỏi băm, nước mắm, đường trong 20 phút.",
+                    "Thắng nước màu, cho thịt vào xào săn rồi đổ nước dừa tươi vào đun nhỏ lửa.",
+                    "Kho đến khi thịt gần mềm thì thả trứng cút vào kho cùng cho ngấm gia vị."
+                ]
+            },
+            {
+                "name": "Sườn Xào Chua Ngọt",
+                "category": "Cơm gia đình",
+                "time": "35 phút",
+                "servings": "3 người",
+                "difficulty": "Trung bình",
+                "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800",
+                "ingredients": "- 500g sườn non\n- Hành tây, ớt đà lạt\n- Giấm, đường, tương ớt, nước mắm, tỏi băm",
+                "steps": [
+                    "Sườn chặt miếng vừa ăn, luộc sơ rồi đem rán vàng đều các mặt.",
+                    "Pha nước sốt chua ngọt gồm giấm, đường, tương ớt và nước mắm.",
+                    "Phi thơm tỏi, cho sườn và nước sốt vào đảo đều cho ngấm gia vị.",
+                    "Thêm hành tây, ớt đà lạt vào xào chín tới rồi tắt bếp."
+                ]
+            },
+            {
+                "name": "Phở Bò Hà Nội",
+                "category": "Món sáng & Món nước",
+                "time": "60 phút",
+                "servings": "4 người",
+                "difficulty": "Trung bình",
+                "image": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800",
+                "ingredients": "- 500g bánh phở\n- 300g thịt bò tái/nạm\n- Xương ống ninh nước dùng\n- Hành tây, hành lá, gừng, hồi, quế",
+                "steps": [
+                    "Ninh xương ống lấy nước dùng, cho gừng nướng và thảo mộc (hồi, quế) vào đun thơm.",
+                    "Chần bánh phở qua nước sôi rồi xếp vào bát.",
+                    "Xếp thịt bò thái mỏng, hành lá lên trên mặt phở.",
+                    "Chan nước dùng đang sôi sùng sục vào bát và thưởng thức nóng."
+                ]
+            },
+            {
+                "name": "Bánh Flan Cà Phê Su kem",
+                "category": "Ăn vặt & Tráng miệng",
+                "time": "30 phút",
+                "servings": "5 người",
+                "difficulty": "Dễ",
+                "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800",
+                "ingredients": "- 5 quả trứng gà\n- 500ml sữa tươi không đường\n- 100g đường làm caramel\n- 1 thìa cà phê phin đậm đặc",
+                "steps": [
+                    "Thắng đường làm caramel chia đều ra các khuôn bánh.",
+                    "Khuấy nhẹ trứng gà với sữa tươi đun ấm, lọc qua rây cho mịn.",
+                    "Rót hỗn hợp trứng sữa vào khuôn, mang hấp nhỏ lửa trong 20 phút.",
+                    "Để lạnh, khi ăn rưới thêm chút nước cà phê đậm đà lên trên."
+                ]
+            }
+        ]
+
+        for item in sample_foods:
+            f = Food(
+                name=item["name"],
+                category=item["category"],
+                time=item["time"],
+                servings=item["servings"],
+                difficulty=item["difficulty"],
+                image=item["image"],
+                ingredients=item["ingredients"],
+                status="approved",
+                author_name="Bếp Nhà Bông"
+            )
+            db.session.add(f)
+            db.session.flush()
+
+            for idx, st_desc in enumerate(item["steps"]):
+                s = RecipeStep(
+                    food_id=f.id,
+                    step_number=idx + 1,
+                    description=st_desc
+                )
+                db.session.add(s)
+
+        db.session.commit()
+
+# KHỞI TẠO DATABASE
 with app.app_context():
     db.create_all()
+    
+    # Tạo admin mặc định
     admin_user = User.query.filter_by(username='admin').first()
     if not admin_user:
         hashed_pw = generate_password_hash('admin123')
         new_admin = User(username='admin', email='admin@bepnhabong.com', password=hashed_pw, full_name="Quản Trị Viên", role="admin")
         db.session.add(new_admin)
         db.session.commit()
+
+    # Tự động nạp dữ liệu món ăn mẫu
+    seed_initial_data()
 
 def save_uploaded_file(file):
     if file and file.filename != '':
@@ -121,7 +218,6 @@ CATEGORIES = [
     "Món đãi tiệc & Cuối tuần"
 ]
 
-# TRANG CHỦ CÓ PHÂN TRANG (PAGINATION)
 @app.route('/')
 def index():
     query = request.args.get('query', '').strip()
