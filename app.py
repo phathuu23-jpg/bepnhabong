@@ -11,13 +11,12 @@ from email_validator import validate_email, EmailNotValidError
 
 app = Flask(__name__)
 
-# 1. BẢO MẬT SECRET KEY (Lấy từ môi trường hoặc dùng key mặc định)
+# 1. BẢO MẬT SECRET KEY
 app.secret_key = os.environ.get('SECRET_KEY', 'bepnhabong_secret_key_2026')
 
 # 2. CẤU HÌNH DATABASE (Tự động thích ứng PostgreSQL trên Render & SQLite ở Local)
 db_url = os.environ.get('DATABASE_URL')
 if db_url:
-    # Render trả về postgres:// nhưng SQLAlchemy cần postgresql://
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
@@ -84,7 +83,7 @@ class Like(db.Model):
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     food_id = db.Column(db.Integer, db.ForeignKey('food.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # Lưu id người dùng
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     user_name = db.Column(db.String(100), nullable=False)
     user_avatar = db.Column(db.String(500), nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -127,7 +126,7 @@ CATEGORIES = [
 def index():
     query = request.args.get('query', '').strip()
     category = request.args.get('category', 'Tất cả').strip()
-    page = request.args.get('page', 1, type=int) # Lấy số trang hiện tại
+    page = request.args.get('page', 1, type=int)
 
     foods_query = Food.query.filter_by(status='approved')
 
@@ -137,7 +136,6 @@ def index():
     if category and category != 'Tất cả':
         foods_query = foods_query.filter(Food.category == category)
 
-    # Hiển thị 9 món ăn trên mỗi trang
     pagination = foods_query.order_by(Food.id.desc()).paginate(page=page, per_page=9, error_out=False)
     foods = pagination.items
 
@@ -209,9 +207,11 @@ def detail(food_id):
         return "Bài viết này đang chờ duyệt!", 403
 
     related_foods = Food.query.filter(Food.id != food_id, Food.status == 'approved', Food.category == food.category).order_by(Food.id.desc()).limit(3).all()
+    
     user_liked = False
     if session.get('user_id'):
         user_liked = Like.query.filter_by(food_id=food_id, user_id=session.get('user_id')).first() is not None
+
     return render_template('detail.html', food=food, related_foods=related_foods, user_liked=user_liked)
 
 @app.route('/admin')
@@ -253,6 +253,15 @@ def approve_food(food_id):
         return redirect(url_for('login'))
     food = Food.query.get_or_404(food_id)
     food.status = 'approved'
+    db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/delete/<int:food_id>')
+def delete_food(food_id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    food = Food.query.get_or_404(food_id)
+    db.session.delete(food)
     db.session.commit()
     return redirect(url_for('admin_dashboard'))
 
@@ -421,14 +430,12 @@ def add_comment(food_id):
 
     return redirect(url_for('detail', food_id=food_id))
 
-# THÊM ROUTE XÓA BÌNH LUẬN
 @app.route('/comment/delete/<int:comment_id>')
 def delete_comment(comment_id):
     if not session.get('user_logged_in'):
         return redirect(url_for('login'))
         
     comment = Comment.query.get_or_404(comment_id)
-    # Cho phép xóa nếu là chủ bình luận hoặc là admin
     if session.get('user_id') == comment.user_id or session.get('role') == 'admin':
         food_id = comment.food_id
         db.session.delete(comment)
@@ -436,15 +443,6 @@ def delete_comment(comment_id):
         return redirect(url_for('detail', food_id=food_id))
     
     return "Bạn không có quyền xóa bình luận này!", 403
-
-@app.route('/delete/<int:food_id>')
-def delete_food(food_id):
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-    food = Food.query.get_or_404(food_id)
-    db.session.delete(food)
-    db.session.commit()
-    return redirect(url_for('admin_dashboard'))
 
 if __name__ == '__main__':
     app.run(debug=True)
