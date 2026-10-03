@@ -134,20 +134,51 @@
         .recipe-card-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 10px; line-height: 1.4; }
         .recipe-card-meta { display: flex; justify-content: space-between; font-size: 12px; color: #777; }
 
+        /* KHU VỰC THÔNG BÁO TÌM KIẾM TRỐNG */
+        .empty-search {
+            grid-column: 1 / -1;
+            text-align: center;
+            background: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .empty-search p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .btn-back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ff9800;
+            color: white;
+            padding: 10px 22px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .btn-back-home:hover {
+            background: #e65100;
+        }
+
         /* CSS DÀNH RIÊNG CHO ĐIỆN THOẠI (Dưới 768px) */
         @media (max-width: 768px) {
             .header-container { padding: 10px 15px; }
             .logo { font-size: 18px; }
             .btn-add-recipe { padding: 6px 12px; font-size: 12px; }
             .user-auth { font-size: 12px; }
-            .user-auth span { display: none; } /* Ẩn bớt text không cần thiết trên mobile */
+            .user-auth span { display: none; }
             
             .hero { padding: 35px 15px; }
             .hero h1 { font-size: 22px; margin-bottom: 15px; }
             .search-form input { padding: 10px 12px; font-size: 13px; }
             .search-form button { padding: 8px 16px; font-size: 13px; }
             
-            .recipe-grid { grid-template-columns: 1fr; } /* Hiển thị 1 cột trên màn hình nhỏ */
+            .recipe-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -176,7 +207,7 @@
 <section class="hero">
     <h1>Khám Phá & Chia Sẻ Công Thức Nấu Ăn</h1>
     <form class="search-form" action="/" method="GET">
-        <input type="text" name="query" placeholder="Tìm kiếm món ăn..." value="{{ query }}">
+        <input type="text" name="query" placeholder="Tìm kiếm món ăn..." value="{{ query if query else '' }}">
         <button type="submit"><i class="fa-solid fa-magnifying-glass"></i> Tìm</button>
     </form>
 </section>
@@ -196,7 +227,15 @@
             </div>
         </a>
         {% else %}
-        <p style="grid-column: 1/-1; text-align: center; color: #777; padding: 40px 0;">Chưa có món ăn nào phù hợp.</p>
+        <!-- KHU VỰC HIỂN THỊ KHI KHÔNG TÌM THẤY MÓN ĂN -->
+        <div class="empty-search">
+            <p>
+                Chưa có món ăn nào phù hợp{% if query %} với từ khóa "<b>{{ query }}</b>"{% endif %}.
+            </p>
+            <a href="/" class="btn-back-home">
+                <i class="fa-solid fa-arrow-left"></i> Xem tất cả món ăn
+            </a>
+        </div>
         {% endfor %}
     </div>
 </div>
