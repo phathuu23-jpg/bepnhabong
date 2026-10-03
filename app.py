@@ -10,9 +10,24 @@ import markupsafe
 from email_validator import validate_email, EmailNotValidError
 
 app = Flask(__name__)
-app.secret_key = 'bepnhabong_secret_key_2026'
 
-# Cấu hình gửi Mail (Ví dụ sử dụng Gmail SMTP)
+# 1. BẢO MẬT SECRET KEY (Lấy từ môi trường hoặc dùng key mặc định)
+app.secret_key = os.environ.get('SECRET_KEY', 'bepnhabong_secret_key_2026')
+
+# 2. CẤU HÌNH DATABASE (Tự động thích ứng PostgreSQL trên Render & SQLite ở Local)
+db_url = os.environ.get('DATABASE_URL')
+if db_url:
+    # Render trả về postgres:// nhưng SQLAlchemy cần postgresql://
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+else:
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'bepnhabong.db')
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Cấu hình gửi Mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -22,17 +37,13 @@ app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
 
 mail = Mail(app)
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'bepnhabong.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 db = SQLAlchemy(app)
 
-# Bảng Người dùng
+# MODEL CƠ SỞ DỮ LIỆU
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
@@ -41,13 +52,12 @@ class User(db.Model):
     full_name = db.Column(db.String(100), nullable=True)
     avatar = db.Column(db.String(500), default="https://cdn-icons-png.flaticon.com/512/847/847969.png")
     role = db.Column(db.String(20), default="user")
-    reset_otp = db.Column(db.String(6), nullable=True) # Lưu mã OTP quên mật khẩu
+    reset_otp = db.Column(db.String(6), nullable=True)
 
-# Bảng Món ăn (Đã bổ sung thuộc tính category và difficulty)
 class Food(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
-    category = db.Column(db.String(100), default="Cơm gia đình") # Phân loại danh mục
+    category = db.Column(db.String(100), default="Cơm gia đình")
     time = db.Column(db.String(50), default="30 phút")
     servings = db.Column(db.String(50), default="2 người")
     difficulty = db.Column(db.String(50), default="Dễ")
@@ -74,6 +84,7 @@ class Like(db.Model):
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     food_id = db.Column(db.Integer, db.ForeignKey('food.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # Lưu id người dùng
     user_name = db.Column(db.String(100), nullable=False)
     user_avatar = db.Column(db.String(500), nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -103,7 +114,6 @@ def save_uploaded_file(file):
         return f"/static/uploads/{filename}"
     return None
 
-# DANH SÁCH DANH MỤC DÙNG CHUNG
 CATEGORIES = [
     "Tất cả",
     "Cơm gia đình",
@@ -112,10 +122,12 @@ CATEGORIES = [
     "Món đãi tiệc & Cuối tuần"
 ]
 
+# TRANG CHỦ CÓ PHÂN TRANG (PAGINATION)
 @app.route('/')
 def index():
     query = request.args.get('query', '').strip()
     category = request.args.get('category', 'Tất cả').strip()
+    page = request.args.get('page', 1, type=int) # Lấy số trang hiện tại
 
     foods_query = Food.query.filter_by(status='approved')
 
@@ -125,8 +137,16 @@ def index():
     if category and category != 'Tất cả':
         foods_query = foods_query.filter(Food.category == category)
 
-    foods = foods_query.order_by(Food.id.desc()).all()
-    return render_template('index.html', foods=foods, query=query, selected_category=category, categories=CATEGORIES)
+    # Hiển thị 9 món ăn trên mỗi trang
+    pagination = foods_query.order_by(Food.id.desc()).paginate(page=page, per_page=9, error_out=False)
+    foods = pagination.items
+
+    return render_template('index.html', 
+                           foods=foods, 
+                           pagination=pagination,
+                           query=query, 
+                           selected_category=category, 
+                           categories=CATEGORIES)
 
 @app.route('/submit-recipe', methods=['GET', 'POST'])
 def submit_recipe():
@@ -391,6 +411,7 @@ def add_comment(food_id):
     if content and content.strip():
         comment = Comment(
             food_id=food_id,
+            user_id=session.get('user_id'),
             user_name=session.get('user_name', 'Khách'),
             user_avatar=session.get('user_avatar', 'https://cdn-icons-png.flaticon.com/512/847/847969.png'),
             content=content.strip()
@@ -399,6 +420,22 @@ def add_comment(food_id):
         db.session.commit()
 
     return redirect(url_for('detail', food_id=food_id))
+
+# THÊM ROUTE XÓA BÌNH LUẬN
+@app.route('/comment/delete/<int:comment_id>')
+def delete_comment(comment_id):
+    if not session.get('user_logged_in'):
+        return redirect(url_for('login'))
+        
+    comment = Comment.query.get_or_404(comment_id)
+    # Cho phép xóa nếu là chủ bình luận hoặc là admin
+    if session.get('user_id') == comment.user_id or session.get('role') == 'admin':
+        food_id = comment.food_id
+        db.session.delete(comment)
+        db.session.commit()
+        return redirect(url_for('detail', food_id=food_id))
+    
+    return "Bạn không có quyền xóa bình luận này!", 403
 
 @app.route('/delete/<int:food_id>')
 def delete_food(food_id):
