@@ -95,73 +95,133 @@ def nl2br_filter(s):
     escaped_text = str(markupsafe.escape(s))
     return markupsafe.Markup(escaped_text.replace('\n', '<br>\n'))
 
-# HÀM NẠP DỮ LIỆU MÓN ĂN SẴN NẾU TRỐNG
+# HÀM NẠP DỮ LIỆU MÓN ĂN MẪU TỰ ĐỘNG
 def seed_initial_data():
-    if Food.query.count() == 0:
-        sample_foods = [
-            {
-                "name": "Thịt Kho Tàu Trứng Cút",
-                "category": "Cơm gia đình",
-                "time": "45 phút",
-                "servings": "4 người",
-                "difficulty": "Dễ",
-                "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800",
-                "ingredients": "- 500g thịt ba chỉ\n- 15 quả trứng cút\n- 1 trái dừa tươi\n- Hành, tỏi, ớt, gia vị thông thường",
-                "steps": [
-                    "Sơ chế thịt ba chỉ rửa sạch, thái miếng vuông vừa ăn.",
-                    "Luộc chín trứng cút, bóc vỏ. Ướp thịt với hành tỏi băm, nước mắm, đường trong 20 phút.",
-                    "Thắng nước màu, cho thịt vào xào săn rồi đổ nước dừa tươi vào đun nhỏ lửa.",
-                    "Kho đến khi thịt gần mềm thì thả trứng cút vào kho cùng cho ngấm gia vị."
-                ]
-            },
-            {
-                "name": "Sườn Xào Chua Ngọt",
-                "category": "Cơm gia đình",
-                "time": "35 phút",
-                "servings": "3 người",
-                "difficulty": "Trung bình",
-                "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800",
-                "ingredients": "- 500g sườn non\n- Hành tây, ớt đà lạt\n- Giấm, đường, tương ớt, nước mắm, tỏi băm",
-                "steps": [
-                    "Sườn chặt miếng vừa ăn, luộc sơ rồi đem rán vàng đều các mặt.",
-                    "Pha nước sốt chua ngọt gồm giấm, đường, tương ớt và nước mắm.",
-                    "Phi thơm tỏi, cho sườn và nước sốt vào đảo đều cho ngấm gia vị.",
-                    "Thêm hành tây, ớt đà lạt vào xào chín tới rồi tắt bếp."
-                ]
-            },
-            {
-                "name": "Phở Bò Hà Nội",
-                "category": "Món sáng & Món nước",
-                "time": "60 phút",
-                "servings": "4 người",
-                "difficulty": "Trung bình",
-                "image": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800",
-                "ingredients": "- 500g bánh phở\n- 300g thịt bò tái/nạm\n- Xương ống ninh nước dùng\n- Hành tây, hành lá, gừng, hồi, quế",
-                "steps": [
-                    "Ninh xương ống lấy nước dùng, cho gừng nướng và thảo mộc (hồi, quế) vào đun thơm.",
-                    "Chần bánh phở qua nước sôi rồi xếp vào bát.",
-                    "Xếp thịt bò thái mỏng, hành lá lên trên mặt phở.",
-                    "Chan nước dùng đang sôi sùng sục vào bát và thưởng thức nóng."
-                ]
-            },
-            {
-                "name": "Bánh Flan Cà Phê Su kem",
-                "category": "Ăn vặt & Tráng miệng",
-                "time": "30 phút",
-                "servings": "5 người",
-                "difficulty": "Dễ",
-                "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800",
-                "ingredients": "- 5 quả trứng gà\n- 500ml sữa tươi không đường\n- 100g đường làm caramel\n- 1 thìa cà phê phin đậm đặc",
-                "steps": [
-                    "Thắng đường làm caramel chia đều ra các khuôn bánh.",
-                    "Khuấy nhẹ trứng gà với sữa tươi đun ấm, lọc qua rây cho mịn.",
-                    "Rót hỗn hợp trứng sữa vào khuôn, mang hấp nhỏ lửa trong 20 phút.",
-                    "Để lạnh, khi ăn rưới thêm chút nước cà phê đậm đà lên trên."
-                ]
-            }
-        ]
+    sample_foods = [
+        {
+            "name": "Thịt Kho Tàu Trứng Cút",
+            "category": "Cơm gia đình",
+            "time": "45 phút",
+            "servings": "4 người",
+            "difficulty": "Dễ",
+            "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800",
+            "ingredients": "- 500g thịt ba chỉ\n- 15 quả trứng cút\n- 1 trái dừa tươi\n- Hành, tỏi, ớt, gia vị thông thường",
+            "steps": [
+                "Sơ chế thịt ba chỉ rửa sạch, thái miếng vuông vừa ăn.",
+                "Luộc chín trứng cút, bóc vỏ. Ướp thịt với hành tỏi băm, nước mắm, đường trong 20 phút.",
+                "Thắng nước màu, cho thịt vào xào săn rồi đổ nước dừa tươi vào đun nhỏ lửa.",
+                "Kho đến khi thịt gần mềm thì thả trứng cút vào kho cùng cho ngấm gia vị."
+            ]
+        },
+        {
+            "name": "Sườn Xào Chua Ngọt",
+            "category": "Cơm gia đình",
+            "time": "35 phút",
+            "servings": "3 người",
+            "difficulty": "Trung bình",
+            "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800",
+            "ingredients": "- 500g sườn non\n- Hành tây, ớt đà lạt\n- Giấm, đường, tương ớt, nước mắm, tỏi băm",
+            "steps": [
+                "Sườn chặt miếng vừa ăn, luộc sơ rồi đem rán vàng đều các mặt.",
+                "Pha nước sốt chua ngọt gồm giấm, đường, tương ớt và nước mắm.",
+                "Phi thơm tỏi, cho sườn và nước sốt vào đảo đều cho ngấm gia vị.",
+                "Thêm hành tây, ớt đà lạt vào xào chín tới rồi tắt bếp."
+            ]
+        },
+        {
+            "name": "Phở Bò Hà Nội",
+            "category": "Món sáng & Món nước",
+            "time": "60 phút",
+            "servings": "4 người",
+            "difficulty": "Trung bình",
+            "image": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800",
+            "ingredients": "- 500g bánh phở\n- 300g thịt bò tái/nạm\n- Xương ống ninh nước dùng\n- Hành tây, hành lá, gừng, hồi, quế",
+            "steps": [
+                "Ninh xương ống lấy nước dùng, cho gừng nướng và thảo mộc (hồi, quế) vào đun thơm.",
+                "Chần bánh phở qua nước sôi rồi xếp vào bát.",
+                "Xếp thịt bò thái mỏng, hành lá lên trên mặt phở.",
+                "Chan nước dùng đang sôi sùng sục vào bát và thưởng thức nóng."
+            ]
+        },
+        {
+            "name": "Bún Chả Hà Nội",
+            "category": "Món đãi tiệc & Cuối tuần",
+            "time": "50 phút",
+            "servings": "4 người",
+            "difficulty": "Trung bình",
+            "image": "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=800",
+            "ingredients": "- 500g thịt ba chỉ & thịt nạc vai xay\n- 1kg bún tươi\n- Đu đủ, su hào, rau sống ăn kèm\n- Nước mắm, đường, dấm, tỏi, ớt",
+            "steps": [
+                "Thái mỏng thịt ba chỉ và viên tròn thịt xay, ướp gia vị nướng vừa ăn.",
+                "Nướng thịt trên bếp than hoa hoặc nồi chiên không dầu cho xém vàng thơm.",
+                "Pha nước mắm chua ngọt ấm, thêm đu đủ su hào ngâm giấm.",
+                "Bày bún, rau sống ra đĩa và ăn kèm thịt nướng trong chén nước mắm."
+            ]
+        },
+        {
+            "name": "Cánh Gà Chiên Nước Mắm",
+            "category": "Cơm gia đình",
+            "time": "30 phút",
+            "servings": "3 người",
+            "difficulty": "Dễ",
+            "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800",
+            "ingredients": "- 500g cánh gà tươi\n- Nước mắm ngon, đường, tỏi băm, bơ lạt\n- Bột chiên giòn",
+            "steps": [
+                "Cánh gà rửa sạch, chặt đôi, tẩm chút bột chiên giòn rồi chiên vàng giòn.",
+                "Pha hỗn hợp nước mắm và đường theo tỷ lệ 1:1.",
+                "Phi thơm tỏi băm với chút bơ, đổ sốt nước mắm vào đun sủi bọt.",
+                "Cho cánh gà đã chiên vào đảo nhanh tay cho ngấm đều sốt rồi tắt bếp."
+            ]
+        },
+        {
+            "name": "Canh Chua Cá Hú",
+            "category": "Cơm gia đình",
+            "time": "30 phút",
+            "servings": "4 người",
+            "difficulty": "Dễ",
+            "image": "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
+            "ingredients": "- 400g cá hú\n- Dứa (thơm), cà chua, đậu ngố, giá đỗ, me chua\n- Ngò gai, rau ôm, ớt tươi",
+            "steps": [
+                "Cá hú làm sạch, cắt khúc. Đun sôi nước me lọc lấy nước cốt.",
+                "Thả cá vào đun chín tới thì vớt ra đĩa riêng.",
+                "Cho dứa, cà chua, đậu ngố vào đun chín mềm rồi thêm giá đỗ.",
+                "Thả cá lại vào nồi, nêm nếm gia vị vừa ăn và rắc rau ôm ngò gai lên trên."
+            ]
+        },
+        {
+            "name": "Bánh Flan Caramel Cà Phê",
+            "category": "Ăn vặt & Tráng miệng",
+            "time": "40 phút",
+            "servings": "6 người",
+            "difficulty": "Dễ",
+            "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800",
+            "ingredients": "- 5 quả trứng gà\n- 500ml sữa tươi không đường\n- 100g đường làm caramel\n- Cà phê phin đắng",
+            "steps": [
+                "Thắng đường làm caramel chia đều ra các khuôn nhỏ.",
+                "Khuấy nhẹ trứng gà với sữa tươi đun ấm, lọc qua rây cho thật mịn.",
+                "Rót hỗn hợp vào khuôn, mang hấp nhỏ lửa trong 20 phút.",
+                "Để lạnh, khi ăn rưới thêm chút nước cà phê thơm đậm đà."
+            ]
+        },
+        {
+            "name": "Trà Đào Cam Sả",
+            "category": "Ăn vặt & Tráng miệng",
+            "time": "15 phút",
+            "servings": "2 người",
+            "difficulty": "Dễ",
+            "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=800",
+            "ingredients": "- 2 túi trà đào coil\n- 2 cây sả đập dập\n- 1 quả cam tươi\n- Đào ngâm đóng hộp, đá viên",
+            "steps": [
+                "Đun sôi sả với nước, dùng nước này ủ túi trà đào 10 phút.",
+                "Vắt thêm nước cam tươi và siro đào vào ly trà.",
+                "Thêm đá viên và xếp các miếng đào ngâm lên trên cùng để thưởng thức."
+            ]
+        }
+    ]
 
-        for item in sample_foods:
+    for item in sample_foods:
+        existing = Food.query.filter_by(name=item["name"]).first()
+        if not existing:
             f = Food(
                 name=item["name"],
                 category=item["category"],
@@ -184,7 +244,7 @@ def seed_initial_data():
                 )
                 db.session.add(s)
 
-        db.session.commit()
+    db.session.commit()
 
 # KHỞI TẠO DATABASE
 with app.app_context():
@@ -198,7 +258,7 @@ with app.app_context():
         db.session.add(new_admin)
         db.session.commit()
 
-    # Tự động nạp dữ liệu món ăn mẫu
+    # Nạp danh sách món ăn
     seed_initial_data()
 
 def save_uploaded_file(file):
