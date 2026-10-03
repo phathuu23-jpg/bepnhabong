@@ -99,122 +99,168 @@ def nl2br_filter(s):
 def seed_initial_data():
     sample_foods = [
         {
-            "name": "Thịt Kho Tàu Trứng Cút",
-            "category": "Cơm gia đình",
-            "time": "45 phút",
-            "servings": "4 người",
-            "difficulty": "Dễ",
-            "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800",
-            "ingredients": "- 500g thịt ba chỉ\n- 15 quả trứng cút\n- 1 trái dừa tươi\n- Hành, tỏi, ớt, gia vị thông thường",
-            "steps": [
-                "Sơ chế thịt ba chỉ rửa sạch, thái miếng vuông vừa ăn.",
-                "Luộc chín trứng cút, bóc vỏ. Ướp thịt với hành tỏi băm, nước mắm, đường trong 20 phút.",
-                "Thắng nước màu, cho thịt vào xào săn rồi đổ nước dừa tươi vào đun nhỏ lửa.",
-                "Kho đến khi thịt gần mềm thì thả trứng cút vào kho cùng cho ngấm gia vị."
-            ]
-        },
-        {
-            "name": "Sườn Xào Chua Ngọt",
-            "category": "Cơm gia đình",
-            "time": "35 phút",
-            "servings": "3 người",
-            "difficulty": "Trung bình",
-            "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800",
-            "ingredients": "- 500g sườn non\n- Hành tây, ớt đà lạt\n- Giấm, đường, tương ớt, nước mắm, tỏi băm",
-            "steps": [
-                "Sườn chặt miếng vừa ăn, luộc sơ rồi đem rán vàng đều các mặt.",
-                "Pha nước sốt chua ngọt gồm giấm, đường, tương ớt và nước mắm.",
-                "Phi thơm tỏi, cho sườn và nước sốt vào đảo đều cho ngấm gia vị.",
-                "Thêm hành tây, ớt đà lạt vào xào chín tới rồi tắt bếp."
-            ]
-        },
-        {
-            "name": "Phở Bò Hà Nội",
-            "category": "Món sáng & Món nước",
-            "time": "60 phút",
-            "servings": "4 người",
-            "difficulty": "Trung bình",
-            "image": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800",
-            "ingredients": "- 500g bánh phở\n- 300g thịt bò tái/nạm\n- Xương ống ninh nước dùng\n- Hành tây, hành lá, gừng, hồi, quế",
-            "steps": [
-                "Ninh xương ống lấy nước dùng, cho gừng nướng và thảo mộc (hồi, quế) vào đun thơm.",
-                "Chần bánh phở qua nước sôi rồi xếp vào bát.",
-                "Xếp thịt bò thái mỏng, hành lá lên trên mặt phở.",
-                "Chan nước dùng đang sôi sùng sục vào bát và thưởng thức nóng."
-            ]
-        },
-        {
-            "name": "Bún Chả Hà Nội",
-            "category": "Món đãi tiệc & Cuối tuần",
-            "time": "50 phút",
-            "servings": "4 người",
-            "difficulty": "Trung bình",
-            "image": "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=800",
-            "ingredients": "- 500g thịt ba chỉ & thịt nạc vai xay\n- 1kg bún tươi\n- Đu đủ, su hào, rau sống ăn kèm\n- Nước mắm, đường, dấm, tỏi, ớt",
-            "steps": [
-                "Thái mỏng thịt ba chỉ và viên tròn thịt xay, ướp gia vị nướng vừa ăn.",
-                "Nướng thịt trên bếp than hoa hoặc nồi chiên không dầu cho xém vàng thơm.",
-                "Pha nước mắm chua ngọt ấm, thêm đu đủ su hào ngâm giấm.",
-                "Bày bún, rau sống ra đĩa và ăn kèm thịt nướng trong chén nước mắm."
-            ]
-        },
-        {
-            "name": "Cánh Gà Chiên Nước Mắm",
+            "name": "Ếch Xào Măng Chua",
             "category": "Cơm gia đình",
             "time": "30 phút",
-            "servings": "3 người",
+            "servings": "3-4 người",
             "difficulty": "Dễ",
-            "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800",
-            "ingredients": "- 500g cánh gà tươi\n- Nước mắm ngon, đường, tỏi băm, bơ lạt\n- Bột chiên giòn",
+            "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800",
+            "ingredients": "- 500g thịt ếch làm sạch\n- 300g măng củ hoặc măng lá chua\n- Tỏi, hành khô, nghệ tươi, lá lốt, hành lá\n- Nước mắm, hạt nêm, gia vị",
             "steps": [
-                "Cánh gà rửa sạch, chặt đôi, tẩm chút bột chiên giòn rồi chiên vàng giòn.",
-                "Pha hỗn hợp nước mắm và đường theo tỷ lệ 1:1.",
-                "Phi thơm tỏi băm với chút bơ, đổ sốt nước mắm vào đun sủi bọt.",
-                "Cho cánh gà đã chiên vào đảo nhanh tay cho ngấm đều sốt rồi tắt bếp."
+                "Ếch rửa sạch, chặt miếng vừa ăn. Ướp với nghệ giã nhỏ, tỏi băm và gia vị trong 15 phút.",
+                "Măng luộc sơ qua nước sôi để bớt chua và chát, vớt ra ráo nước.",
+                "Phi thơm hành tỏi, cho ếch vào xào săn chín vàng rồi trút ra đĩa riêng.",
+                "Cho măng vào xào chín ngấm gia vị, sau đó đổ ếch vào xào chung, thêm lá lốt, hành lá rồi tắt bếp."
             ]
         },
         {
-            "name": "Canh Chua Cá Hú",
+            "name": "Cá Hấp Bia Sả",
+            "category": "Món đãi tiệc & Cuối tuần",
+            "time": "40 phút",
+            "servings": "4 người",
+            "difficulty": "Trung bình",
+            "image": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800",
+            "ingredients": "- 1 con cá chép hoặc cá trắm (khoảng 1kg)\n- 2 lon bia\n- Sả, gừng, hành lá, thì là, ớt tươi\n- Gia vị, nước mắm",
+            "steps": [
+                "Cá làm sạch, khứa nhẹ lên thân. Ướp cá với gừng, sả băm, hạt nêm trong 20 phút.",
+                "Lót sả đập dập và gừng thái chỉ dưới đáy nồi/xửng hấp, đặt cá lên trên.",
+                "Đổ 2 lon bia vào nồi hấp, đậy nắp đun sôi hấp cá chín trong khoảng 20-25 phút.",
+                "Rắc thêm thì là, hành lá đun thêm 2 phút rồi vớt ra ăn nóng kèm nước mắm gừng."
+            ]
+        },
+        {
+            "name": "Ếch Nấu Mướp Hương",
+            "category": "Cơm gia đình",
+            "time": "25 phút",
+            "servings": "3 người",
+            "difficulty": "Dễ",
+            "image": "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
+            "ingredients": "- 400g thịt ếch\n- 2 quả mướp hương\n- Hành khô, hành lá, rau ngổ\n- Dầu ăn, nước mắm, hạt nêm",
+            "steps": [
+                "Ếch chặt miếng vừa ăn, ướp chút hành băm và hạt nêm.",
+                "Mướp gọt vỏ, rửa sạch, thái miếng xéo vừa ăn.",
+                "Phi thơm hành khô, cho thịt ếch vào xào săn chín tỏi.",
+                "Thả mướp vào xào cùng nhanh tay trên lửa lớn, nêm gia vị vừa ăn, rắc hành lá rau ngổ rồi tắt bếp."
+            ]
+        },
+        {
+            "name": "Ếch Chiên Bơ Tỏi",
+            "category": "Món đãi tiệc & Cuối tuần",
+            "time": "30 phút",
+            "servings": "3-4 người",
+            "difficulty": "Dễ",
+            "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800",
+            "ingredients": "- 500g đùi ếch\n- Bột chiên giòn\n- Bơ lạt, tỏi băm ngập\n- Gia vị, tiêu, dầu ăn",
+            "steps": [
+                "Đùi ếch rửa sạch, ướp tiêu và chút hạt nêm.",
+                "Lăn đùi ếch qua lớp bột chiên giòn mỏng rồi thả vào chảo dầu nóng chiên vàng giòn, vớt ra ráo dầu.",
+                "Đun chảy bơ lạt trong chảo, cho tỏi băm vào phi vàng thơm.",
+                "Trút đùi ếch chiên vào đảo đều cho áo lớp bơ tỏi thơm lừng rồi gắp ra đĩa."
+            ]
+        },
+        {
+            "name": "Lẩu Ếch Măng Chua Cay",
+            "category": "Món đãi tiệc & Cuối tuần",
+            "time": "50 phút",
+            "servings": "4-6 người",
+            "difficulty": "Trung bình",
+            "image": "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=800",
+            "ingredients": "- 1kg thịt ếch\n- 500g măng chua\n- Xương ống ninh nước dùng\n- Nấm hương, lá lốt, rau muống, hoa chuối, ớt, sa tế",
+            "steps": [
+                "Thịt ếch xào săn với măng chua và sa tế cho đậm đà.",
+                "Ninh nước dùng xương ống, nêm gia vị chua cay nhẹ.",
+                "Đổ nước dùng vào nồi lẩu đun sôi, thả ếch xào măng vào nồi.",
+                "Ăn kèm các loại rau muống, hoa chuối và lá lốt nhúng lẩu cực ngon."
+            ]
+        },
+        {
+            "name": "Cháo Ếch Singapore",
+            "category": "Món sáng & Món nước",
+            "time": "45 phút",
+            "servings": "2-3 người",
+            "difficulty": "Trung bình",
+            "image": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800",
+            "ingredients": "- 500g thịt đùi ếch\n- 1 bát gạo nấu cháo trắng\n- Sốt xì dầu kho (dầu hào, xì dầu, hắc xì dầu, đường)\n- Hành lá, ớt khô, bột năng",
+            "steps": [
+                "Nấu nồi cháo trắng nhuyễn mịn trong niêu đất.",
+                "Ếch ướp gia vị xì dầu, dầu hào, đường và tỏi băm.",
+                "Kho ếch trong niêu đất với sốt xì dầu, thêm ớt khô đun đến khi sốt sánh sệt.",
+                "Múc cháo trắng ra bát, ăn kèm ếch kho niêu đất đậm đà nóng hổi."
+            ]
+        },
+        {
+            "name": "Canh Cá Nấu Chua Mền",
             "category": "Cơm gia đình",
             "time": "30 phút",
             "servings": "4 người",
             "difficulty": "Dễ",
             "image": "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
-            "ingredients": "- 400g cá hú\n- Dứa (thơm), cà chua, đậu ngố, giá đỗ, me chua\n- Ngò gai, rau ôm, ớt tươi",
+            "ingredients": "- 500g cá quả/cá diêu hồng\n- Dứa, cà chua, me chua, giá đỗ\n- Hành lá, thì là, ớt tươi",
             "steps": [
-                "Cá hú làm sạch, cắt khúc. Đun sôi nước me lọc lấy nước cốt.",
-                "Thả cá vào đun chín tới thì vớt ra đĩa riêng.",
-                "Cho dứa, cà chua, đậu ngố vào đun chín mềm rồi thêm giá đỗ.",
-                "Thả cá lại vào nồi, nêm nếm gia vị vừa ăn và rắc rau ôm ngò gai lên trên."
+                "Cá làm sạch, rán sơ qua cho thịt cá chắc và không bị tanh.",
+                "Phi thơm hành tỏi, xào cà chua và dứa cho ra màu đẹp.",
+                "Đổ nước sôi vào đun, thêm nước cốt me chua và thả cá vào đun chín.",
+                "Nêm gia vị vừa ăn, thêm giá đỗ, thì là, hành lá cắt nhỏ rồi tắt bếp."
             ]
         },
         {
-            "name": "Bánh Flan Caramel Cà Phê",
-            "category": "Ăn vặt & Tráng miệng",
-            "time": "40 phút",
-            "servings": "6 người",
+            "name": "Thịt Lợn Chao Riềng",
+            "category": "Cơm gia đình",
+            "time": "35 phút",
+            "servings": "4 người",
             "difficulty": "Dễ",
-            "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800",
-            "ingredients": "- 5 quả trứng gà\n- 500ml sữa tươi không đường\n- 100g đường làm caramel\n- Cà phê phin đắng",
+            "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800",
+            "ingredients": "- 500g thịt ba chỉ lợn\n- Riềng giã nhỏ, sả băm\n- Mắm tôm, mẻ, nước mắm, nghệ",
             "steps": [
-                "Thắng đường làm caramel chia đều ra các khuôn nhỏ.",
-                "Khuấy nhẹ trứng gà với sữa tươi đun ấm, lọc qua rây cho thật mịn.",
-                "Rót hỗn hợp vào khuôn, mang hấp nhỏ lửa trong 20 phút.",
-                "Để lạnh, khi ăn rưới thêm chút nước cà phê thơm đậm đà."
+                "Thịt ba chỉ thái miếng vừa ăn.",
+                "Ướp thịt với riềng giã, sả, chút mắm tôm, mẻ lọc và nghệ trong 20 phút.",
+                "Đun nóng dầu ăn trên chảo, cho thịt đã ướp vào chao/xào săn cháy cạnh thơm lừng.",
+                "Thịt vàng giòn thơm mùi riềng mẻ thì gắp ra đĩa ăn kèm cơm nóng."
             ]
         },
         {
-            "name": "Trà Đào Cam Sả",
-            "category": "Ăn vặt & Tráng miệng",
-            "time": "15 phút",
-            "servings": "2 người",
-            "difficulty": "Dễ",
-            "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=800",
-            "ingredients": "- 2 túi trà đào coil\n- 2 cây sả đập dập\n- 1 quả cam tươi\n- Đào ngâm đóng hộp, đá viên",
+            "name": "Thịt Lợn Quay Giòn Rụm",
+            "category": "Cơm gia đình",
+            "time": "50 phút",
+            "servings": "4 người",
+            "difficulty": "Trung bình",
+            "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800",
+            "ingredients": "- 1kg thịt ba chỉ nguyên tảng\n- Ngũ vị hương, giấm, muối hạt\n- Hành, gừng, tiêu",
             "steps": [
-                "Đun sôi sả với nước, dùng nước này ủ túi trà đào 10 phút.",
-                "Vắt thêm nước cam tươi và siro đào vào ly trà.",
-                "Thêm đá viên và xếp các miếng đào ngâm lên trên cùng để thưởng thức."
+                "Luộc sơ tảng thịt ba chỉ với gừng và hành khô, vớt ra lau thật khô phần bì.",
+                "Ướp phần thịt với ngũ vị hương, tiêu và nước mắm (tránh dính vào bì).",
+                "Dùng xăm/dĩa xăm đều lên phần bì, phết hỗn hợp giấm và muối hạt.",
+                "Nướng bằng nồi chiên không dầu hoặc lò nướng đến khi phần bì nổ giòn rụm."
+            ]
+        },
+        {
+            "name": "Dê Tái Chanh",
+            "category": "Món đãi tiệc & Cuối tuần",
+            "time": "30 phút",
+            "servings": "3-4 người",
+            "difficulty": "Trung bình",
+            "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800",
+            "ingredients": "- 400g thịt dê tươi\n- Chanh tươi, vừng rang, xả thái mỏng, lá chanh\n- Tương gừng, ớt, riềng",
+            "steps": [
+                "Thịt dê thái mỏng, chần nhanh qua nước sôi có gừng và sả để khử mùi hôi.",
+                "Vắt nước cốt chanh vào thịt dê trộn đều cho thịt tái chín.",
+                "Trộn thêm sả thái mỏng, lá chanh thái chỉ, vừng rang và ớt.",
+                "Bày ra đĩa ăn kèm chuối xanh, khế chua và chấm tương gừng."
+            ]
+        },
+        {
+            "name": "Dê Hấp Sả Mới",
+            "category": "Món đãi tiệc & Cuối tuần",
+            "time": "35 phút",
+            "servings": "4 người",
+            "difficulty": "Dễ",
+            "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800",
+            "ingredients": "- 500g thịt dê (phần sườn hoặc thịt đùi)\n- Sả cây đập dập, lá tía tơi\n- Sa tế, gừng, hạt nêm",
+            "steps": [
+                "Thịt dê thái miếng vừa ăn, ướp với chút gừng, sả băm và hạt nêm.",
+                "Lót đống sả cây và lá tía tô xuống đáy xửng hấp.",
+                "Xếp thịt dê lên trên, hấp cách thủy trong khoảng 15-20 phút cho thịt chín tới ngọt mềm.",
+                "Ăn nóng kèm tía tô và chấm chao hoặc tương gừng."
             ]
         }
     ]
