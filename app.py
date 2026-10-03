@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import markupsafe
 from email_validator import validate_email, EmailNotValidError
+from sqlalchemy import func  # Import func để xử lý chuyển chữ thường (lower)
 
 app = Flask(__name__)
 
@@ -350,8 +351,9 @@ def index():
 
     foods_query = Food.query.filter_by(status='approved')
 
+    # Đã sửa: Sử dụng func.lower() để chuyển cả tên món và từ khóa về chữ thường
     if query:
-        foods_query = foods_query.filter(Food.name.ilike(f"%{query}%"))
+        foods_query = foods_query.filter(func.lower(Food.name).contains(func.lower(query)))
     
     if category and category != 'Tất cả':
         foods_query = foods_query.filter(Food.category == category)
