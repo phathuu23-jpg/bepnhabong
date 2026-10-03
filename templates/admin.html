@@ -30,6 +30,7 @@
         }
         
         .btn-approve { background: #28a745; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px; display: inline-block; margin-right: 5px; }
+        .btn-edit { background: #ffc107; color: #212529; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px; display: inline-block; margin-right: 5px; }
         .btn-delete { background: #dc3545; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px; display: inline-block; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -118,7 +119,7 @@
                     <th style="width: 70px;">Ảnh</th>
                     <th>Tên món</th>
                     <th>Người đăng</th>
-                    <th style="width: 200px;">Thao tác</th>
+                    <th style="width: 260px;">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
@@ -135,7 +136,10 @@
                     <td>{{ food.author_name }}</td>
                     <td>
                         <a href="/admin/approve/{{ food.id }}" class="btn-approve">
-                            <i class="fa-solid fa-check"></i> Duyệt Bài
+                            <i class="fa-solid fa-check"></i> Duyệt
+                        </a>
+                        <a href="/edit-recipe/{{ food.id }}" class="btn-edit">
+                            <i class="fa-solid fa-pen-to-square"></i> Sửa
                         </a>
                         <a href="/delete/{{ food.id }}" class="btn-delete" onclick="return confirm('Từ chối và xóa bài này?')">
                             <i class="fa-solid fa-trash"></i> Xóa
@@ -162,7 +166,7 @@
                     <th style="width: 70px;">Ảnh</th>
                     <th>Tên món</th>
                     <th>Tác giả</th>
-                    <th style="width: 120px;">Thao tác</th>
+                    <th style="width: 180px;">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
@@ -172,6 +176,9 @@
                     <td><b>{{ food.name }}</b></td>
                     <td>{{ food.author_name }}</td>
                     <td>
+                        <a href="/edit-recipe/{{ food.id }}" class="btn-edit">
+                            <i class="fa-solid fa-pen-to-square"></i> Sửa
+                        </a>
                         <a href="/delete/{{ food.id }}" class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa món này?')">
                             <i class="fa-solid fa-trash"></i> Xóa
                         </a>
