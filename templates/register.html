@@ -3,50 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Ký Tư Vấn Dịch Vụ</title>
+    <title>Đăng ký tài khoản - Bếp Nhà Bông</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; background-color: #eef2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .form-card { background: white; padding: 35px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); width: 100%; max-width: 480px; }
-        h2 { color: #003366; text-align: center; margin-bottom: 20px; font-size: 22px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .auth-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 420px; position: relative; }
+        .back-home { display: inline-flex; align-items: center; gap: 6px; color: #666; text-decoration: none; font-size: 14px; margin-bottom: 20px; font-weight: 500; transition: color 0.2s; }
+        .back-home:hover { color: #ff5722; }
+        h2 { text-align: center; color: #ff5722; margin-bottom: 20px; }
         .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; color: #444; font-size: 14px; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #d9534f; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #c9302c; }
-        .back-link { display: block; text-align: center; margin-top: 15px; color: #003366; text-decoration: none; font-size: 14px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #444; }
+        .form-group input { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        .btn-submit { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .btn-submit:hover { background: #218838; }
+        .auth-footer { text-align: center; margin-top: 15px; font-size: 14px; color: #666; }
+        .auth-footer a { color: #ff5722; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="form-card">
-        <h2>ĐĂNG KÝ TƯ VẤN TRỌN GÓI</h2>
+
+    <div class="auth-container">
+        <!-- Nút Quay Lại Trang Chủ -->
+        <a href="/" class="back-home">
+            <i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ
+        </a>
+
+        <h2>Đăng Ký Tài Khoản</h2>
+
         <form action="/register" method="POST">
             <div class="form-group">
-                <label>Họ và tên *</label>
-                <input type="text" name="name" required placeholder="Ví dụ: Nguyễn Văn A">
+                <label>Tên hiển thị</label>
+                <input type="text" name="full_name" required placeholder="Ví dụ: Nguyễn Văn A">
             </div>
             <div class="form-group">
-                <label>Số điện thoại *</label>
-                <input type="tel" name="phone" required placeholder="Ví dụ: 0912345678">
+                <label>Tên đăng nhập</label>
+                <input type="text" name="username" required placeholder="Nhập tên đăng nhập">
             </div>
             <div class="form-group">
-                <label>Địa chỉ Email *</label>
-                <input type="email" name="email" required placeholder="nguyenvana@gmail.com">
+                <label>Địa chỉ Email</label>
+                <input type="email" name="email" required placeholder="example@gmail.com">
             </div>
             <div class="form-group">
-                <label>Dịch vụ cần tư vấn</label>
-                <select name="service">
-                    <option value="Đăng ký giấy phép kinh doanh">Đăng ký giấy phép kinh doanh</option>
-                    <option value="Dịch vụ kế toán & Thuế">Dịch vụ kế toán & Thuế</option>
-                    <option value="Tư vấn pháp lý doanh nghiệp">Tư vấn pháp lý doanh nghiệp</option>
-                </select>
+                <label>Mật khẩu</label>
+                <input type="password" name="password" required placeholder="Nhập mật khẩu">
             </div>
-            <div class="form-group">
-                <label>Ghi chú / Yêu cầu thêm</label>
-                <textarea name="note" rows="3" placeholder="Chi tiết yêu cầu của bạn..."></textarea>
-            </div>
-            <button type="submit">GỬI ĐĂNG KÝ NGAY</button>
+            <button type="submit" class="btn-submit">Tạo Tài Khoản</button>
         </form>
-        <a href="/" class="back-link">← Quay lại trang chủ</a>
+
+        <div class="auth-footer">
+            Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
+        </div>
     </div>
+
 </body>
-</html>s
+</html>
