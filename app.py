@@ -99,12 +99,27 @@ def nl2br_filter(s):
 def seed_initial_data():
     sample_foods = [
         {
+            "name": "Bún Chả Hà Nội",
+            "category": "Món đãi tiệc & Cuối tuần",
+            "time": "50 phút",
+            "servings": "4 người",
+            "difficulty": "Trung bình",
+            "image": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800",
+            "ingredients": "- 500g thịt ba chỉ & thịt nạc vai xay\n- 1kg bún tươi\n- Đu đủ, su hào, rau sống ăn kèm\n- Nước mắm, đường, dấm, tỏi, ớt",
+            "steps": [
+                "Thái mỏng thịt ba chỉ và viên tròn thịt xay, ướp gia vị nướng vừa ăn.",
+                "Nướng thịt trên bếp than hoa hoặc nồi chiên không dầu cho xém vàng thơm.",
+                "Pha nước mắm chua ngọt ấm, thêm đu đủ su hào ngâm giấm.",
+                "Bày bún, rau sống ra đĩa và ăn kèm thịt nướng trong chén nước mắm."
+            ]
+        },
+        {
             "name": "Ếch Xào Măng Chua",
             "category": "Cơm gia đình",
             "time": "30 phút",
             "servings": "3-4 người",
             "difficulty": "Dễ",
-            "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800",
+            "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=800",
             "ingredients": "- 500g thịt ếch làm sạch\n- 300g măng củ hoặc măng lá chua\n- Tỏi, hành khô, nghệ tươi, lá lốt, hành lá\n- Nước mắm, hạt nêm, gia vị",
             "steps": [
                 "Ếch rửa sạch, chặt miếng vừa ăn. Ướp với nghệ giã nhỏ, tỏi băm và gia vị trong 15 phút.",
@@ -119,7 +134,7 @@ def seed_initial_data():
             "time": "40 phút",
             "servings": "4 người",
             "difficulty": "Trung bình",
-            "image": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800",
+            "image": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=800",
             "ingredients": "- 1 con cá chép hoặc cá trắm (khoảng 1kg)\n- 2 lon bia\n- Sả, gừng, hành lá, thì là, ớt tươi\n- Gia vị, nước mắm",
             "steps": [
                 "Cá làm sạch, khứa nhẹ lên thân. Ướp cá với gừng, sả băm, hạt nêm trong 20 phút.",
@@ -149,7 +164,7 @@ def seed_initial_data():
             "time": "30 phút",
             "servings": "3-4 người",
             "difficulty": "Dễ",
-            "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800",
+            "image": "https://images.unsplash.com/photo-1562967914-608f82629710?w=800",
             "ingredients": "- 500g đùi ếch\n- Bột chiên giòn\n- Bơ lạt, tỏi băm ngập\n- Gia vị, tiêu, dầu ăn",
             "steps": [
                 "Đùi ếch rửa sạch, ướp tiêu và chút hạt nêm.",
@@ -164,7 +179,7 @@ def seed_initial_data():
             "time": "50 phút",
             "servings": "4-6 người",
             "difficulty": "Trung bình",
-            "image": "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=800",
+            "image": "https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=800",
             "ingredients": "- 1kg thịt ếch\n- 500g măng chua\n- Xương ống ninh nước dùng\n- Nấm hương, lá lốt, rau muống, hoa chuối, ớt, sa tế",
             "steps": [
                 "Thịt ếch xào săn với măng chua và sa tế cho đậm đà.",
@@ -179,7 +194,7 @@ def seed_initial_data():
             "time": "45 phút",
             "servings": "2-3 người",
             "difficulty": "Trung bình",
-            "image": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800",
+            "image": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=800",
             "ingredients": "- 500g thịt đùi ếch\n- 1 bát gạo nấu cháo trắng\n- Sốt xì dầu kho (dầu hào, xì dầu, hắc xì dầu, đường)\n- Hành lá, ớt khô, bột năng",
             "steps": [
                 "Nấu nồi cháo trắng nhuyễn mịn trong niêu đất.",
@@ -189,7 +204,7 @@ def seed_initial_data():
             ]
         },
         {
-            "name": "Canh Cá Nấu Chua Mền",
+            "name": "Canh Cá Nấu Chua",
             "category": "Cơm gia đình",
             "time": "30 phút",
             "servings": "4 người",
@@ -224,7 +239,7 @@ def seed_initial_data():
             "time": "50 phút",
             "servings": "4 người",
             "difficulty": "Trung bình",
-            "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800",
+            "image": "https://images.unsplash.com/photo-1514944288352-fffac99f0bdf?w=800",
             "ingredients": "- 1kg thịt ba chỉ nguyên tảng\n- Ngũ vị hương, giấm, muối hạt\n- Hành, gừng, tiêu",
             "steps": [
                 "Luộc sơ tảng thịt ba chỉ với gừng và hành khô, vớt ra lau thật khô phần bì.",
@@ -289,6 +304,9 @@ def seed_initial_data():
                     description=st_desc
                 )
                 db.session.add(s)
+        else:
+            # Cập nhật lại hình ảnh chuẩn nếu món đã tồn tại
+            existing.image = item["image"]
 
     db.session.commit()
 
@@ -401,6 +419,51 @@ def submit_recipe():
         return render_template('submit_success.html', is_admin=is_admin)
 
     return render_template('submit_recipe.html', categories=CATEGORIES[1:])
+
+# ROUTE MỚI: CHỈNH SỬA BÀI VIẾT MÓN ĂN
+@app.route('/edit-recipe/<int:food_id>', methods=['GET', 'POST'])
+def edit_recipe(food_id):
+    if not session.get('user_logged_in'):
+        return redirect(url_for('login'))
+
+    food = Food.query.get_or_404(food_id)
+
+    # Chỉ Admin mới có quyền sửa bài
+    if session.get('role') != 'admin':
+        return "Bạn không có quyền chỉnh sửa bài viết này!", 403
+
+    if request.method == 'POST':
+        food.name = request.form.get('name', '').strip()
+        food.category = request.form.get('category')
+        food.time = request.form.get('time')
+        food.servings = request.form.get('servings')
+        food.difficulty = request.form.get('difficulty')
+        food.ingredients = request.form.get('ingredients')
+
+        # Cập nhật ảnh chính nếu người dùng tải lên ảnh mới
+        new_image = save_uploaded_file(request.files.get('image_file'))
+        if new_image:
+            food.image = new_image
+        elif request.form.get('image_url'):
+            food.image = request.form.get('image_url').strip()
+
+        # Xóa các bước cũ và nạp lại bước mới
+        RecipeStep.query.filter_by(food_id=food.id).delete()
+        step_descriptions = request.form.getlist('step_description[]')
+
+        for idx, desc in enumerate(step_descriptions):
+            if desc.strip():
+                step = RecipeStep(
+                    food_id=food.id,
+                    step_number=idx + 1,
+                    description=desc.strip()
+                )
+                db.session.add(step)
+
+        db.session.commit()
+        return redirect(url_for('detail', food_id=food.id))
+
+    return render_template('edit_recipe.html', food=food, categories=CATEGORIES[1:])
 
 @app.route('/detail/<int:food_id>')
 def detail(food_id):
