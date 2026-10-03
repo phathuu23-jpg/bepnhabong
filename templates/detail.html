@@ -8,115 +8,123 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f8f9fa; color: #333; line-height: 1.6; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .container { max-width: 800px; margin: 25px auto; padding: 0 15px; }
-        .recipe-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
-        .recipe-image { width: 100%; height: 350px; object-fit: cover; }
-        .recipe-content { padding: 25px; }
-        .recipe-title { font-size: 28px; color: #111; margin-bottom: 15px; font-weight: 800; }
-        .author-tag { color: #666; font-size: 14px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        body { background: #f8f9fa; color: #333; padding-bottom: 40px; }
+
+        /* HEADER Responsive */
+        header { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 1000; }
+        .header-container { max-width: 1000px; margin: 0 auto; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { color: #e65100; font-size: 20px; font-weight: 800; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .back-btn { text-decoration: none; color: #555; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 5px; }
+
+        /* CONTENT CONTAINER */
+        .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
         
-        .like-btn { display: inline-flex; align-items: center; gap: 8px; background: #ffebee; color: #e91e63; border: 1px solid #ffcdd2; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 15px; margin-bottom: 20px; }
-        .like-btn.liked { background: #e91e63; color: white; }
+        /* BANNER MÓN ĂN */
+        .recipe-header { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .recipe-banner { width: 100%; height: 320px; object-fit: cover; }
+        .recipe-info { padding: 20px; }
+        .recipe-title { font-size: 26px; font-weight: 800; color: #222; margin-bottom: 15px; line-height: 1.3; }
+        
+        .recipe-meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: #fff3e0; padding: 12px; border-radius: 12px; text-align: center; }
+        .meta-item i { color: #e65100; font-size: 18px; margin-bottom: 4px; display: block; }
+        .meta-item span { font-size: 12px; color: #666; }
+        .meta-item strong { display: block; font-size: 14px; color: #333; }
 
-        .ingredients-box { background: #fdfbf7; border-left: 4px solid #ff5722; padding: 15px 20px; border-radius: 4px; margin-bottom: 25px; }
-        .step-item { background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-        .step-img { width: 100%; max-height: 350px; object-fit: cover; border-radius: 6px; margin-top: 10px; }
+        /* KHUNG NGUYÊN LIỆU */
+        .section-card { background: white; border-radius: 16px; padding: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .section-title { font-size: 18px; font-weight: 800; color: #e65100; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #fff3e0; padding-bottom: 8px; }
+        
+        .ingredients-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+        .ingredients-list li { padding: 8px 12px; background: #f9f9f9; border-radius: 8px; font-size: 14px; display: flex; align-items: center; gap: 8px; border-left: 3px solid #ff9800; }
 
-        /* KHUNG BÌNH LUẬN */
-        .comment-section { margin-top: 30px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .comment-item { display: flex; gap: 12px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
-        .comment-item img { width: 40px; height: 40px; border-radius: 50%; }
-        .comment-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 10px; }
+        /* KHUNG CÁC BƯỚC THỰC HIỆN */
+        .steps-wrapper { display: flex; flex-direction: column; gap: 20px; margin-top: 15px; }
+        .step-item { display: flex; gap: 15px; background: #fafafa; padding: 15px; border-radius: 12px; border: 1px solid #eee; }
+        .step-number { background: #ff9800; color: white; min-width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; flex-shrink: 0; }
+        .step-content { flex: 1; }
+        .step-title { font-weight: 700; font-size: 15px; color: #333; margin-bottom: 6px; }
+        .step-desc { font-size: 14px; color: #555; line-height: 1.6; }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 600px) {
+            .recipe-banner { height: 220px; }
+            .recipe-title { font-size: 20px; }
+            .ingredients-list { grid-template-columns: 1fr; }
+            .step-item { padding: 12px; }
+            .step-number { min-width: 30px; height: 30px; font-size: 14px; }
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <a href="/" style="text-decoration: none; color: #555; font-weight: bold;"><i class="fa-solid fa-arrow-left"></i> Trang chủ</a>
-        <a href="/" style="text-decoration: none; color: #e65100; font-weight: 800; font-size: 18px;">Bếp Nhà Bông</a>
-    </header>
+<header>
+    <div class="header-container">
+        <a href="/" class="back-btn"><i class="fa-solid fa-chevron-left"></i> Quay lại</a>
+        <a href="/" class="logo"><i class="fa-solid fa-utensils"></i> Bếp Nhà Bông</a>
+    </div>
+</header>
 
-    <div class="container">
-        <div class="recipe-card">
-            <img src="{{ food.image }}" class="recipe-image">
-
-            <div class="recipe-content">
-                <h1 class="recipe-title">{{ food.name }}</h1>
-                <div class="author-tag"><i class="fa-solid fa-user-pen"></i> Tác giả: <b>{{ food.author_name }}</b></div>
-
-                <!-- NÚT THẢ TIM -->
-                <button class="like-btn {% if user_liked %}liked{% endif %}" onclick="toggleLike({{ food.id }})">
-                    <i class="fa-solid fa-heart"></i> <span id="likeCount">{{ food.likes|length }}</span> Thả tim
-                </button>
-
-                <div class="section">
-                    <h3 style="margin-bottom: 10px; color: #ff5722;"><i class="fa-solid fa-basket-shopping"></i> Nguyên liệu chuẩn bị</h3>
-                    <div class="ingredients-box">{{ food.ingredients | nl2br }}</div>
+<div class="container">
+    <!-- BANNER & THÔNG TIN MÓN -->
+    <div class="recipe-header">
+        <img src="{{ food.image }}" alt="{{ food.name }}" class="recipe-banner">
+        <div class="recipe-info">
+            <h1 class="recipe-title">{{ food.name }}</h1>
+            
+            <div class="recipe-meta-grid">
+                <div class="meta-item">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Thời gian</span>
+                    <strong>{{ food.time or '30 phút' }}</strong>
                 </div>
-
-                <div class="section">
-                    <h3 style="margin-bottom: 10px; color: #ff5722;"><i class="fa-solid fa-fire-burner"></i> Các bước nấu ăn</h3>
-                    {% for step in food.steps %}
-                    <div class="step-item">
-                        <b style="color: #ff5722;">Bước {{ step.step_number }}</b>
-                        <p style="margin-top: 5px;">{{ step.description | nl2br }}</p>
-                        {% if step.image_url %}<img src="{{ step.image_url }}" class="step-img">{% endif %}
-                    </div>
-                    {% endfor %}
+                <div class="meta-item">
+                    <i class="fa-solid fa-user-group"></i>
+                    <span>Khẩu phần</span>
+                    <strong>{{ food.servings or '2-4 người' }}</strong>
                 </div>
-            </div>
-        </div>
-
-        <!-- KHU VỰC BÌNH LUẬN -->
-        <div class="comment-section">
-            <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-comments"></i> Bình luận ({{ food.comments|length }})</h3>
-
-            {% if session.get('user_logged_in') %}
-            <form action="/comment/{{ food.id }}" method="POST">
-                <textarea name="content" class="comment-input" rows="3" placeholder="Viết cảm nghĩ hoặc thắc mắc của bạn về món ăn này..." required></textarea>
-                <button type="submit" style="background: #ff5722; color: white; border: none; padding: 8px 18px; border-radius: 4px; font-weight: bold; cursor: pointer;">Gửi bình luận</button>
-            </form>
-            {% else %}
-            <p style="color: #777;"><a href="/login" style="color: #ff5722; font-weight: bold;">Đăng nhập</a> để tham gia thả tim và bình luận món ăn này!</p>
-            {% endif %}
-
-            <div style="margin-top: 20px;">
-                {% for c in food.comments %}
-                <div class="comment-item">
-                    <img src="{{ c.user_avatar }}">
-                    <div>
-                        <b style="font-size: 14px;">{{ c.user_name }}</b>
-                        <p style="font-size: 14px; color: #444; margin-top: 3px;">{{ c.content }}</p>
-                    </div>
+                <div class="meta-item">
+                    <i class="fa-solid fa-signal"></i>
+                    <span>Độ khó</span>
+                    <strong>{{ food.difficulty or 'Dễ' }}</strong>
                 </div>
-                {% else %}
-                <p style="color: #888; font-size: 13px;">Chưa có bình luận nào. Hãy là người đầu tiên bình luận!</p>
-                {% endfor %}
             </div>
         </div>
     </div>
 
-    <script>
-        function toggleLike(foodId) {
-            fetch('/like/' + foodId, { method: 'POST' })
-            .then(res => {
-                if (res.status === 401) {
-                    window.location.href = '/login';
-                    return;
-                }
-                return res.json();
-            })
-            .then(data => {
-                if (data) {
-                    document.getElementById('likeCount').innerText = data.total_likes;
-                    const btn = document.querySelector('.like-btn');
-                    if (data.liked) btn.classList.add('liked');
-                    else btn.classList.remove('liked');
-                }
-            });
-        }
-    </script>
+    <!-- DANH SÁCH NGUYÊN LIỆU -->
+    <div class="section-card">
+        <div class="section-title"><i class="fa-solid fa-basket-shopping"></i> Nguyên Liệu Cần Chuẩn Bị</div>
+        <ul class="ingredients-list">
+            {% if food.ingredients %}
+                {% for item in food.ingredients %}
+                    <li><i class="fa-solid fa-check" style="color: #28a745;"></i> {{ item }}</li>
+                {% endfor %}
+            {% else %}
+                <li><i class="fa-solid fa-check" style="color: #28a745;"></i> Nguyên liệu đang cập nhật...</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- HƯỚNG DẪN CÁC BƯỚC THỰC HIỆN -->
+    <div class="section-card">
+        <div class="section-title"><i class="fa-solid fa-list-check"></i> Các Bước Thực Hiện</div>
+        <div class="steps-wrapper">
+            {% if food.steps %}
+                {% for step in food.steps %}
+                <div class="step-item">
+                    <div class="step-number">{{ loop.index }}</div>
+                    <div class="step-content">
+                        <div class="step-title">Bước {{ loop.index }}</div>
+                        <div class="step-desc">{{ step }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: #777;">Công thức chi tiết từng bước đang được cập nhật...</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
