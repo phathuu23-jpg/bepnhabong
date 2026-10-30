@@ -3,38 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chỉnh Sửa Món Ăn - Bếp Nhà Bông</title>
+    <title>Chỉnh Sửa Deal - Săn Sale 247</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: #f4f6f9; padding: 20px; }
-        .container { max-width: 650px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .container { max-width: 650px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        button { background: #28a745; color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
-        .btn-add-step { background: #e0e0e0; color: #333; margin-bottom: 15px; padding: 8px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; width: auto; font-size: 13px; border: 1px solid #ccc; }
-        .step-block { background: #fafafa; border: 1px dashed #bbb; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #333; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; }
+        input:focus, textarea:focus { border-color: #ff5722; }
+        button[type="submit"] { background: #28a745; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; transition: background 0.2s; }
+        button[type="submit"]:hover { background: #218838; }
+        .btn-add-step { background: #e0e0e0; color: #333; margin-bottom: 15px; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; width: auto; font-size: 13px; border: 1px solid #ccc; }
+        .step-block { background: #fafafa; border: 1px dashed #bbb; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>✏️ Chỉnh Sửa: {{ food.name }}</h2>
-    <br>
-    <form action="/edit/{{ food.id }}" method="POST" enctype="multipart/form-data">
+    <h2 style="color: #ff5722; margin-bottom: 20px;"><i class="fa-solid fa-pen-to-square"></i> Cập Nhật Deal: {{ food.name }}</h2>
+    
+    {% if error %}
+    <div style="background: #ffebee; color: #c62828; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px;">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form action="/edit-recipe/{{ food.id }}" method="POST" enctype="multipart/form-data">
+        <!-- Token bảo mật CSRF -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
         <div class="form-group">
-            <label>Tên món ăn *</label>
+            <label>Tên sản phẩm / Deal hời *</label>
             <input type="text" name="name" value="{{ food.name }}" required>
         </div>
 
         <div style="display: flex; gap: 10px;">
             <div class="form-group" style="flex: 1;">
-                <label>Thời gian nấu</label>
+                <label>Mức giảm giá (Ví dụ: -50%)</label>
                 <input type="text" name="time" value="{{ food.time }}">
             </div>
             <div class="form-group" style="flex: 1;">
-                <label>Khẩu phần</label>
+                <label>Trạng thái deal (Ví dụ: Hot Deal)</label>
                 <input type="text" name="servings" value="{{ food.servings }}">
             </div>
         </div>
@@ -45,12 +56,12 @@
         </div>
 
         <div class="form-group">
-            <label>Nguyên liệu chuẩn bị *</label>
+            <label>Thông tin chi tiết & Ưu đãi / Mã giảm giá *</label>
             <textarea name="ingredients" rows="4" required>{{ food.ingredients }}</textarea>
         </div>
 
         <div class="form-group">
-            <label style="color: #ff5722;">🍳 Các bước thực hiện (Kèm ảnh)</label>
+            <label style="color: #ff5722;"><i class="fa-solid fa-list-check"></i> Các bước hướng dẫn săn deal (Kèm ảnh)</label>
             <div id="stepsContainer">
                 {% for step in food.steps %}
                 <div class="step-block">
@@ -59,16 +70,19 @@
                     
                     {% if step.image_url %}
                         <div style="margin: 5px 0;"><img src="{{ step.image_url }}" width="80" style="border-radius: 4px;"></div>
-                        <input type="hidden" name="existing_step_image_{{ loop.index0 }}" value="{{ step.image_url }}">
+                        <input type="hidden" name="step_image_keep[]" value="{{ step.image_url }}">
+                    {% else %}
+                        <input type="hidden" name="step_image_keep[]" value="">
                     {% endif %}
                     
-                    <label style="font-size: 12px; font-weight: normal;">Tải ảnh mới để thay thế (nếu muốn):</label>
+                    <label style="font-size: 12px; font-weight: normal; margin-top: 5px;">Tải ảnh mới để thay thế (nếu muốn):</label>
                     <input type="file" name="step_image[]" accept="image/*">
                 </div>
                 {% else %}
                 <div class="step-block">
                     <b>Bước 1</b>
                     <textarea name="step_description[]" rows="2" style="margin: 6px 0;" required></textarea>
+                    <input type="hidden" name="step_image_keep[]" value="">
                     <input type="file" name="step_image[]" accept="image/*">
                 </div>
                 {% endfor %}
@@ -76,8 +90,8 @@
             <button type="button" class="btn-add-step" onclick="addStep()"><i class="fa-solid fa-plus"></i> Thêm bước tiếp theo</button>
         </div>
 
-        <button type="submit">Cập Nhật Bài Viết</button>
-        <a href="/admin" style="display: block; text-align: center; margin-top: 10px; color: #6c757d; text-decoration: none;">Hủy bỏ</a>
+        <button type="submit">Lưu Thay Đổi</button>
+        <a href="/admin" style="display: block; text-align: center; margin-top: 12px; color: #6c757d; text-decoration: none; font-weight: 600;">Hủy bỏ</a>
     </form>
 </div>
 
@@ -90,8 +104,9 @@
         div.className = 'step-block';
         div.innerHTML = `
             <b>Bước ${stepCount}</b>
-            <textarea name="step_description[]" rows="2" style="margin: 6px 0;" required></textarea>
-            <label style="font-size: 12px; font-weight: normal;">Ảnh minh họa Bước ${stepCount}:</label>
+            <textarea name="step_description[]" rows="2" style="margin: 6px 0;" required placeholder="Mô tả bước tiếp theo..."></textarea>
+            <input type="hidden" name="step_image_keep[]" value="">
+            <label style="font-size: 12px; font-weight: normal; margin-top: 5px;">Ảnh minh họa Bước ${stepCount}:</label>
             <input type="file" name="step_image[]" accept="image/*">
         `;
         container.appendChild(div);
