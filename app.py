@@ -57,7 +57,7 @@ DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/847/847969.png"
 DEFAULT_FOOD_IMAGE = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500"
 BRAND_AUTHOR = "San Sale 247"
 USERNAME_RE = re.compile(r'^[A-Za-z0-9_.]{3,30}$')
-CATEGORIES = ["Tat ca", "Cong nghe & Dien tu", "Thoi trang & My pham", "Doi song & Gia dung", "Ma giam gia & Voucher"]
+CATEGORIES = ["Tất cả", "Công nghệ & Điện tử", "Thời trang & Mỹ phẩm", " Gia dụng", "Mã giảm giá & Voucher"]
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
