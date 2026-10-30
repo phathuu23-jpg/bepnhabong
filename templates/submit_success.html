@@ -3,33 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trạng Thái Bài Viết - Bếp Nhà Bông</title>
+    <title>Trạng Thái Đăng Deal - Săn Sale 247</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { text-align: center; font-family: 'Segoe UI', sans-serif; padding: 50px 20px; background: #f8f9fa; }
+        body { text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 50px 20px; background: #f8f9fa; }
         .card { background: white; max-width: 450px; margin: 0 auto; padding: 35px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         .status-badge { display: inline-block; background: #fff3cd; color: #856404; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 15px; margin: 15px 0; border: 1px solid #ffeeba; }
-        .btn-home { display: inline-block; margin-top: 20px; background: #ff9800; color: white; padding: 10px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; }
+        .btn-home { display: inline-block; margin-top: 20px; background: #ff5722; color: white; padding: 10px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; transition: background 0.2s; }
+        .btn-home:hover { background: #e64a19; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <i class="fa-solid fa-clock-rotate-left" style="font-size: 48px; color: #ff9800;"></i>
-    <h2 style="margin-top: 15px; color: #333;">Đã Đăng Bài Thành Công!</h2>
+    <i class="fa-solid fa-clock-rotate-left" style="font-size: 48px; color: #ff5722;"></i>
+    <h2 style="margin-top: 15px; color: #333;">Đăng Deal Thành Công!</h2>
     
     {% if is_admin %}
-        <div style="color: #28a745; font-weight: bold; margin: 15px 0;">[Admin] Bài của bạn đã được xuất bản trực tiếp!</div>
+        <div style="color: #28a745; font-weight: bold; margin: 15px 0;">[Admin] Deal của bạn đã được xuất bản trực tiếp!</div>
     {% else %}
         <div class="status-badge">
             <i class="fa-solid fa-hourglass-half"></i> Trạng thái: Chờ duyệt...
         </div>
         <p style="color: #666; font-size: 14px; line-height: 1.5;">
-            Bài viết của bạn đang được **Quản trị viên kiểm duyệt**. Sau khi được duyệt, món ăn sẽ tự động hiển thị trên trang chủ!
+            Deal hời của bạn đang được **Quản trị viên kiểm duyệt**. Sau khi được duyệt, sản phẩm sẽ tự động hiển thị công khai trên trang chủ!
         </p>
     {% endif %}
 
-    <a href="/" class="btn-home">Về Trang Chủ</a>
+    <a href="/" class="btn-home"><i class="fa-solid fa-house"></i> Về Trang Chủ</a>
 </div>
 
 </body>
