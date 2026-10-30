@@ -114,6 +114,7 @@ class Food(db.Model):
     servings = db.Column(db.String(50), default="Shopee / Lazada")
     difficulty = db.Column(db.String(50), default="Hot Deal")
     image = db.Column(db.String(500), nullable=False)
+    aff_link = db.Column(db.String(1000), default="https://shopee.vn")
     ingredients = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default="approved")
     author_name = db.Column(db.String(100), default=BRAND_AUTHOR)
