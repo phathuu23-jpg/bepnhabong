@@ -16,7 +16,7 @@ from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
 import markupsafe
-from email_validator import validate_email, EmailNotValidError
+
 from sqlalchemy import func, inspect, text, UniqueConstraint
 
 from seed_data import SAMPLE_FOODS
