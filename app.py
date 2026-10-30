@@ -380,6 +380,15 @@ def init_db():
               try:
             with db.engine.connect() as c:
                 cols = [r[1] for r in c.exec_driver_sql("PRAGMA table_info(food)").fetchall()]
+                for col, default in [('aff_link',"'https://shopee.vn'"),('price',"'0'"),('old_price',"''"),('discount',"''"),('sold',"'ĐÃ BÁN 0'")]:
+                    if col not in cols:
+                        c.exec_driver_sql(f"ALTER TABLE food ADD COLUMN {col} VARCHAR(1000) DEFAULT {default}")
+                        c.commit()
+        except Exception as e:
+            log.info(f"skip migrate: {e}")
+              try:
+            with db.engine.connect() as c:
+                cols = [r[1] for r in c.exec_driver_sql("PRAGMA table_info(food)").fetchall()]
                 if 'aff_link' not in cols:
                     c.exec_driver_sql("ALTER TABLE food ADD COLUMN aff_link VARCHAR(1000) DEFAULT 'https://shopee.vn'")
                     c.commit()
