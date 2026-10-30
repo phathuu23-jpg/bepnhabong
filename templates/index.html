@@ -10,7 +10,7 @@
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
 body{background:#f5f5f8;color:#222}
 a{text-decoration:none;color:inherit}
-.top{max-width:1200px;margin:14px auto 0;padding:0 20px;display:flex;align-items:center;gap:14px;justify-content:space-between}
+.top{max-width:1200px;margin:14px auto 0;padding:0 20px;display:flex;align-items:center;gap:14px}
 .logo{background:#fff;border-radius:14px;padding:8px 16px;font-size:24px;font-weight:900;display:flex;align-items:center;gap:6px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
 .logo .s{width:38px;height:38px;border-radius:10px;background:#1a2fb3;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;position:relative}
 .logo .s::after{content:'%';position:absolute;left:4px;bottom:2px;background:#ff6a2b;color:#fff;font-size:12px;border-radius:6px;padding:1px 4px}
@@ -54,68 +54,73 @@ footer{margin:30px 0 30px;text-align:center;color:#999;font-size:13px}
 </head>
 <body>
 <div class="top">
-  <a class="logo" href="/"><span class="s">S</span><b>sansale<span>247</span></b></a>
-  <nav class="nav">
-    <a class="active" href="/">🏠 Trang chủ</a>
-    <a href="/?cat=Mã giảm giá & Voucher">📄 Hướng dẫn</a>
-    <a href="/?cat=Công nghệ & Điện tử">⚡ Flashsale</a>
-    <a href="/?cat=Thời trang & Mỹ phẩm">✍️ Blog</a>
-    {% if current_user %}
-    <a href="/my-favorites">❤️ Đã lưu</a>
-    <a href="/my-recipes">📝 Deal của tôi</a>
-    {% else %}
-    <a href="/login">Đăng nhập</a>
-    {% endif %}
-  </nav>
+  <a class="logo" href="/"><span class="s">S</span><b>sansale<span>247</span></b></a>
+ <nav class="nav">
+  <a class="active" href="/">🏠 Trang chủ</a>
+  <a href="/guide">📄 Hướng dẫn</a>
+  <a href="/flashsale">⚡ Flashsale</a>
+  <a href="/guide">✍️ Blog</a>
+</nav>
+    <a class="active" href="/">🏠 Trang chủ</a>
+    <a href="/?cat=Mã giảm giá & Voucher">📄 Hướng dẫn</a>
+    <a href="/?cat=Công nghệ & Điện tử">⚡ Flashsale</a>
+    <a href="/?cat=Thời trang & Mỹ phẩm">✍️ Blog</a>
+    {% if current_user %}
+    <a href="/my-favorites">❤️ Đã lưu</a>
+    <a href="/my-recipes">📝 Deal của tôi</a>
+    {% else %}
+    <a href="/login">Đăng nhập</a>
+    {% endif %}
+  </nav>
 </div>
 <div class="hero">
-  <div class="hero-box">
-    <h2>sansale247 – Dán link sản phẩm Shopee hoặc Lazada để tìm voucher</h2>
-    <div class="sub">Nhóm Zalo tự động ập voucher</div>
-    <form class="search-row" method="get" action="/">
-      <div class="search-box">
-        <i class="fa-solid fa-link"></i>
-        <input name="q" value="{{ query or '' }}" placeholder="Dán link sản phẩm Shopee hoặc Lazada vào đây...">
-        <button type="button" class="btn-paste" onclick="navigator.clipboard.readText().then(t=>document.querySelector('input[name=q]').value=t)">📋 Dán</button>
-      </div>
-      <button class="btn-find" type="submit">🔍 Tìm mã ngay</button>
-    </form>
-  </div>
+  <div class="hero-box">
+    <h2>sansale247 – Dán link sản phẩm Shopee hoặc Lazada để tìm voucher</h2>
+    <div class="sub">Nhóm Zalo tự động ập voucher</div>
+    <form class="search-row" method="get" action="/">
+      <div class="search-box">
+        <i class="fa-solid fa-link"></i>
+        <input name="q" value="{{ query or '' }}" placeholder="Dán link sản phẩm Shopee hoặc Lazada vào đây...">
+        <button type="button" class="btn-paste" onclick="navigator.clipboard.readText().then(t=>document.querySelector('input[name=q]').value=t)">📋 Dán</button>
+      </div>
+      <button class="btn-find" type="submit">🔍 Tìm mã ngay</button>
+    </form>
+  </div>
 </div>
 <div class="cats">
-  {% for c in categories %}
-  <a class="cat {% if c == selected_cat %}active{% endif %}" href="/?cat={{ c }}{% if query %}&q={{ query }}{% endif %}">{{ c }}</a>
-  {% endfor %}
+  {% for c in categories %}
+  <a class="cat {% if c == selected_cat %}active{% endif %}" href="/?cat={{ c }}{% if query %}&q={{ query }}{% endif %}">{{ c }}</a>
+  {% endfor %}
 </div>
 <div class="grid">
-  {% if foods and foods|length > 0 %}
-    {% for food in foods %}
-    <div class="card">
-      <div class="ribbon">Lựa chọn tốt nhất</div>
-      <a class="ticket" href="/detail/{{ food.id }}">
-        <img src="{{ food.image or 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500' }}" alt="{{ food.name }}" loading="lazy">
-      </a>
-      <div class="info">
-        <h3><a href="/detail/{{ food.id }}">{{ food.name }}</a></h3>
-        <span class="tag">{{ food.category }} • {{ food.difficulty }}</span>
-        <div class="bar"><i style="width:{{ 60 + (food.id % 35) }}%"></i></div>
-        <div class="used">Đã dùng {{ 60 + (food.id % 35) }}% • ⏰ {{ food.time }} • 🛒 {{ food.servings }}</div>
-      </div>
-      <a class="get" href="/detail/{{ food.id }}">✔</a>
-    </div>
-    {% endfor %}
-  {% else %}
-    <div class="card">
-      <div class="ticket"><img src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png" alt="sale" style="object-fit:contain;padding:18px"></div>
-      <div class="info"><h3>Dán link để tìm mã giảm giá</h3><span class="tag">Shopee • Lazada</span><div class="bar"><i style="width:10%"></i></div><div class="used">Chưa có deal nào cho từ khóa này</div></div>
-    </div>
-    <div class="card">
-      <div class="ribbon">Lựa chọn tốt nhất</div>
-      <div class="ticket" style="background:#ff0000;color:#fff;font-weight:900;flex-direction:column"><i class="fa-brands fa-youtube" style="font-size:52px"></i>YouTube</div>
-      <div class="info"><h3>Giảm 20% tối đa 2tr đơn từ 500k</h3><span class="tag">Độc Quyền Mã YouTube</span><div class="bar"><i style="width:82%"></i></div><div class="used">Đã dùng 82%</div></div>
-      <button class="get">✔</button>
-    </div>
-  {% endif %}
+  {% if foods and foods|length > 0 %}
+    {% for food in foods %}
+    <div class="card">
+      <div class="ribbon">Lựa chọn tốt nhất</div>
+      <a class="ticket" href="/detail/{{ food.id }}">
+        <img src="{{ food.image or 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500' }}" alt="{{ food.name }}" loading="lazy">
+      </a>
+      <div class="info">
+        <h3><a href="/detail/{{ food.id }}">{{ food.name }}</a></h3>
+        <span class="tag">{{ food.category }} • {{ food.difficulty }}</span>
+        <div class="bar"><i style="width:{{ 60 + (food.id % 35) }}%"></i></div>
+        <div class="used">Đã dùng {{ 60 + (food.id % 35) }}% • ⏰ {{ food.time }} • 🛒 {{ food.servings }}</div>
+      </div>
+      <a class="get" href="/detail/{{ food.id }}">✔</a>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="card">
+      <div class="ticket"><img src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png" alt="sale" style="object-fit:contain;padding:18px"></div>
+      <div class="info"><h3>Dán link để tìm mã giảm giá</h3><span class="tag">Shopee • Lazada</span><div class="bar"><i style="width:10%"></i></div><div class="used">Chưa có deal nào cho từ khóa này</div></div>
+    </div>
+    <div class="card">
+      <div class="ribbon">Lựa chọn tốt nhất</div>
+      <div class="ticket" style="background:#ff0000;color:#fff;font-weight:900;flex-direction:column"><i class="fa-brands fa-youtube" style="font-size:52px"></i>YouTube</div>
+      <div class="info"><h3>Giảm 20% tối đa 2tr đơn từ 500k</h3><span class="tag">Độc Quyền Mã YouTube</span><div class="bar"><i style="width:82%"></i></div><div class="used">Đã dùng 82%</div></div>
+      <button class="get">✔</button>
+    </div>
+  {% endif %}
 </div>
 <p class="note">Mã thường được bổ sung lượt theo các khung giờ: Mã YouTube — 0h, 9h, 12h và 18h; Mã Instagram — 0h, 9h, 15h và 20h.</p>
 <footer><b>Săn Sale 247</b> — sansale247.onrender.com • Tổng hợp voucher Shopee / Lazada mỗi ngày</footer>
