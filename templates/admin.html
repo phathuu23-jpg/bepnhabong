@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duyệt Bài & Quản Lý Email - Bếp Nhà Bông</title>
+    <title>Duyệt Deal & Quản Lý Thành Viên - Săn Sale 247</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1830/1830839.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -44,7 +44,7 @@
 
     <div class="header">
         <h2 style="color: #ff5722; display: flex; align-items: center; gap: 10px;">
-            <i class="fa-solid fa-shield-halved"></i> TRANG QUẢN TRỊ BẾP NHÀ BÔNG
+            <i class="fa-solid fa-shield-halved"></i> TRANG QUẢN TRỊ SĂN SALE 247
         </h2>
         <div>
             <a href="/" style="margin-right: 15px; color: #555; text-decoration: none; font-weight: bold;">
@@ -88,6 +88,7 @@
                     <td>
                         {% if user.role != 'admin' %}
                         <form action="/admin/reset-user-password/{{ user.id }}" method="POST" style="display: flex; gap: 5px;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="password" name="new_password" placeholder="MK mới..." required style="padding: 4px; font-size: 12px; width: 110px; border: 1px solid #ccc; border-radius: 4px;">
                             <button type="submit" style="padding: 4px 8px; background: #ff9800; color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold;">Lưu</button>
                         </form>
@@ -97,9 +98,12 @@
                     </td>
                     <td>
                         {% if user.role != 'admin' %}
-                            <a href="/admin/delete-user/{{ user.id }}" class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa tài khoản này?')">
-                                <i class="fa-solid fa-user-xmark"></i> Xóa
-                            </a>
+                            <form action="/admin/delete-user/{{ user.id }}" method="POST" style="display:inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa tài khoản này?')" style="border:none; cursor:pointer;">
+                                    <i class="fa-solid fa-user-xmark"></i> Xóa
+                                </button>
+                            </form>
                         {% else %}
                             <span style="color: #aaa; font-size: 12px;">Gốc</span>
                         {% endif %}
@@ -110,14 +114,14 @@
         </table>
     </div>
 
-    <!-- KHU VỰC 2: BÀI VIẾT CHỜ DUYỆT -->
+    <!-- KHU VỰC 2: DEAL CHỜ DUYỆT -->
     <div class="card" style="border-left: 5px solid #ff9800;">
-        <h3 style="color: #e65100;">⏳ Bài Viết Đang Chờ Duyệt ({{ pending_foods|length }})</h3>
+        <h3 style="color: #e65100;">⏳ Deal Đang Chờ Duyệt ({{ pending_foods|length }})</h3>
         <table>
             <thead>
                 <tr>
                     <th style="width: 70px;">Ảnh</th>
-                    <th>Tên món</th>
+                    <th>Tên sản phẩm / Deal</th>
                     <th>Người đăng</th>
                     <th style="width: 260px;">Thao tác</th>
                 </tr>
@@ -135,21 +139,27 @@
                     </td>
                     <td>{{ food.author_name }}</td>
                     <td>
-                        <a href="/admin/approve/{{ food.id }}" class="btn-approve">
-                            <i class="fa-solid fa-check"></i> Duyệt
-                        </a>
+                        <form action="/admin/approve/{{ food.id }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn-approve" style="border:none; cursor:pointer;">
+                                <i class="fa-solid fa-check"></i> Duyệt
+                            </button>
+                        </form>
                         <a href="/edit-recipe/{{ food.id }}" class="btn-edit">
                             <i class="fa-solid fa-pen-to-square"></i> Sửa
                         </a>
-                        <a href="/delete/{{ food.id }}" class="btn-delete" onclick="return confirm('Từ chối và xóa bài này?')">
-                            <i class="fa-solid fa-trash"></i> Xóa
-                        </a>
+                        <form action="/delete/{{ food.id }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn-delete" onclick="return confirm('Từ chối và xóa deal này?')" style="border:none; cursor:pointer;">
+                                <i class="fa-solid fa-trash"></i> Xóa
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
                     <td colspan="4" style="text-align: center; color: #888; padding: 20px;">
-                        Không có bài viết nào đang chờ duyệt.
+                        Không có deal nào đang chờ duyệt.
                     </td>
                 </tr>
                 {% endfor %}
@@ -157,15 +167,15 @@
         </table>
     </div>
 
-    <!-- KHU VỰC 3: MÓN ĂN ĐÃ DUYỆT -->
+    <!-- KHU VỰC 3: DEAL ĐÃ ĐƯỢC DUYỆT -->
     <div class="card">
-        <h3 style="color: #28a745;">✅ Danh Sách Món Ăn Đã Duyệt ({{ approved_foods|length }})</h3>
+        <h3 style="color: #28a745;">✅ Danh Sách Deal Đã Đăng ({{ approved_foods|length }})</h3>
         <table>
             <thead>
                 <tr>
                     <th style="width: 70px;">Ảnh</th>
-                    <th>Tên món</th>
-                    <th>Tác giả</th>
+                    <th>Tên sản phẩm / Deal</th>
+                    <th>Người đăng</th>
                     <th style="width: 180px;">Thao tác</th>
                 </tr>
             </thead>
@@ -179,15 +189,18 @@
                         <a href="/edit-recipe/{{ food.id }}" class="btn-edit">
                             <i class="fa-solid fa-pen-to-square"></i> Sửa
                         </a>
-                        <a href="/delete/{{ food.id }}" class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa món này?')">
-                            <i class="fa-solid fa-trash"></i> Xóa
-                        </a>
+                        <form action="/delete/{{ food.id }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa deal này?')" style="border:none; cursor:pointer;">
+                                <i class="fa-solid fa-trash"></i> Xóa
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
                     <td colspan="4" style="text-align: center; color: #888; padding: 20px;">
-                        Chưa có món ăn nào trên hệ thống.
+                        Chưa có deal nào trên hệ thống.
                     </td>
                 </tr>
                 {% endfor %}
