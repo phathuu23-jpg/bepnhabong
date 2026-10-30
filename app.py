@@ -332,7 +332,23 @@ def index():
     
     foods = foods_query.order_by(Food.id.desc()).all()
     return render_template('index.html', foods=foods, categories=CATEGORIES, selected_cat=cat, query=query)
+@app.route('/guide')
+def guide():
+    return render_template('guide.html')
 
+@app.route('/flashsale')
+def flashsale():
+    query = request.args.get('q', '').strip()
+    cat = request.args.get('cat', 'Tất cả')
+    foods_query = Food.query.filter_by(status='approved')
+    if cat and cat != 'Tất cả':
+        foods_query = foods_query.filter_by(category=cat)
+    if query:
+        foods_query = foods_query.filter(Food.name.ilike(f'%{query}%'))
+    foods = foods_query.order_by(Food.id.desc()).all()
+    return render_template('flashsale.html', foods=foods, categories=CATEGORIES, selected_cat=cat, query=query)
+
+@app.route('/detail/<int:food_id>')
 @app.route('/detail/<int:food_id>')
 def detail(food_id):
     food = Food.query.get_or_404(food_id)
