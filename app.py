@@ -22,7 +22,7 @@ from sqlalchemy import func, inspect, text, UniqueConstraint
 from seed_data import SAMPLE_FOODS
 
 logging.basicConfig(level=logging.INFO)
-log = logging.getLogger("bepnhabong")
+log = logging.getLogger("sansale247")
 
 # ============================================================
 # 1. CẤU HÌNH
@@ -56,7 +56,7 @@ if db_url:
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 else:
     basedir = os.path.abspath(os.path.dirname(__file__))
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'bepnhabong.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'sansale247.db')
 
 # Gửi mail (Gmail + App Password)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -75,7 +75,7 @@ db = SQLAlchemy(app)
 
 DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/847/847969.png"
 DEFAULT_FOOD_IMAGE = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500"
-BRAND_AUTHOR = "Bếp Nhà Bông"
+BRAND_AUTHOR = "Săn Sale 247"
 MIN_PASSWORD = 8
 MAX_STEPS = 30
 OTP_TTL_MINUTES = 10
@@ -84,10 +84,10 @@ USERNAME_RE = re.compile(r'^[A-Za-z0-9_.]{3,30}$')
 
 CATEGORIES = [
     "Tất cả",
-    "Cơm gia đình",
-    "Món sáng & Món nước",
-    "Ăn vặt & Tráng miệng",
-    "Món đãi tiệc & Cuối tuần"
+    "Công nghệ & Điện tử",
+    "Thời trang & Mỹ phẩm",
+    "Đời sống & Gia dụng",
+    "Mã giảm giá & Voucher"
 ]
 
 # ============================================================
@@ -109,10 +109,10 @@ class User(db.Model):
 class Food(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
-    category = db.Column(db.String(100), default="Cơm gia đình")
-    time = db.Column(db.String(50), default="30 phút")
-    servings = db.Column(db.String(50), default="2 người")
-    difficulty = db.Column(db.String(50), default="Dễ")
+    category = db.Column(db.String(100), default="Công nghệ & Điện tử")
+    time = db.Column(db.String(50), default="Hôm nay")
+    servings = db.Column(db.String(50), default="Shopee / Lazada")
+    difficulty = db.Column(db.String(50), default="Hot Deal")
     image = db.Column(db.String(500), nullable=False)
     ingredients = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default="approved")
@@ -313,4 +313,81 @@ def save_uploaded_file(file):
 
 def valid_external_image(url):
     url = (url or '').strip()
-    return url if url.startswith('https://') and len
+    return url if (url.startswith('https://') and len(url) < 500) else DEFAULT_FOOD_IMAGE
+
+
+# ============================================================
+# 6. ROUTE CHÍNH & KHỞI TẠO
+# ============================================================
+@app.route('/')
+def index():
+    query = request.args.get('q', '').strip()
+    cat = request.args.get('cat', 'Tất cả')
+    
+    foods_query = Food.query.filter_by(status='approved')
+    if cat and cat != 'Tất cả':
+        foods_query = foods_query.filter_by(category=cat)
+    if query:
+        foods_query = foods_query.filter(Food.name.ilike(f'%{query}%'))
+    
+    foods = foods_query.order_by(Food.id.desc()).all()
+    return render_template('index.html', foods=foods, categories=CATEGORIES, selected_cat=cat, query=query)
+
+@app.route('/detail/<int:food_id>')
+def detail(food_id):
+    food = Food.query.get_or_404(food_id)
+    return render_template('detail.html', food=food)
+
+@app.route('/my-recipes')
+@login_required
+def my_recipes():
+    foods = Food.query.filter_by(author_id=get_current_user().id).order_by(Food.id.desc()).all()
+    return render_template('my_recipes.html', foods=foods)
+
+@app.route('/my-favorites')
+@login_required
+def my_favorites():
+    favs = Favorite.query.filter_by(user_id=get_current_user().id).all()
+    foods = [f.food for f in favs if f.food]
+    return render_template('my_favorites.html', foods=foods)
+
+
+def init_db():
+    with app.app_context():
+        db.create_all()
+        admin_pass = os.environ.get('ADMIN_PASSWORD', 'admin123')
+        admin = User.query.filter_by(username='admin').first()
+        if not admin:
+            admin = User(
+                username='admin',
+                email='admin@sansale247.com',
+                password=generate_password_hash(admin_pass),
+                full_name='Quản Trị Viên',
+                role='admin'
+            )
+            db.session.add(admin)
+            db.session.commit()
+            log.info("Đã tạo tài khoản admin mặc định thành công.")
+
+        if Food.query.count() == 0 and 'SAMPLE_FOODS' in globals():
+            for item in SAMPLE_FOODS:
+                food = Food(
+                    name=item.get('name'),
+                    category=item.get('category', 'Công nghệ & Điện tử'),
+                    time=item.get('time', 'Hôm nay'),
+                    servings=item.get('servings', 'Shopee'),
+                    difficulty=item.get('difficulty', 'Hot Deal'),
+                    image=item.get('image', DEFAULT_FOOD_IMAGE),
+                    ingredients=item.get('ingredients', ''),
+                    status='approved',
+                    author_name=BRAND_AUTHOR
+                )
+                db.session.add(food)
+            db.session.commit()
+            log.info("Đã khởi tạo dữ liệu mẫu cho Săn Sale 247.")
+
+init_db()
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
