@@ -372,6 +372,14 @@ def my_favorites():
 def init_db():
     with app.app_context():
         db.create_all()
+              try:
+            with db.engine.connect() as c:
+                cols = [r[1] for r in c.exec_driver_sql("PRAGMA table_info(food)").fetchall()]
+                if 'aff_link' not in cols:
+                    c.exec_driver_sql("ALTER TABLE food ADD COLUMN aff_link VARCHAR(1000) DEFAULT 'https://shopee.vn'")
+                    c.commit()
+        except Exception as e:
+            log.info(f"skip migrate aff_link: {e}")
         admin_pass = os.environ.get('ADMIN_PASSWORD', 'admin123')
         admin = User.query.filter_by(username='admin').first()
         if not admin:
