@@ -1,3 +1,6 @@
+Copy nguyên file này dán đè vào templates/index.html là hết trắng:
+
+html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -9,123 +12,108 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f8f9fa; color: #333; }
-
-        /* HEADER RESPONSIVE */
-        header { 
-            background: white; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08); 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
-        }
-        .header-container { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding: 12px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        .logo { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            color: #ff5722; 
-            font-size: 22px; 
-            font-weight: 800; 
-            text-decoration: none; 
-            white-space: nowrap;
-        }
-        .nav-actions { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-        }
-        .btn-add-recipe { 
-            background: #ff5722; 
-            color: white; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            text-decoration: none; 
-            font-weight: bold; 
-            font-size: 14px; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 6px; 
-            white-space: nowrap;
-            transition: background 0.2s;
-        }
+        header { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 1000; }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 8px; color: #ff5722; font-size: 22px; font-weight: 800; text-decoration: none; white-space: nowrap; }
+        .nav-actions { display: flex; align-items: center; gap: 12px; }
+        .btn-add-recipe { background: #ff5722; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; transition: background 0.2s; }
         .btn-add-recipe:hover { background: #e64a19; }
-        .user-auth { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            font-size: 14px; 
-            font-weight: bold; 
-        }
+        .user-auth { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: bold; }
         .user-auth a { color: #444; text-decoration: none; white-space: nowrap; }
-
-        /* HERO BANNER RESPONSIVE */
-        .hero { 
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1200') center/cover no-repeat; 
-            color: white; 
-            text-align: center; 
-            padding: 50px 20px; 
-        }
-        .hero h1 { 
-            font-size: 32px; 
-            font-weight: 800; 
-            margin-bottom: 20px; 
-            line-height: 1.3;
-        }
-        .search-form { 
-            max-width: 550px; 
-            margin: 0 auto; 
-            display: flex; 
-            background: white; 
-            border-radius: 30px; 
-            overflow: hidden; 
-            padding: 3px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
-        }
-        .search-form input { 
-            flex: 1; 
-            border: none; 
-            padding: 12px 20px; 
-            outline: none; 
-            font-size: 14px; 
-            min-width: 0;
-        }
-        .search-form button { 
-            background: #ff5722; 
-            color: white; 
-            border: none; 
-            padding: 10px 25px; 
-            border-radius: 25px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 14px;
-            white-space: nowrap;
-        }
-
-        /* MAIN CONTENT */
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        .hero { background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1200') center/cover no-repeat; color: white; text-align: center; padding: 50px 20px; }
+        .hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 20px; line-height: 1.3; }
+        .hero p { opacity: .9; margin-bottom: 20px; }
+        .search-form { max-width: 550px; margin: 0 auto; display: flex; background: white; border-radius: 30px; overflow: hidden; padding: 3px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .search-form input { flex: 1; border: none; padding: 12px 20px; outline: none; font-size: 14px; min-width: 0; }
+        .search-form button { background: #ff5722; color: white; border: none; padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 14px; white-space: nowrap; }
+        .cat-bar { max-width: 1200px; margin: 20px auto 0; padding: 0 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .cat-pill { padding: 8px 16px; border-radius: 20px; background: white; border: 1px solid #eee; text-decoration: none; color: #555; font-size: 14px; font-weight: 600; }
+        .cat-pill.active { background: #ff5722; color: white; border-color: #ff5722; }
         .main-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
         .section-title { font-size: 20px; font-weight: 800; border-left: 4px solid #ff5722; padding-left: 10px; margin-bottom: 20px; }
+        .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .recipe-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-decoration: none; color: inherit; display: flex; flex-direction: column; transition: transform 0.2s; }
+        .recipe-card:hover { transform: translateY(-4px); }
+        .recipe-card img { width: 100%; height: 180px; object-fit: cover; }
+        .recipe-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .recipe-body h3 { font-size: 16px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; color: #777; }
+        .meta span { background: #f1f2f4; padding: 4px 10px; border-radius: 12px; }
+        .badge-cat { background: #fff0e8 !important; color: #ff5722 !important; font-weight: 700; }
+        .empty { background: white; border-radius: 12px; padding: 40px 20px; text-align: center; color: #777; }
+        footer { margin-top: 40px; background: #222; color: #bbb; text-align: center; padding: 24px 16px; font-size: 14px; }
+        footer b { color: white; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <a class="logo" href="/"><i class="fa-solid fa-bolt"></i> Săn Sale 247</a>
+        <div class="nav-actions">
+            {% if current_user %}
+                <div class="user-auth">
+                    <img class="user-avatar" src="{{ current_user.avatar or 'https://cdn-icons-png.flaticon.com/512/847/847969.png' }}" alt="avatar">
+                    <span>{{ current_user.full_name or current_user.username }}</span>
+                    <a href="/my-favorites">❤️ Đã lưu</a>
+                    <a href="/my-recipes">📝 Deal của tôi</a>
+                </div>
+            {% else %}
+                <div class="user-auth">
+                    <a href="/login">Đăng nhập</a>
+                    <a class="btn-add-recipe" href="/login"><i class="fa-solid fa-plus"></i> Đăng deal</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</header>
 
-        .recipe-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 20px; 
-        }
-        .recipe-card { 
-            background: white; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
-            text-decoration: none; 
-            color: inherit; 
-            display: flex; 
-            flex-direction: column;
-            transition: transform 0.2s;
-        }
-        .recipe-
+<section class="hero">
+    <h1>Săn Sale 247 - Tổng Hợp Deal Hot & Mã Giảm Giá</h1>
+    <p>Công nghệ • Thời trang • Gia dụng • Voucher mỗi ngày</p>
+    <form class="search-form" method="get" action="/">
+        <input name="q" placeholder="Tìm deal, voucher, sản phẩm..." value="{{ query or '' }}">
+        {% if selected_cat and selected_cat != 'Tất cả' %}
+        <input type="hidden" name="cat" value="{{ selected_cat }}">
+        {% endif %}
+        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i> Tìm</button>
+    </form>
+</section>
+
+<div class="cat-bar">
+    {% for c in categories %}
+    <a class="cat-pill {% if c == selected_cat %}active{% endif %}" href="/?cat={{ c }}{% if query %}&q={{ query }}{% endif %}">{{ c }}</a>
+    {% endfor %}
+</div>
+
+<div class="main-container">
+    <div class="section-title">🔥 Deal nổi bật {% if selected_cat and selected_cat != 'Tất cả' %}— {{ selected_cat }}{% endif %}</div>
+    {% if foods and foods|length > 0 %}
+    <div class="recipe-grid">
+        {% for food in foods %}
+        <a class="recipe-card" href="/detail/{{ food.id }}">
+            <img src="{{ food.image or 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500' }}" alt="{{ food.name }}" loading="lazy">
+            <div class="recipe-body">
+                <h3>{{ food.name }}</h3>
+                <div class="meta">
+                    <span class="badge-cat">{{ food.category }}</span>
+                    <span>⏰ {{ food.time }}</span>
+                    <span>🛒 {{ food.servings }}</span>
+                    <span>🔥 {{ food.difficulty }}</span>
+                </div>
+                <div class="meta"><span>✍️ {{ food.author_name }}</span></div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+        <h3>Chưa có deal nào 😢</h3>
+        <p>Thử đổi từ khóa hoặc danh mục khác nhé.</p>
+    </div>
+    {% endif %}
+</div>
+
+<footer><b>Săn Sale 247</b> — Tổng hợp deal Shopee / Lazada / Tiki mỗi ngày.<br>© 2026 sansale247.onrender.com</footer>
+</body>
+</html>
