@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashsale - Săn Sale 247</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,sans-serif}
+body{background:#f5f5f8}.top{max-width:1200px;margin:14px auto 0;padding:0 20px;display:flex;gap:14px;align-items:center}
+.logo{background:#fff;border-radius:14px;padding:8px 16px;font-weight:900;color:#1a2fb3;font-size:22px}
+.logo span{color:#ff6a2b}.nav{background:#fff;border-radius:14px;padding:8px 14px;display:flex;gap:16px;font-weight:700}
+.nav a{color:#333;text-decoration:none;padding:6px 10px}.nav a.active{background:#fff0e8;border-bottom:3px solid #ff6a2b}
+.box{max-width:1200px;margin:14px auto 0;padding:0 20px}.white{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.cats{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;text-align:center;font-size:12px;font-weight:600;color:#555}
+@media(max-width:860px){.cats{grid-template-columns:repeat(4,1fr)}}
+.cats a{display:flex;flex-direction:column;align-items:center;gap:6px;color:#555}
+.ic{width:52px;height:52px;border-radius:50%;background:#f4f5f7;display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid #eee}
+a.on .ic{background:#ff6a2b;color:#fff;border-color:#ff6a2b}a.on{color:#ff6a2b}
+.filters{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.filters input{flex:1;min-width:180px;border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;outline:none}
+.filters a{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;color:#333}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}
+@media(max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}}
+.p{background:#fff;border-radius:12px;overflow:hidden;border:1px solid #eee;display:block;color:#222}
+.p img{width:100%;height:150px;object-fit:cover}.p .b{padding:10px}.p h4{font-size:13px;height:36px;overflow:hidden}.price{color:#ee2b2b;font-weight:900;margin-top:6px}.old{color:#999;font-size:12px;text-decoration:line-through}
+</style>
+</head>
+<body>
+<div class="top"><a class="logo" href="/">S sansale<span>247</span></a>
+<nav class="nav"><a href="/">🏠 Trang chủ</a><a href="/guide">📄 Hướng dẫn</a><a class="active" href="/flashsale">⚡ Flashsale</a><a href="/">✍️ Blog</a></nav></div>
+<div class="box"><div class="white">
+<div class="cats">
+<a class="on" href="/flashsale"> <span class="ic">▦</span> Tất cả<br>sản phẩm</a>
+<a href="/flashsale?cat=Thời trang & Mỹ phẩm"><span class="ic">👕</span>Thời Trang<br>& Phụ Kiện</a>
+<a href="/flashsale?cat=Công nghệ & Điện tử"><span class="ic">💻</span>Điện Tử<br>& Gia Dụng</a>
+<a href="/flashsale?cat=Đời sống & Gia dụng"><span class="ic">💊</span>Sức Khỏe<br>& Sắc Đẹp</a>
+<a href="/flashsale?cat=Đời sống & Gia dụng"><span class="ic">📖</span>Đời Sống<br>& Nhà Cửa</a>
+<a href="/flashsale?cat=Thời trang & Mỹ phẩm"><span class="ic">🍼</span>Mẹ &<br>Bé</a>
+<a href="/flashsale?cat=Mã giảm giá & Voucher"><span class="ic">🧺</span>Bách Hóa<br>Online</a>
+<a href="/flashsale?cat=Công nghệ & Điện tử"><span class="ic">✈</span>Thể Thao<br>& Du Lịch</a>
+</div></div>
+<div class="white" style="margin-top:12px"><form class="filters" method="get" action="/flashsale">
+<input name="q" value="{{ query or '' }}" placeholder="🔍 Tìm tên sản phẩm...">
+<a href="/flashsale?cat={{ selected_cat }}">Deal 1K</a><a href="/flashsale?cat={{ selected_cat }}">Deal 9K</a><a href="/flashsale?cat={{ selected_cat }}">Shopee Mall</a><a href="/flashsale">Ẩn hết hàng</a><a href="/flashsale">Sắp xếp Mặc định</a>
+</form></div>
+<div class="grid">
+{% if foods %}{% for food in foods %}
+<a class="p" href="/detail/{{ food.id }}"><img src="{{ food.image }}" loading="lazy"><div class="b"><h4>{{ food.name }}</h4><div class="price">⚡ {{ food.difficulty }}</div><div class="old">{{ food.servings }} • {{ food.time }}</div></div></a>
+{% endfor %}{% else %}<div class="white" style="grid-column:1/-1;text-align:center;color:#777">Đang tải dữ liệu Flash Sale... (chưa có deal nào)</div>{% endif %}
+</div></div>
+</body>
+</html>
