@@ -306,7 +306,14 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect('/')
+    @app.before_request
+def csrf_protect():
+    if request.method in ('POST', 'PUT', 'PATCH', 'DELETE'):
+        exp = session.get('_csrf')
+        sent = request.form.get('csrf_token') or request.headers.get('X-CSRFToken')
+        if not exp or not sent or not hmac.compare_digest(exp, sent):
+            abort(400)
+        # Xóa dòng return redirect('/') ở đây đi để các route POST chạy tiếp tục bình thường!
 
 @app.route('/admin')
 @admin_required
