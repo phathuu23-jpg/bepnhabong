@@ -241,15 +241,18 @@ def parse_shopee_text(text):
         if '\t' in l: return [x.strip() for x in l.split('\t')]
         if ';' in l and ',' not in l: return [x.strip() for x in l.split(';')]
         return [x.strip().strip('"') for x in l.split(',')]
+    
     first = split_l(lines[0])
     has_h = any(re.search(r'tên|ten|name|giá|gia|price|link|ảnh|anh|img|bán|ban|sold|cat', x, re.I) for x in first)
     heads = [x.lower() for x in first] if has_h else []
     body = lines[1:] if has_h else lines
+    
     def fi(*ks):
         for i, h in enumerate(heads):
             for k in ks:
                 if k in h: return i
         return -1
+        
     if has_h:
         mi = {
           'name': fi('tên', 'ten', 'name', 'title'),
@@ -262,29 +265,37 @@ def parse_shopee_text(text):
         }
         if mi['name'] < 0: mi['name'] = 0
     else:
+        # Thứ tự chuẩn xác: 0: Tên | 1: Giá gốc | 2: Giá sale | 3: Link Affiliate | 4: Link Ảnh | 5: Đã bán | 6: Danh mục
         mi = {'name': 0, 'old': 1, 'price': 2, 'link': 3, 'img': 4, 'sold': 5, 'cat': 6}
+        
     out = []
     for l in body:
         c = split_l(l)
         def g(k):
             i = mi.get(k, -1)
             return c[i] if 0 <= i < len(c) else ''
+            
         name = g('name')
         if not name: continue
+        
         raw_price = g('price')
         raw_old = g('old')
+        
         cur = parse_num(raw_price) if raw_price else parse_num(raw_old)
         old = parse_num(raw_old) if raw_old else cur
         if old == "0": old = cur
         if cur == "0": cur = old
+        
         try:
             cur_fmt = f"{int(cur):,}".replace(',', '.')
         except:
             cur_fmt = cur
+            
         try:
             old_fmt = f"{int(old):,}".replace(',', '.')
         except:
             old_fmt = old
+
         disc = ""
         try:
             o = int(old); n = int(cur)
@@ -292,9 +303,12 @@ def parse_shopee_text(text):
                 disc = f"-{round((o-n)/o*100)}%"
         except: 
             pass
+            
+        # Lấy trực tiếp link ảnh từ cột tương ứng trong Excel/Bảng copy
         img_url = g('img')
         if not img_url or not img_url.startswith('http'):
             img_url = DEFAULT_FOOD_IMAGE
+
         out.append({
           'name': name,
           'price': cur_fmt,
