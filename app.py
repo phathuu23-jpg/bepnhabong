@@ -246,45 +246,64 @@ def parse_shopee_text(text):
     heads = [x.lower() for x in first] if has_h else []
     body = lines[1:] if has_h else lines
     def fi(*ks):
-        for i,h in enumerate(heads):
+        for i, h in enumerate(heads):
             for k in ks:
                 if k in h: return i
         return -1
     if has_h:
         mi = {
-          'name': fi('tên','ten','name','title'),
-          'old': fi('giá gốc','gia goc','gốc','old'),
-          'price': fi('giá sale','gia sale','sale','giảm','price'),
-          'link': fi('link','url','aff','shopee'),
-          'img': fi('ảnh','anh','img','image'),
-          'sold': fi('bán','ban','sold'),
-          'cat': fi('cat','danh','loại','ngành')
+          'name': fi('tên', 'ten', 'name', 'title'),
+          'old': fi('gốc', 'old', 'giá gốc', 'gia goc'),
+          'price': fi('giá sale', 'gia sale', 'sale', 'giá', 'gia', 'price', 'giảm'),
+          'link': fi('link', 'url', 'aff', 'shopee', 'lazada'),
+          'img': fi('ảnh', 'anh', 'img', 'image', 'hình'),
+          'sold': fi('bán', 'ban', 'sold', 'đã bán'),
+          'cat': fi('cat', 'danh', 'loại', 'ngành', 'category')
         }
-        if mi['name']<0: mi['name']=0
+        if mi['name'] < 0: mi['name'] = 0
     else:
-        mi = {'name':0,'old':1,'price':2,'link':3,'img':4,'sold':5,'cat':6}
-    out=[]
+        mi = {'name': 0, 'old': 1, 'price': 2, 'link': 3, 'img': 4, 'sold': 5, 'cat': 6}
+    out = []
     for l in body:
         c = split_l(l)
         def g(k):
-            i=mi.get(k,-1)
-            return c[i] if 0<=i<len(c) else ''
-        name=g('name')
+            i = mi.get(k, -1)
+            return c[i] if 0 <= i < len(c) else ''
+        name = g('name')
         if not name: continue
-        old=parse_num(g('old')); cur=parse_num(g('price'))
-        if old=="0": old=cur
-        if cur=="0": cur=old
-        disc=""
+        raw_price = g('price')
+        raw_old = g('old')
+        cur = parse_num(raw_price) if raw_price else parse_num(raw_old)
+        old = parse_num(raw_old) if raw_old else cur
+        if old == "0": old = cur
+        if cur == "0": cur = old
         try:
-            o=int(old); n=int(cur)
-            if o>n and o>0: disc=f"-{round((o-n)/o*100)}%"
-        except: pass
+            cur_fmt = f"{int(cur):,}".replace(',', '.')
+        except:
+            cur_fmt = cur
+        try:
+            old_fmt = f"{int(old):,}".replace(',', '.')
+        except:
+            old_fmt = old
+        disc = ""
+        try:
+            o = int(old); n = int(cur)
+            if o > n and o > 0: 
+                disc = f"-{round((o-n)/o*100)}%"
+        except: 
+            pass
+        img_url = g('img')
+        if not img_url or not img_url.startswith('http'):
+            img_url = DEFAULT_FOOD_IMAGE
         out.append({
-          'name':name,'price':cur,'old_price':old,'discount':disc,
-          'aff_link':g('link') or 'https://shopee.vn',
-          'image':g('img') or DEFAULT_FOOD_IMAGE,
-          'sold':f"ĐÃ BÁN {g('sold') or '0'}",
-          'category':g('cat') or 'Công nghệ & Điện tử'
+          'name': name,
+          'price': cur_fmt,
+          'old_price': old_fmt,
+          'discount': disc,
+          'aff_link': g('link') or 'https://shopee.vn',
+          'image': img_url,
+          'sold': f"ĐÃ BÁN {g('sold') or '0'}",
+          'category': g('cat') or 'Công nghệ & Điện tử'
         })
     return out
 
