@@ -7,25 +7,29 @@ import secrets
 import logging
 from datetime import timedelta
 from functools import wraps
-from flask import Flask, render_template, request, redirect, url_for, session, abort, g
+from flask import Flask, render_template, request, redirect, url_for, session, abort, g, render_template_string
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
 import markupsafe
 from sqlalchemy import UniqueConstraint
 from seed_data import SAMPLE_FOODS
+
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("sansale247")
+
 IS_PROD = bool(os.environ.get('RENDER')) or os.environ.get('APP_ENV') == 'production'
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+
 _secret = os.environ.get('SECRET_KEY')
 if not _secret:
     if IS_PROD:
         raise RuntimeError("Thieu SECRET_KEY tren Render.")
     _secret = secrets.token_hex(32)
 app.secret_key = _secret
+
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax',
@@ -34,6 +38,7 @@ app.config.update(
     MAX_CONTENT_LENGTH=25*1024*1024,
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
 )
+
 db_url = os.environ.get('DATABASE_URL')
 if db_url:
     if db_url.startswith("postgres://"):
@@ -42,17 +47,21 @@ if db_url:
 else:
     basedir = os.path.abspath(os.path.dirname(__file__))
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'sansale247.db')
+
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
+
 mail = Mail(app)
 UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 ALLOWED_EXT = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
 db = SQLAlchemy(app)
+
 DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/847/847969.png"
 DEFAULT_FOOD_IMAGE = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500"
 BRAND_AUTHOR = "San Sale 247"
@@ -225,7 +234,6 @@ def parse_num(s):
     return s or "0"
 
 def parse_shopee_text(text):
-    # copy từ Excel ShopeeLate: Tên[TAB]Giá gốc[TAB]Giá sale[TAB]Link[TAB]Ảnh[TAB]Đã bán[TAB]Category
     lines = [l.strip() for l in text.strip().splitlines() if l.strip()]
     if not lines:
         return []
@@ -286,8 +294,6 @@ def login():
         u = request.form.get('username','').strip()
         p = request.form.get('password','')
         user = User.query.filter_by(username=u).first()
-        # admin tạo lúc init_db dùng generate_password_hash, check thế này
-        from werkzeug.security import check_password_hash
         if user and user.password and check_password_hash(user.password, p):
             session['user_id']=user.id
             session.permanent=True
@@ -306,14 +312,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
-    @app.before_request
-def csrf_protect():
-    if request.method in ('POST', 'PUT', 'PATCH', 'DELETE'):
-        exp = session.get('_csrf')
-        sent = request.form.get('csrf_token') or request.headers.get('X-CSRFToken')
-        if not exp or not sent or not hmac.compare_digest(exp, sent):
-            abort(400)
-        # Xóa dòng return redirect('/') ở đây đi để các route POST chạy tiếp tục bình thường!
+    return redirect('/')
 
 @app.route('/admin')
 @admin_required
@@ -357,6 +356,7 @@ def admin_delete(fid):
     f = Food.query.get_or_404(fid)
     db.session.delete(f); db.session.commit()
     return redirect('/admin')
+
 def init_db():
     with app.app_context():
         db.create_all()
@@ -385,5 +385,6 @@ def init_db():
                 db.session.commit()
 
 init_db()
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
