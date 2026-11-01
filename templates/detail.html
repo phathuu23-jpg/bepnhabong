@@ -3,44 +3,69 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{ food.name }} - Săn Sale 247</title>
-<meta name="description" content="{{ food.name }} - {{ food.category }} - Mã giảm giá mới nhất">
+<meta name="description" content="{{ food.name }} - {{ food.category }} - Săn deal giá rẻ Shopee Lazada">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,sans-serif}
 body{background:#f5f5f8}.top{max-width:1200px;margin:14px auto 0;padding:0 20px;display:flex;gap:14px;align-items:center}
-.logo{background:#fff;border-radius:14px;padding:8px 16px;font-weight:900;color:#1a2fb3;font-size:22px}.logo span{color:#ff6a2b}
+.logo{background:#fff;border-radius:14px;padding:8px 16px;font-weight:900;color:#1a2fb3;font-size:22px;text-decoration:none}.logo span{color:#ff6a2b}
 .nav{background:#fff;border-radius:14px;padding:8px 14px;display:flex;gap:16px;font-weight:700}
 .nav a{color:#333;text-decoration:none;padding:6px 10px}
 .box{max-width:900px;margin:16px auto;padding:0 20px}
 .card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)}
-.card img{width:100%;height:340px;object-fit:cover}
-.b{padding:22px}.b h1{font-size:24px;margin-bottom:10px}
+.card img{width:100%;height:360px;object-fit:cover;background:#f8f9fa}
+.b{padding:24px}.b h1{font-size:22px;margin-bottom:12px;color:#222;line-height:1.4}
+.price-box{display:flex;align-items:baseline;gap:12px;margin:14px 0}
+.price{color:#ee2b2b;font-size:26px;font-weight:900}
+.old-price{color:#888;font-size:16px;text-decoration:line-through}
 .meta{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;font-size:13px;color:#666}
-.meta span{background:#f1f2f4;padding:5px 12px;border-radius:12px}
-.voucher{background:#fff7f2;border:2px dashed #ff6a2b;border-radius:12px;padding:14px;margin:14px 0;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.voucher b{font-size:18px;color:#e11d2e}
-.copy{background:#1a2fb3;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-weight:800;cursor:pointer}
-.buy{display:flex;gap:10px;margin-top:16px}
-.btn-buy{flex:1;background:#ee2b2b;color:#fff;text-align:center;font-weight:900;font-size:18px;border-radius:12px;padding:15px;text-decoration:none}
-.btn-back{flex:.4;background:#eee;color:#333;text-align:center;font-weight:700;border-radius:12px;padding:15px;text-decoration:none}
-.desc{margin-top:16px;line-height:1.7;color:#444;white-space:pre-line}
+.meta span{background:#f1f2f4;padding:6px 12px;border-radius:8px;font-weight:600}
+.buy{display:flex;gap:12px;margin-top:20px}
+.btn-buy{flex:1;background:#ee2b2b;color:#fff;text-align:center;font-weight:900;font-size:18px;border-radius:12px;padding:16px;text-decoration:none;box-shadow:0 4px 12px rgba(238,43,43,0.3)}
+.btn-buy:hover{background:#d92020}
+.btn-back{flex:0.4;background:#eee;color:#333;text-align:center;font-weight:700;border-radius:12px;padding:16px;text-decoration:none}
+.btn-back:hover{background:#e0e0e0}
 </style>
 </head>
 <body>
-<div class="top"><a class="logo" href="/" style="text-decoration:none">S sansale<span>247</span></a>
-<nav class="nav"><a href="/">🏠 Trang chủ</a><a href="/guide">📄 Hướng dẫn</a><a href="/flashsale">⚡ Flashsale</a></nav></div>
-<div class="box"><div class="card">
-<img src="{{ food.image }}" alt="{{ food.name }}">
-<div class="b">
-<h1>{{ food.name }}</h1>
-<div class="meta"><span>{{ food.category }}</span><span>⏰ {{ food.time }}</span><span>🛒 {{ food.servings }}</span><span>🔥 {{ food.difficulty }}</span></div>
-<div class="voucher"><div><div style="font-size:13px;color:#666">Mã tốt nhất hiện tại</div><b>GIẢM 20% TỐI ĐA 2TR</b></div><button class="copy" onclick="navigator.clipboard.writeText('SANSALE20');this.innerText='Đã copy!'">Copy mã</button></div>
-<div class="buy">
-<a class="btn-back" href="/">← Quay lại</a>
-<a class="btn-buy" href="{{ food.aff_link or 'https://shopee.vn' }}" target="_blank" rel="nofollow noopener">🛒 MUA NGAY - CHỐT DEAL →</a>
+<div class="top">
+    <a class="logo" href="/">S sansale<span>247</span></a>
+    <nav class="nav">
+        <a href="/">🏠 Trang chủ</a>
+        <a href="/flashsale">⚡ Flashsale</a>
+        <a href="/guide">📄 Hướng dẫn</a>
+    </nav>
 </div>
-<div class="desc">{{ food.ingredients }}</div>
+
+<div class="box">
+    <div class="card">
+        <img src="{{ food.image }}" alt="{{ food.name }}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500'">
+        <div class="b">
+            <h1>{{ food.name }}</h1>
+            
+            <div class="price-box">
+                <span class="price">{{ food.price }}đ</span>
+                {% if food.old_price and food.old_price != food.price %}
+                <span class="old-price">{{ food.old_price }}đ</span>
+                {% endif %}
+                {% if food.discount %}
+                <span style="background:#ffe14d;color:#ee2b2b;padding:2px 8px;border-radius:4px;font-weight:bold;font-size:13px;">{{ food.discount }}</span>
+                {% endif %}
+            </div>
+
+            <div class="meta">
+                <span>📂 {{ food.category }}</span>
+                <span>🛒 {{ food.sold or 'ĐÃ BÁN 0' }}</span>
+                <span>🔥 {{ food.difficulty }}</span>
+            </div>
+
+            <div class="buy">
+                <a class="btn-back" href="/">← Quay lại</a>
+                <!-- Nút chuyển hướng trực tiếp sang link Affiliate Shopee của bạn -->
+                <a class="btn-buy" href="{{ food.aff_link or 'https://shopee.vn' }}" target="_blank" rel="nofollow sponsored noopener">🛒 MUA NGAY TRÊN SHOPEE →</a>
+            </div>
+        </div>
+    </div>
 </div>
-</div></div>
 </body>
 </html>
