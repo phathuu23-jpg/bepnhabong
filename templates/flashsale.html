@@ -23,60 +23,47 @@ a.on .ic{background:#ff6a2b;color:#fff}a.on{color:#ff6a2b}
 .off{position:absolute;top:8px;right:8px;background:#ffe14d;color:#ee2b2b;font-weight:900;font-size:12px;padding:3px 8px;border-radius:6px}
 .p .b{padding:10px}.p h4{font-size:13px;height:36px;overflow:hidden;line-height:1.4}
 .price{color:#ee2b2b;font-weight:900;margin-top:6px;font-size:17px}.soldbar{background:#fdd9b5;color:#b25a1a;font-size:11px;text-align:center;border-radius:99px;padding:3px;margin-top:6px;font-weight:700}
-
-/* Mobile */
 @media(max-width:860px){
-.top{padding:0 12px;gap:10px}
-.logo{font-size:18px;padding:6px 12px}
+.top{padding:0 12px;gap:10px}.logo{font-size:18px;padding:6px 12px}
 .nav{width:100%;overflow-x:auto;flex-wrap:nowrap;gap:6px;padding:8px 10px}
-.nav a{font-size:14px;padding:6px 8px;flex-shrink:0}
-.box{padding:0 12px}
-.white{padding:12px}
-.cats{grid-template-columns:repeat(4,1fr);gap:8px;font-size:11px}
-.ic{width:44px;height:44px;font-size:19px}
-.filters{flex-wrap:nowrap;overflow-x:auto}
-.filters input{min-width:140px;flex:1}
-.filters span{flex-shrink:0;font-size:13px;padding:8px 12px}
-.grid{grid-template-columns:repeat(2,1fr);gap:10px}
-.p img{height:140px}
-.p .b{padding:8px}.p h4{font-size:12px}
-.price{font-size:15px}
+.nav a{font-size:14px;padding:6px 8px;flex-shrink:0}.box{padding:0 12px}.white{padding:12px}
+.cats{grid-template-columns:repeat(4,1fr);gap:8px;font-size:11px}.ic{width:44px;height:44px;font-size:19px}
+.filters{flex-wrap:nowrap;overflow-x:auto}.filters input{min-width:140px;flex:1}.filters span{flex-shrink:0;font-size:13px;padding:8px 12px}
+.grid{grid-template-columns:repeat(2,1fr);gap:10px}.p img{height:140px}.p .b{padding:8px}.p h4{font-size:12px}.price{font-size:15px}
 }
 </style>
 </head>
 <body>
 <div class="top"><a class="logo" href="/">S sansale<span>247</span></a>
 <nav class="nav"><a href="/">🏠 Trang chủ</a><a href="/guide">📄 Hướng dẫn</a><a class="active" href="/flashsale">⚡ Flashsale</a><a href="/flashsale">✍️ Blog</a></nav></div>
-<div class="box"><div class="white"><div class="cats">
-<a class="on" href="/flashsale"><span class="ic">▦</span>Tất cả<br>sản phẩm</a>
-<a href="/flashsale?cat=Thời trang & Mỹ phẩm"><span class="ic">👕</span>Thời Trang<br>& Phụ Kiện</a>
-<a href="/flashsale?cat=Công nghệ & Điện tử"><span class="ic">💻</span>Điện Tử<br>& Gia Dụng</a>
-<a href="/flashsale?cat=Đời sống & Gia dụng"><span class="ic">💊</span>Sức Khỏe<br>& Sắc Đẹp</a>
-<a href="/flashsale?cat=Đời sống & Gia dụng"><span class="ic">📖</span>Đời Sống<br>& Nhà Cửa</a>
-<a href="/flashsale?cat=Thời trang & Mỹ phẩm"><span class="ic">🍼</span>Mẹ &<br>Bé</a>
-<a href="/flashsale?cat=Mã giảm giá & Voucher"><span class="ic">🧺</span>Bách Hóa<br>Online</a>
-<a href="/flashsale?cat=Công nghệ & Điện tử"><span class="ic">✈</span>Thể Thao<br>& Du Lịch</a>
+<div class="box">
+<div class="white"><div class="cats">
+<a class="{{ 'on' if selected_cat=='Tất cả' else '' }}" href="/flashsale"><span class="ic">▦</span>Tất cả<br>sản phẩm</a>
+<a class="{{ 'on' if selected_cat=='Thời trang & Mỹ phẩm' else '' }}" href="/flashsale?cat=Thời trang & Mỹ phẩm"><span class="ic">👕</span>Thời Trang<br>& Phụ Kiện</a>
+<a class="{{ 'on' if selected_cat=='Công nghệ & Điện tử' else '' }}" href="/flashsale?cat=Công nghệ & Điện tử"><span class="ic">💻</span>Điện Tử<br>& Gia Dụng</a>
+<a class="{{ 'on' if selected_cat=='Đời sống & Gia dụng' else '' }}" href="/flashsale?cat=Đời sống & Gia dụng"><span class="ic">💊</span>Sức Khỏe<br>& Sắc Đẹp</a>
+<a class="{{ 'on' if selected_cat=='Đời sống & Gia dụng' else '' }}" href="/flashsale?cat=Đời sống & Gia dụng"><span class="ic">📖</span>Đời Sống<br>& Nhà Cửa</a>
+<a class="{{ 'on' if selected_cat=='Thời trang & Mỹ phẩm' else '' }}" href="/flashsale?cat=Thời trang & Mỹ phẩm"><span class="ic">🍼</span>Mẹ &<br>Bé</a>
+<a class="{{ 'on' if selected_cat=='Mã giảm giá & Voucher' else '' }}" href="/flashsale?cat=Mã giảm giá & Voucher"><span class="ic">🧺</span>Bách Hóa<br>Online</a>
+<a class="{{ 'on' if selected_cat=='Công nghệ & Điện tử' else '' }}" href="/flashsale?cat=Công nghệ & Điện tử"><span class="ic">✈</span>Thể Thao<br>& Du Lịch</a>
 </div></div>
 <div class="white" style="margin-top:12px"><form class="filters" method="get" action="/flashsale">
+<input type="hidden" name="cat" value="{{ selected_cat or 'Tất cả' }}">
 <input name="q" value="{{ query or '' }}" placeholder="🔍 Tìm tên sản phẩm...">
 <span>Deal 1K</span><span>Deal 9K</span><span>Shopee Mall</span><span>Ẩn hết hàng</span>
 </form></div>
 <div class="grid">
+{% if foods %}
 {% for f in foods %}
-<a class="p" href="{{ f.aff_link }}" target="_blank" rel="nofollow sponsored noopener">
-<div class="imgw"><img src="{{ f.image }}" loading="lazy"></div>
-<div class="b"><h4>{{ f.name }}</h4><div class="price">₫{{ f.price }}</div><div class="soldbar">{{ f.sold }}</div></div>
+<a class="p" href="{{ f.aff_link or 'https://shopee.vn' }}" target="_blank" rel="nofollow sponsored noopener">
+<div class="imgw"><img src="{{ f.image }}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500'">{% if f.discount %}<span class="off">{{ f.discount }}</span>{% endif %}</div>
+<div class="b"><h4>{{ f.name }}</h4><div class="price">₫{{ f.price }}</div><div class="soldbar">{{ f.sold or 'ĐÃ BÁN 0' }}</div></div>
 </a>
-{% else %}
-<div>Chưa có sản phẩm.</div>
 {% endfor %}
+{% else %}
+<div class="white" style="grid-column:1/-1;text-align:center">Chưa có sản phẩm. Vào /admin để up hàng.</div>
+{% endif %}
 </div>
-{% if foods %}{% for food in foods %}
-<a class="p" href="{{ food.aff_link or 'https://shopee.vn' }}" target="_blank" rel="nofollow sponsored noopener">
-<div class="imgw"><img src="{{ food.image }}" loading="lazy">{% if food.discount %}<span class="off">{{ food.discount }}</span>{% endif %}</div>
-<div class="b"><h4>{{ food.name }}</h4><div class="price">₫{{ food.price }}</div><div class="soldbar">{{ food.sold }}</div></div>
-</a>
-{% endfor %}{% else %}<div class="white" style="grid-column:1/-1;text-align:center">Đang tải dữ liệu Flash Sale...</div>{% endif %}
-</div></div>
+</div>
 </body>
 </html>
