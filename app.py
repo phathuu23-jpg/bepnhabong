@@ -233,6 +233,14 @@ def parse_num(s):
     s = re.sub(r'[^\d]', '', str(s or ''))
     return s or "0"
 
+def clean_url(url_str, default="https://shopee.vn"):
+    u = str(url_str or "").strip()
+    if not u:
+        return default
+    if not u.startswith("http://") and not u.startswith("https://"):
+        u = "https://" + u
+    return u
+
 def parse_shopee_text(text):
     lines = [l.strip() for l in text.strip().splitlines() if l.strip()]
     if not lines:
@@ -265,7 +273,6 @@ def parse_shopee_text(text):
         }
         if mi['name'] < 0: mi['name'] = 0
     else:
-        # Thứ tự chuẩn xác: 0: Tên | 1: Giá gốc | 2: Giá sale | 3: Link Affiliate | 4: Link Ảnh | 5: Đã bán | 6: Danh mục
         mi = {'name': 0, 'old': 1, 'price': 2, 'link': 3, 'img': 4, 'sold': 5, 'cat': 6}
         
     out = []
@@ -304,17 +311,15 @@ def parse_shopee_text(text):
         except: 
             pass
             
-        # Lấy trực tiếp link ảnh từ cột tương ứng trong Excel/Bảng copy
-        img_url = g('img')
-        if not img_url or not img_url.startswith('http'):
-            img_url = DEFAULT_FOOD_IMAGE
+        img_url = clean_url(g('img'), DEFAULT_FOOD_IMAGE)
+        aff_url = clean_url(g('link'), "https://shopee.vn")
 
         out.append({
           'name': name,
           'price': cur_fmt,
           'old_price': old_fmt,
           'discount': disc,
-          'aff_link': g('link') or 'https://shopee.vn',
+          'aff_link': aff_url,
           'image': img_url,
           'sold': f"ĐÃ BÁN {g('sold') or '0'}",
           'category': g('cat') or 'Công nghệ & Điện tử'
@@ -361,8 +366,8 @@ def admin_add():
       price=parse_num(request.form.get('price')),
       old_price=parse_num(request.form.get('old_price')),
       discount=request.form.get('discount',''),
-      aff_link=request.form.get('aff_link') or 'https://shopee.vn',
-      image=request.form.get('image') or DEFAULT_FOOD_IMAGE,
+      aff_link=clean_url(request.form.get('aff_link'), "https://shopee.vn"),
+      image=clean_url(request.form.get('image'), DEFAULT_FOOD_IMAGE),
       sold=request.form.get('sold') or 'ĐÃ BÁN 0',
       category=request.form.get('category') or 'Công nghệ & Điện tử',
       ingredients='', status='approved', author_name=BRAND_AUTHOR,
