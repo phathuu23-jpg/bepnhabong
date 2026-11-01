@@ -1,28 +1,50 @@
 <div style="max-width:900px;margin:20px auto;font-family:sans-serif">
-<h2>Admin - Up hàng ShopeeLate <a href="/flashsale">Xem flashsale</a> | <a href="/logout">Thoát</a></h2>
-<h3>1. Paste Excel / hoặc chọn file .csv</h3>
-<form method="post" action="/admin/import" enctype="multipart/form-data">
-<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-<textarea name="paste" style="width:100%;height:120px" placeholder="Tên[TAB]Giá gốc[TAB]Giá sale[TAB]Link[TAB]Ảnh[TAB]Đã bán"></textarea><br>
-<input type="file" name="file" accept=".csv,.txt,.tsv">
-<button>Up loạt</button>
-</form>
-<h3>2. Thêm lẻ 1 con</h3>
-<form method="post" action="/admin/add">
-<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-<input name="name" placeholder="Tên sp" required>
-<input name="price" placeholder="Giá sale vd 99000">
-<input name="old_price" placeholder="Giá gốc vd 199000">
-<input name="aff_link" placeholder="Link Shopee">
-<input name="image" placeholder="Link ảnh" style="width:300px">
-<input name="sold" placeholder="1200">
-<input name="category" placeholder="Công nghệ & Điện tử">
-<button>Thêm</button>
-</form>
-<h3>Danh sách (200 mới nhất)</h3>
-{% for f in foods %}
-<div>{{f.id}} - {{f.name}} - {{f.price}} - <a href="{{f.aff_link}}" target="_blank">link</a>
-<form method="post" action="/admin/delete/{{f.id}}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button>Xóa</button></form>
-</div>
-{% endfor %}
+    <h2>Admin - Up hàng ShopeeLate <a href="/flashsale" target="_blank">Xem flashsale</a> | <a href="/logout">Thoát</a></h2>
+    
+    <h3>1. Paste Excel / hoặc chọn file .csv</h3>
+    <form method="post" action="/admin/import" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <textarea name="paste" style="width:100%;height:120px" placeholder="Tên[TAB]Giá gốc[TAB]Giá sale[TAB]Link[TAB]Ảnh[TAB]Đã bán"></textarea><br>
+        <input type="file" name="file" accept=".csv,.txt,.tsv">
+        <button type="submit">Up loạt</button>
+    </form>
+    
+    <hr style="margin: 20px 0;">
+
+    <h3>2. Thêm lẻ 1 con</h3>
+    <form method="post" action="/admin/add">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div style="margin-bottom: 8px;"><input name="name" placeholder="Tên sp" required style="width:100%; padding:5px;"></div>
+        <div style="margin-bottom: 8px; display: flex; gap: 10px;">
+            <input name="price" placeholder="Giá sale (vd: 99000)" style="flex:1; padding:5px;">
+            <input name="old_price" placeholder="Giá gốc (vd: 199000)" style="flex:1; padding:5px;">
+            <input name="sold" placeholder="Đã bán (vd: 1200)" style="flex:1; padding:5px;">
+        </div>
+        <div style="margin-bottom: 8px;"><input name="aff_link" placeholder="Link Shopee" style="width:100%; padding:5px;"></div>
+        <div style="margin-bottom: 8px;"><input name="image" placeholder="Link ảnh" style="width:100%; padding:5px;"></div>
+        <div style="margin-bottom: 8px;"><input name="category" placeholder="Danh mục (vd: Công nghệ & Điện tử)" style="width:100%; padding:5px;"></div>
+        <button type="submit">Thêm</button>
+    </form>
+
+    <hr style="margin: 20px 0;">
+
+    <h3>Danh sách (200 mới nhất)</h3>
+    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+        {% for f in foods %}
+        <div style="padding: 8px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <b>#{{f.id}}</b> - <span style="color: #333;">{{f.name}}</span> 
+                <br>
+                <small style="color: #666;">
+                    Giá: <b style="color: red;">{{f.price}}đ</b> (Gốc: <del>{{f.old_price}}đ</del>) | Đã bán: {{f.sold}} | 
+                    <a href="{{f.aff_link}}" target="_blank">Link Shopee</a>
+                </small>
+            </div>
+            <form method="post" action="/admin/delete/{{f.id}}" style="margin:0;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" style="background: #ff4d4d; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px;">Xóa</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
 </div>
