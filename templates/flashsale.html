@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flashsale Giờ Vàng - Săn Sale 247</title>
+<title>Flashsale 11.11 - Săn Sale 247</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
@@ -19,6 +19,20 @@ body{background:#f0f2f5;color:#333}
 .admin-menu-btn:hover{background:#000;transform:scale(1.05)}
 
 .container{max-width:1200px;margin:20px auto;padding:0 20px}
+
+/* BANNER QUẢNG CÁO 11.11 */
+.promo-banner{background:linear-gradient(135deg, #ff2a2a, #ff7e1d);border-radius:16px;padding:25px;color:#fff;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 6px 20px rgba(255,42,42,0.3);position:relative;overflow:hidden}
+.promo-banner::before{content:"";position:absolute;top:-50px;right:-50px;width:150px;height:150px;background:rgba(255,255,255,0.1);border-radius:50%}
+.banner-content h2{font-size:26px;font-weight:900;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.banner-content p{font-size:14px;opacity:0.95}
+.banner-badge{background:#ffe14d;color:#d70000;font-weight:900;padding:10px 20px;border-radius:30px;font-size:16px;box-shadow:0 4px 10px rgba(0,0,0,0.15);text-align:center;animation:pulse 1.5s infinite}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
 .search-box-wrap{background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,0.05);margin-bottom:20px}
 .search-form{display:flex;gap:10px}
 .search-form input{flex:1;border:2px solid #eee;border-radius:12px;padding:12px 16px;font-size:15px;outline:none}
@@ -42,6 +56,8 @@ body{background:#f0f2f5;color:#333}
 .grid{grid-template-columns:repeat(2,1fr);gap:10px}
 .container{padding:0 10px}
 .admin-menu-btn{top:12px;right:10px;width:34px;height:34px;font-size:14px}
+.promo-banner{flex-direction:column;text-align:center;gap:15px;padding:20px}
+.banner-content h2{font-size:20px}
 }
 </style>
 </head>
@@ -60,9 +76,20 @@ body{background:#f0f2f5;color:#333}
 </header>
 
 <div class="container">
+    <!-- BANNER QUẢNG CÁO 11.11 -->
+    <div class="promo-banner">
+        <div class="banner-content">
+            <h2>⚡ FLASHSALE 11.11 - GIỜ VÀNG SĂN DEAL ⚡</h2>
+            <p>Hàng loạt sản phẩm công nghệ, thời trang, gia dụng giảm sốc độc quyền. Bấm vào sản phẩm để nhận ngay link mua hàng và tích lũy hoa hồng!</p>
+        </div>
+        <div class="banner-badge">
+            SIÊU SALE 11.11 <br><span style="font-size:12px; font-weight:normal;">🚀 KHÔNG THỂ BỎ LỠ</span>
+        </div>
+    </div>
+
     <div class="search-box-wrap">
         <form class="search-form" method="get" action="/flashsale">
-            <input name="q" value="{{ query or '' }}" placeholder="⚡ Tìm kiếm deal Flashsale...">
+            <input name="q" value="{{ query or '' }}" placeholder="⚡ Tìm kiếm deal Flashsale 11.11...">
             <button type="submit">Tìm kiếm</button>
         </form>
     </div>
