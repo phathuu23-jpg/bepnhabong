@@ -62,6 +62,15 @@ a.on .ic{background:#ff6a2b;color:#fff}a.on{color:#ff6a2b}
 <span>Deal 1K</span><span>Deal 9K</span><span>Shopee Mall</span><span>Ẩn hết hàng</span>
 </form></div>
 <div class="grid">
+{% for f in foods %}
+<a class="p" href="{{ f.aff_link }}" target="_blank" rel="nofollow sponsored noopener">
+<div class="imgw"><img src="{{ f.image }}" loading="lazy"></div>
+<div class="b"><h4>{{ f.name }}</h4><div class="price">₫{{ f.price }}</div><div class="soldbar">{{ f.sold }}</div></div>
+</a>
+{% else %}
+<div>Chưa có sản phẩm.</div>
+{% endfor %}
+</div>
 {% if foods %}{% for food in foods %}
 <a class="p" href="{{ food.aff_link or 'https://shopee.vn' }}" target="_blank" rel="nofollow sponsored noopener">
 <div class="imgw"><img src="{{ food.image }}" loading="lazy">{% if food.discount %}<span class="off">{{ food.discount }}</span>{% endif %}</div>
