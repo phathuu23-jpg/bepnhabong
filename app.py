@@ -177,9 +177,9 @@ def login_required(view):
 @app.route('/')
 def index():
     query = request.args.get('q', '').strip()
-    cat = request.args.get('cat', 'Tat ca')
+    cat = request.args.get('cat', 'Tất cả')
     q = Food.query.filter_by(status='approved')
-    if cat and cat != 'Tat ca':
+    if cat and cat != 'Tất cả':
         q = q.filter_by(category=cat)
     if query:
         q = q.filter(Food.name.ilike(f'%{query}%'))
@@ -193,9 +193,9 @@ def guide():
 @app.route('/flashsale')
 def flashsale():
     query = request.args.get('q', '').strip()
-    cat = request.args.get('cat', 'Tat ca')
+    cat = request.args.get('cat', 'Tất cả')
     q = Food.query.filter_by(status='approved')
-    if cat and cat != 'Tat ca':
+    if cat and cat != 'Tất cả':
         q = q.filter_by(category=cat)
     if query:
         q = q.filter(Food.name.ilike(f'%{query}%'))
