@@ -80,7 +80,7 @@ class User(db.Model):
 class Food(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
-    category = db.Column(db.String(100), default="Cong nghe & Dien tu")
+    category = db.Column(db.String(100), default="Công nghệ & Điện tử")
     time = db.Column(db.String(50), default="Hom nay")
     servings = db.Column(db.String(50), default="Shopee / Lazada")
     difficulty = db.Column(db.String(50), default="Hot Deal")
@@ -229,9 +229,15 @@ def admin_required(view):
         return view(*a, **k)
     return wrapped
 
-def parse_num(s):
-    s = re.sub(r'[^\d]', '', str(s or ''))
-    return s or "0"
+def parse_price_str(s):
+    # Giữ nguyên đầy đủ số tiền, làm sạch ký tự lạ nhưng giữ giá trị chính xác hàng nghìn
+    s_clean = re.sub(r'[^\d]', '', str(s or ''))
+    if not s_clean:
+        return "0"
+    try:
+        return f"{int(s_clean):,}".replace(',', '.')
+    except:
+        return s_clean
 
 def clean_url(url_str, default="https://shopee.vn"):
     u = str(url_str or "").strip()
@@ -273,6 +279,7 @@ def parse_shopee_text(text):
         }
         if mi['name'] < 0: mi['name'] = 0
     else:
+        # Cột chuẩn: 0: Tên | 1: Giá gốc | 2: Giá sale | 3: Link Affiliate | 4: Link Ảnh | 5: Đã bán | 6: Danh mục
         mi = {'name': 0, 'old': 1, 'price': 2, 'link': 3, 'img': 4, 'sold': 5, 'cat': 6}
         
     out = []
@@ -288,27 +295,19 @@ def parse_shopee_text(text):
         raw_price = g('price')
         raw_old = g('old')
         
-        cur = parse_num(raw_price) if raw_price else parse_num(raw_old)
-        old = parse_num(raw_old) if raw_old else cur
+        cur = parse_price_str(raw_price) if raw_price else parse_price_str(raw_old)
+        old = parse_price_str(raw_old) if raw_old else cur
         if old == "0": old = cur
         if cur == "0": cur = old
         
-        try:
-            cur_fmt = f"{int(cur):,}".replace(',', '.')
-        except:
-            cur_fmt = cur
-            
-        try:
-            old_fmt = f"{int(old):,}".replace(',', '.')
-        except:
-            old_fmt = old
-
+        # Tính phần trăm giảm giá nếu có
         disc = ""
         try:
-            o = int(old); n = int(cur)
-            if o > n and o > 0: 
-                disc = f"-{round((o-n)/o*100)}%"
-        except: 
+            n_val = int(re.sub(r'[^\d]', '', cur))
+            o_val = int(re.sub(r'[^\d]', '', old))
+            if o_val > n_val and o_val > 0:
+                disc = f"-{round((o_val - n_val) / o_val * 100)}%"
+        except:
             pass
             
         img_url = clean_url(g('img'), DEFAULT_FOOD_IMAGE)
@@ -316,8 +315,8 @@ def parse_shopee_text(text):
 
         out.append({
           'name': name,
-          'price': cur_fmt,
-          'old_price': old_fmt,
+          'price': cur,
+          'old_price': old,
           'discount': disc,
           'aff_link': aff_url,
           'image': img_url,
@@ -361,10 +360,12 @@ def admin():
 @app.route('/admin/add', methods=['POST'])
 @admin_required
 def admin_add():
+    p_raw = request.form.get('price')
+    o_raw = request.form.get('old_price')
     f = Food(
       name=request.form.get('name','Deal hot')[:200],
-      price=parse_num(request.form.get('price')),
-      old_price=parse_num(request.form.get('old_price')),
+      price=parse_price_str(p_raw),
+      old_price=parse_price_str(o_raw) if o_raw else "",
       discount=request.form.get('discount',''),
       aff_link=clean_url(request.form.get('aff_link'), "https://shopee.vn"),
       image=clean_url(request.form.get('image'), DEFAULT_FOOD_IMAGE),
