@@ -2,68 +2,75 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flashsale - Săn Sale 247</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<title>Admin - Săn Sale 247</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,sans-serif}
-body{background:#f5f5f8}.top{max-width:1200px;margin:14px auto 0;padding:0 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-.logo{background:#fff;border-radius:14px;padding:8px 16px;font-weight:900;color:#1a2fb3;font-size:22px;text-decoration:none}.logo span{color:#ff6a2b}
-.nav{background:#fff;border-radius:14px;padding:8px 14px;display:flex;gap:16px;font-weight:700;flex-wrap:wrap;align-items:center}
-.nav a{color:#333;text-decoration:none;padding:6px 10px;white-space:nowrap}.nav a.active{background:#fff0e8;border-bottom:3px solid #ff6a2b}
-.box{max-width:1200px;margin:14px auto 0;padding:0 20px}.white{background:#fff;border-radius:14px;padding:16px}
-.cats{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;text-align:center;font-size:12px;font-weight:600}
-.cats a{color:#555;text-decoration:none}
-.ic{width:52px;height:52px;border-radius:50%;background:#f4f5f7;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 6px}
-a.on .ic{background:#ff6a2b;color:#fff}a.on{color:#ff6a2b}
-.filters{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}.filters input{flex:1;min-width:180px;border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px}
-.filters span{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;font-size:14px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}
-.p{background:#fff;border-radius:12px;overflow:hidden;border:1px solid #eee;color:#222;text-decoration:none;display:block;position:relative}
-.p .imgw{position:relative}.p img{width:100%;height:180px;object-fit:cover;display:block}
-.off{position:absolute;top:8px;right:8px;background:#ffe14d;color:#ee2b2b;font-weight:900;font-size:12px;padding:3px 8px;border-radius:6px}
-.p .b{padding:10px}.p h4{font-size:13px;height:36px;overflow:hidden;line-height:1.4}
-.price{color:#ee2b2b;font-weight:900;margin-top:6px;font-size:17px}.soldbar{background:#fdd9b5;color:#b25a1a;font-size:11px;text-align:center;border-radius:99px;padding:3px;margin-top:6px;font-weight:700}
-@media(max-width:860px){
-.top{padding:0 12px;gap:10px}.logo{font-size:18px;padding:6px 12px}
-.nav{width:100%;overflow-x:auto;flex-wrap:nowrap;gap:6px;padding:8px 10px}
-.nav a{font-size:14px;padding:6px 8px;flex-shrink:0}.box{padding:0 12px}.white{padding:12px}
-.cats{grid-template-columns:repeat(4,1fr);gap:8px;font-size:11px}.ic{width:44px;height:44px;font-size:19px}
-.filters{flex-wrap:nowrap;overflow-x:auto}.filters input{min-width:140px;flex:1}.filters span{flex-shrink:0;font-size:13px;padding:8px 12px}
-.grid{grid-template-columns:repeat(2,1fr);gap:10px}.p img{height:140px}.p .b{padding:8px}.p h4{font-size:12px}.price{font-size:15px}
-}
+body{font-family:sans-serif;background:#f5f5f8;margin:0;padding:20px}
+.container{max-width:900px;margin:0 auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+h2{margin-top:0;color:#1a2fb3;display:flex;justify-content:space-between;align-items:center}
+h2 a{font-size:14px;color:#ff6a2b;text-decoration:none}
+h3{border-bottom:2px solid #eee;padding-bottom:6px;margin-top:20px;color:#333;font-size:16px}
+input, textarea{width:100%;padding:10px;margin:6px 0 12px 0;border:1px solid #ddd;border-radius:6px;box-sizing:border-box}
+button{background:#ff6a2b;color:white;border:none;padding:10px 20px;font-weight:bold;border-radius:6px;cursor:pointer}
+button:hover{background:#e05b22}
+.item-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
+.item-info{font-size:14px;color:#333}
+.item-info small{color:#666}
+.del-btn{background:#ff4d4d;padding:6px 12px;font-size:12px}
+.del-btn:hover{background:#e03b3b}
 </style>
 </head>
 <body>
-<div class="top"><a class="logo" href="/">S sansale<span>247</span></a>
-<nav class="nav"><a href="/">🏠 Trang chủ</a><a href="/guide">📄 Hướng dẫn</a><a class="active" href="/flashsale">⚡ Flashsale</a><a href="/flashsale">✍️ Blog</a></nav></div>
-<div class="box">
-<div class="white"><div class="cats">
-<a class="{{ 'on' if selected_cat=='Tất cả' else '' }}" href="/flashsale"><span class="ic">▦</span>Tất cả<br>sản phẩm</a>
-<a class="{{ 'on' if selected_cat=='Thời trang & Mỹ phẩm' else '' }}" href="/flashsale?cat=Thời trang & Mỹ phẩm"><span class="ic">👕</span>Thời Trang<br>& Phụ Kiện</a>
-<a class="{{ 'on' if selected_cat=='Công nghệ & Điện tử' else '' }}" href="/flashsale?cat=Công nghệ & Điện tử"><span class="ic">💻</span>Điện Tử<br>& Gia Dụng</a>
-<a class="{{ 'on' if selected_cat=='Đời sống & Gia dụng' else '' }}" href="/flashsale?cat=Đời sống & Gia dụng"><span class="ic">💊</span>Sức Khỏe<br>& Sắc Đẹp</a>
-<a class="{{ 'on' if selected_cat=='Đời sống & Gia dụng' else '' }}" href="/flashsale?cat=Đời sống & Gia dụng"><span class="ic">📖</span>Đời Sống<br>& Nhà Cửa</a>
-<a class="{{ 'on' if selected_cat=='Thời trang & Mỹ phẩm' else '' }}" href="/flashsale?cat=Thời trang & Mỹ phẩm"><span class="ic">🍼</span>Mẹ &<br>Bé</a>
-<a class="{{ 'on' if selected_cat=='Mã giảm giá & Voucher' else '' }}" href="/flashsale?cat=Mã giảm giá & Voucher"><span class="ic">🧺</span>Bách Hóa<br>Online</a>
-<a class="{{ 'on' if selected_cat=='Công nghệ & Điện tử' else '' }}" href="/flashsale?cat=Công nghệ & Điện tử"><span class="ic">✈</span>Thể Thao<br>& Du Lịch</a>
-</div></div>
-<div class="white" style="margin-top:12px"><form class="filters" method="get" action="/flashsale">
-<input type="hidden" name="cat" value="{{ selected_cat or 'Tất cả' }}">
-<input name="q" value="{{ query or '' }}" placeholder="🔍 Tìm tên sản phẩm...">
-<span>Deal 1K</span><span>Deal 9K</span><span>Shopee Mall</span><span>Ẩn hết hàng</span>
-</form></div>
-<div class="grid">
-{% if foods %}
-{% for f in foods %}
-<a class="p" href="{{ f.aff_link or 'https://shopee.vn' }}" target="_blank" rel="nofollow sponsored noopener">
-<div class="imgw"><img src="{{ f.image }}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500'">{% if f.discount %}<span class="off">{{ f.discount }}</span>{% endif %}</div>
-<div class="b"><h4>{{ f.name }}</h4><div class="price">₫{{ f.price }}</div><div class="soldbar">{{ f.sold or 'ĐÃ BÁN 0' }}</div></div>
-</a>
-{% endfor %}
-{% else %}
-<div class="white" style="grid-column:1/-1;text-align:center">Chưa có sản phẩm. Vào /admin để up hàng.</div>
-{% endif %}
-</div>
+<div class="container">
+    <h2>
+        <span>Admin - Quản lý ShopeeLate</span>
+        <div>
+            <a href="/flashsale" target="_blank">⚡ Xem Flashsale</a> | 
+            <a href="/logout">🚪 Thoát</a>
+        </div>
+    </h2>
+    
+    <h3>1. Up hàng loạt (Dán từ Excel / Google Sheets)</h3>
+    <form method="post" action="/admin/import" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <textarea name="paste" style="height:100px" placeholder="Tên[TAB]Giá gốc[TAB]Giá sale[TAB]Link Affiliate[TAB]Ảnh[TAB]Đã bán[TAB]Danh mục"></textarea>
+        <input type="file" name="file" accept=".csv,.txt,.tsv">
+        <button type="submit">🚀 Up loạt ngay</button>
+    </form>
+    
+    <h3>2. Thêm lẻ 1 sản phẩm</h3>
+    <form method="post" action="/admin/add">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input name="name" placeholder="Tên sản phẩm" required>
+        <div style="display:flex; gap:10px;">
+            <input name="price" placeholder="Giá sale (vd: 99000)">
+            <input name="old_price" placeholder="Giá gốc (vd: 199000)">
+            <input name="sold" placeholder="Số lượng đã bán (vd: 1200)">
+        </div>
+        <input name="aff_link" placeholder="Dán Link Affiliate Shopee của bạn vào đây">
+        <input name="image" placeholder="Link ảnh sản phẩm">
+        <input name="category" placeholder="Danh mục (vd: Công nghệ & Điện tử)">
+        <button type="submit">➕ Thêm sản phẩm</button>
+    </form>
+
+    <h3>Danh sách sản phẩm mới nhất (200 gần đây)</h3>
+    <div style="max-height: 400px; overflow-y: auto;">
+        {% if foods %}
+            {% for f in foods %}
+            <div class="item-row">
+                <div class="item-info">
+                    <b>#{{f.id}}</b> - <b>{{f.name}}</b><br>
+                    <small>Giá: <span style="color:red;font-weight:bold">{{f.price}}đ</span> | Đã bán: {{f.sold}} | <a href="{{f.aff_link}}" target="_blank">Link gốc</a></small>
+                </div>
+                <form method="post" action="/admin/delete/{{f.id}}" style="margin:0;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="del-btn">Xóa</button>
+                </form>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color:#777;text-align:center;padding:20px;">Chưa có sản phẩm nào trong cơ sở dữ liệu.</p>
+        {% endif %}
+    </div>
 </div>
 </body>
 </html>
