@@ -211,10 +211,145 @@ def my_favorites():
     foods = [f.food for f in favs if f.food]
     return render_template('my_favorites.html', foods=foods)
 
-@app.route('/login')
-def login():
-    return "<h3>Trang dang nhap demo</h3><a href='/'>Ve trang chu</a>"
+def admin_required(view):
+    @wraps(view)
+    def wrapped(*a, **k):
+        u = get_current_user()
+        if not u or u.role != 'admin':
+            return redirect(url_for('login') + '?next=' + request.path)
+        return view(*a, **k)
+    return wrapped
 
+def parse_num(s):
+    s = re.sub(r'[^\d]', '', str(s or ''))
+    return s or "0"
+
+def parse_shopee_text(text):
+    # copy từ Excel ShopeeLate: Tên[TAB]Giá gốc[TAB]Giá sale[TAB]Link[TAB]Ảnh[TAB]Đã bán[TAB]Category
+    lines = [l.strip() for l in text.strip().splitlines() if l.strip()]
+    if not lines:
+        return []
+    def split_l(l):
+        if '\t' in l: return [x.strip() for x in l.split('\t')]
+        if ';' in l and ',' not in l: return [x.strip() for x in l.split(';')]
+        return [x.strip().strip('"') for x in l.split(',')]
+    first = split_l(lines[0])
+    has_h = any(re.search(r'tên|ten|name|giá|gia|price|link|ảnh|anh|img|bán|ban|sold|cat', x, re.I) for x in first)
+    heads = [x.lower() for x in first] if has_h else []
+    body = lines[1:] if has_h else lines
+    def fi(*ks):
+        for i,h in enumerate(heads):
+            for k in ks:
+                if k in h: return i
+        return -1
+    if has_h:
+        mi = {
+          'name': fi('tên','ten','name','title'),
+          'old': fi('giá gốc','gia goc','gốc','old'),
+          'price': fi('giá sale','gia sale','sale','giảm','price'),
+          'link': fi('link','url','aff','shopee'),
+          'img': fi('ảnh','anh','img','image'),
+          'sold': fi('bán','ban','sold'),
+          'cat': fi('cat','danh','loại','ngành')
+        }
+        if mi['name']<0: mi['name']=0
+    else:
+        mi = {'name':0,'old':1,'price':2,'link':3,'img':4,'sold':5,'cat':6}
+    out=[]
+    for l in body:
+        c = split_l(l)
+        def g(k):
+            i=mi.get(k,-1)
+            return c[i] if 0<=i<len(c) else ''
+        name=g('name')
+        if not name: continue
+        old=parse_num(g('old')); cur=parse_num(g('price'))
+        if old=="0": old=cur
+        if cur=="0": cur=old
+        disc=""
+        try:
+            o=int(old); n=int(cur)
+            if o>n and o>0: disc=f"-{round((o-n)/o*100)}%"
+        except: pass
+        out.append({
+          'name':name,'price':cur,'old_price':old,'discount':disc,
+          'aff_link':g('link') or 'https://shopee.vn',
+          'image':g('img') or DEFAULT_FOOD_IMAGE,
+          'sold':f"ĐÃ BÁN {g('sold') or '0'}",
+          'category':g('cat') or 'Công nghệ & Điện tử'
+        })
+    return out
+
+@app.route('/login', methods=['GET','POST'])
+def login():
+    if request.method=='POST':
+        u = request.form.get('username','').strip()
+        p = request.form.get('password','')
+        user = User.query.filter_by(username=u).first()
+        # admin tạo lúc init_db dùng generate_password_hash, check thế này
+        from werkzeug.security import check_password_hash
+        if user and user.password and check_password_hash(user.password, p):
+            session['user_id']=user.id
+            session.permanent=True
+            nxt=request.args.get('next') or ('/admin' if user.role=='admin' else '/')
+            return redirect(nxt)
+        return "Sai tài khoản hoặc mật khẩu <a href='/login'>Thử lại</a>", 401
+    return render_template_string("""
+    <form method="post" style="max-width:360px;margin:60px auto;font-family:sans-serif">
+    <h3>Đăng nhập Admin</h3>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input name="username" placeholder="admin" style="width:100%;padding:10px;margin:6px 0"><br>
+    <input name="password" type="password" placeholder="mật khẩu" style="width:100%;padding:10px;margin:6px 0"><br>
+    <button style="padding:10px 20px">Vào</button>
+    </form>""")
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+
+@app.route('/admin')
+@admin_required
+def admin():
+    foods = Food.query.order_by(Food.id.desc()).limit(200).all()
+    return render_template('admin.html', foods=foods)
+
+@app.route('/admin/add', methods=['POST'])
+@admin_required
+def admin_add():
+    f = Food(
+      name=request.form.get('name','Deal hot')[:200],
+      price=parse_num(request.form.get('price')),
+      old_price=parse_num(request.form.get('old_price')),
+      discount=request.form.get('discount',''),
+      aff_link=request.form.get('aff_link') or 'https://shopee.vn',
+      image=request.form.get('image') or DEFAULT_FOOD_IMAGE,
+      sold=request.form.get('sold') or 'ĐÃ BÁN 0',
+      category=request.form.get('category') or 'Công nghệ & Điện tử',
+      ingredients='', status='approved', author_name=BRAND_AUTHOR,
+      author_id=get_current_user().id
+    )
+    db.session.add(f); db.session.commit()
+    return redirect('/admin')
+
+@app.route('/admin/import', methods=['POST'])
+@admin_required
+def admin_import():
+    text = request.form.get('paste','')
+    if 'file' in request.files and request.files['file'].filename:
+        text = request.files['file'].read().decode('utf-8', errors='ignore')
+    rows = parse_shopee_text(text)
+    for r in rows:
+        db.session.add(Food(ingredients='', status='approved', author_name=BRAND_AUTHOR, author_id=get_current_user().id, **r))
+    db.session.commit()
+    return redirect('/admin')
+
+@app.route('/admin/delete/<int:fid>', methods=['POST'])
+@admin_required
+def admin_delete(fid):
+    f = Food.query.get_or_404(fid)
+    db.session.delete(f); db.session.commit()
+    return redirect('/admin')
 def init_db():
     with app.app_context():
         db.create_all()
