@@ -1,50 +1,76 @@
-<div style="max-width:900px;margin:20px auto;font-family:sans-serif">
-    <h2>Admin - Up hàng ShopeeLate <a href="/flashsale" target="_blank">Xem flashsale</a> | <a href="/logout">Thoát</a></h2>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Săn Sale 247</title>
+<style>
+body{font-family:sans-serif;background:#f5f5f8;margin:0;padding:20px}
+.container{max-width:900px;margin:0 auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+h2{margin-top:0;color:#1a2fb3;display:flex;justify-content:space-between;align-items:center}
+h2 a{font-size:14px;color:#ff6a2b;text-decoration:none}
+h3{border-bottom:2px solid #eee;padding-bottom:6px;margin-top:20px;color:#333;font-size:16px}
+input, textarea{width:100%;padding:10px;margin:6px 0 12px 0;border:1px solid #ddd;border-radius:6px;box-sizing:border-box}
+button{background:#ff6a2b;color:white;border:none;padding:10px 20px;font-weight:bold;border-radius:6px;cursor:pointer}
+button:hover{background:#e05b22}
+.item-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
+.item-info{font-size:14px;color:#333}
+.item-info small{color:#666}
+.del-btn{background:#ff4d4d;padding:6px 12px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>
+        <span>Admin - Quản lý ShopeeLate</span>
+        <div>
+            <a href="/" target="_blank">🏠 Xem Trang chủ</a> | 
+            <a href="/flashsale" target="_blank">⚡ Xem Flashsale</a> | 
+            <a href="/logout">🚪 Thoát</a>
+        </div>
+    </h2>
     
-    <h3>1. Paste Excel / hoặc chọn file .csv</h3>
+    <h3>1. Up hàng loạt (Dán từ Excel / Google Sheets)</h3>
     <form method="post" action="/admin/import" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <textarea name="paste" style="width:100%;height:120px" placeholder="Tên[TAB]Giá gốc[TAB]Giá sale[TAB]Link[TAB]Ảnh[TAB]Đã bán"></textarea><br>
+        <textarea name="paste" style="height:100px" placeholder="Tên[TAB]Giá gốc[TAB]Giá sale[TAB]Link Affiliate[TAB]Ảnh[TAB]Đã bán[TAB]Danh mục"></textarea>
         <input type="file" name="file" accept=".csv,.txt,.tsv">
-        <button type="submit">Up loạt</button>
+        <button type="submit">🚀 Up loạt ngay</button>
     </form>
     
-    <hr style="margin: 20px 0;">
-
-    <h3>2. Thêm lẻ 1 con</h3>
+    <h3>2. Thêm lẻ 1 sản phẩm</h3>
     <form method="post" action="/admin/add">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div style="margin-bottom: 8px;"><input name="name" placeholder="Tên sp" required style="width:100%; padding:5px;"></div>
-        <div style="margin-bottom: 8px; display: flex; gap: 10px;">
-            <input name="price" placeholder="Giá sale (vd: 99000)" style="flex:1; padding:5px;">
-            <input name="old_price" placeholder="Giá gốc (vd: 199000)" style="flex:1; padding:5px;">
-            <input name="sold" placeholder="Đã bán (vd: 1200)" style="flex:1; padding:5px;">
+        <input name="name" placeholder="Tên sản phẩm" required>
+        <div style="display:flex; gap:10px;">
+            <input name="price" placeholder="Giá sale (vd: 99000)">
+            <input name="old_price" placeholder="Giá gốc (vd: 199000)">
+            <input name="sold" placeholder="Số lượng đã bán (vd: 1200)">
         </div>
-        <div style="margin-bottom: 8px;"><input name="aff_link" placeholder="Link Shopee" style="width:100%; padding:5px;"></div>
-        <div style="margin-bottom: 8px;"><input name="image" placeholder="Link ảnh" style="width:100%; padding:5px;"></div>
-        <div style="margin-bottom: 8px;"><input name="category" placeholder="Danh mục (vd: Công nghệ & Điện tử)" style="width:100%; padding:5px;"></div>
-        <button type="submit">Thêm</button>
+        <input name="aff_link" placeholder="Dán Link Affiliate Shopee của bạn vào đây">
+        <input name="image" placeholder="Link ảnh sản phẩm">
+        <input name="category" placeholder="Danh mục (vd: Công nghệ & Điện tử)">
+        <button type="submit">➕ Thêm sản phẩm</button>
     </form>
 
-    <hr style="margin: 20px 0;">
-
-    <h3>Danh sách (200 mới nhất)</h3>
-    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
-        {% for f in foods %}
-        <div style="padding: 8px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <b>#{{f.id}}</b> - <span style="color: #333;">{{f.name}}</span> 
-                <br>
-                <small style="color: #666;">
-                    Giá: <b style="color: red;">{{f.price}}đ</b> (Gốc: <del>{{f.old_price}}đ</del>) | Đã bán: {{f.sold}} | 
-                    <a href="{{f.aff_link}}" target="_blank">Link Shopee</a>
-                </small>
+    <h3>Danh sách sản phẩm mới nhất</h3>
+    <div style="max-height: 400px; overflow-y: auto;">
+        {% if foods %}
+            {% for f in foods %}
+            <div class="item-row">
+                <div class="item-info">
+                    <b>#{{f.id}}</b> - <b>{{f.name}}</b><br>
+                    <small>Giá: <span style="color:red;font-weight:bold">{{f.price}}đ</span> | Đã bán: {{f.sold}} | <a href="{{f.aff_link}}" target="_blank">Link Shopee</a></small>
+                </div>
+                <form method="post" action="/admin/delete/{{f.id}}" style="margin:0;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="del-btn">Xóa</button>
+                </form>
             </div>
-            <form method="post" action="/admin/delete/{{f.id}}" style="margin:0;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" style="background: #ff4d4d; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px;">Xóa</button>
-            </form>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p style="color:#777;text-align:center;padding:20px;">Chưa có sản phẩm nào.</p>
+        {% endif %}
     </div>
 </div>
+</body>
+</html>
