@@ -276,6 +276,74 @@ def go_deal(deal_id):
     return redirect(target_url, code=302)
 
 
+@app.route("/deal/<int:deal_id>")
+def deal_detail(deal_id):
+    deal = Food.query.get_or_404(deal_id)
+    plat = "lazada" if "lazada" in (deal.aff_link or "").lower() or "lazada" in (deal.servings or "").lower() else "shopee"
+    aff_url = build_aff_url(deal.aff_link, sub_id=f"{AFF_SUB_ID}_detail{deal.id}")
+    code = extract_voucher_code(deal)
+    caption = build_social_caption(deal, aff_url)
+    related = (
+        Food.query.filter(Food.status == "approved", Food.id != deal.id, Food.category == deal.category)
+        .order_by(Food.clicks.desc(), Food.id.desc())
+        .limit(6)
+        .all()
+    )
+    return render_template_string("""
+        <!DOCTYPE html>
+        <html lang="vi">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ deal.name }} - {{ deal.price }} | Săn Sale 247</title>
+        <style>
+        body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;padding:20px;color:#222}
+        .box{max-width:780px;margin:0 auto;background:#fff;border-radius:14px;padding:22px;box-shadow:0 4px 16px rgba(0,0,0,0.06)}
+        .top-row{display:flex;gap:20px;flex-wrap:wrap}
+        .top-row img{width:240px;height:240px;object-fit:cover;border-radius:10px;background:#fafafa}
+        .info{flex:1;min-width:240px}
+        .price{font-size:24px;font-weight:900;color:#ee4d2d}
+        .old{text-decoration:line-through;color:#888;margin-left:8px}
+        .btn-buy{display:inline-block;margin-top:14px;background:linear-gradient(135deg,#ee4d2d,#ff6a00);color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:800}
+        .voucher{margin-top:10px;background:#fff7e6;border:1px dashed #ffa940;color:#d46b08;padding:8px 12px;border-radius:8px;font-weight:700}
+        .rel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:14px}
+        .rel-card{border:1px solid #eee;border-radius:10px;padding:10px;text-decoration:none;color:#222;display:block}
+        .rel-card img{width:100%;height:110px;object-fit:cover;border-radius:6px}
+        </style>
+        </head>
+        <body>
+        <div class="box">
+          <p><a href="/">← Quay lại danh sách deal</a></p>
+          <div class="top-row">
+            <img src="{{ deal.image or default_img }}" alt="{{ deal.name }}">
+            <div class="info">
+              <small style="color:#666;">{{ deal.category }} • {{ plat|upper }}</small>
+              <h1 style="font-size:20px;margin:6px 0 10px;">{{ deal.name }}</h1>
+              <div><span class="price">{{ deal.price }}</span>{% if deal.old_price %}<span class="old">{{ deal.old_price }}</span>{% endif %}</div>
+              {% if code %}<div class="voucher">Mã giảm giá: {{ code }}</div>{% endif %}
+              {% if deal.ingredients %}<div style="margin-top:10px;font-size:13.5px;color:#444;">{{ deal.ingredients|nl2br }}</div>{% endif %}
+              <a class="btn-buy" href="/go/{{ deal.id }}" target="_blank" rel="nofollow sponsored noopener">LẤY MÃ & MUA NGAY ({{ deal.clicks or 0 }} lượt click)</a>
+            </div>
+          </div>
+          {% if related %}
+          <hr style="margin:22px 0;border:none;border-top:1px solid #eee;">
+          <h3>Deal tương tự</h3>
+          <div class="rel-grid">
+            {% for r in related %}
+            <a class="rel-card" href="/deal/{{ r.id }}">
+              <img src="{{ r.image or default_img }}" alt="{{ r.name }}">
+              <div style="font-size:12.5px;font-weight:700;margin-top:6px;">{{ r.name[:45] }}</div>
+              <div style="color:#ee4d2d;font-weight:800;font-size:13px;margin-top:4px;">{{ r.price }}</div>
+            </a>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        </body>
+        </html>
+    """, deal=deal, plat=plat, aff_url=aff_url, code=code, caption=caption, related=related, default_img=DEFAULT_DEAL_IMAGE)
+
+
 @app.route("/")
 def index():
     q = (request.args.get("q") or "").strip()
