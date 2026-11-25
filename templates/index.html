@@ -22,10 +22,15 @@ body{background:#f4f6f8;color:#222;padding-bottom:60px}
 .container{max-width:1200px;margin:20px auto;padding:0 20px}
 
 /* BANNER KHUYẾN MÃI */
-.promo-banner{background:linear-gradient(135deg, #d70018, #ff6a00);border-radius:16px;padding:22px 25px;color:#fff;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 6px 20px rgba(215,0,24,0.2);gap:15px}
+.promo-banner{background:linear-gradient(135deg, #d70018, #ff6a00);border-radius:16px;padding:22px 25px;color:#fff;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 6px 20px rgba(215,0,24,0.2);gap:15px}
 .banner-content h2{font-size:24px;font-weight:900;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
 .banner-content p{font-size:14px;opacity:0.95;line-height:1.4}
 .banner-badge{background:#ffe14d;color:#c80000;font-weight:900;padding:10px 18px;border-radius:14px;font-size:15px;text-align:center;flex-shrink:0;box-shadow:0 4px 10px rgba(0,0,0,0.15)}
+
+/* THANH ĐẾM NGƯỢC FLASH SALE */
+.flash-bar{background:#fff2f0;border:1px solid #ffccc7;color:#cf1322;border-radius:12px;padding:11px 16px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:13px;font-weight:700}
+.countdown-box{display:flex;align-items:center;gap:6px}
+.countdown-box span.time-unit{background:#cf1322;color:#fff;padding:3px 7px;border-radius:6px;font-weight:800;min-width:28px;text-align:center}
 
 /* TÌM KIẾM & DANH MỤC */
 .search-box-wrap{background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(0,0,0,0.04);margin-bottom:20px}
@@ -55,5 +60,180 @@ body{background:#f4f6f8;color:#222;padding-bottom:60px}
 .current-price{color:#ee4d2d;font-weight:900;font-size:16.5px}
 .original-price{color:#999;font-size:12px;text-decoration:line-through}
 
-.meta-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:6px}
-.sold-count{font-size:11px
+.meta-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px}
+.sold-count{font-size:11px;color:#666;background:#f5f6f8;padding:3px 8px;border-radius:999px;font-weight:600}
+.voucher-tag{display:inline-flex;align-items:center;gap:5px;background:#fff7e6;color:#d46b08;border:1px dashed #ffa940;font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;margin-bottom:10px}
+
+.card-actions{margin-top:auto;display:flex;gap:6px}
+.btn-buy{flex:1;background:linear-gradient(135deg,#ee4d2d,#ff6a00);color:#fff;text-decoration:none;text-align:center;padding:9px 10px;border-radius:8px;font-size:12.5px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:0.2s}
+.btn-buy:hover{filter:brightness(0.95)}
+.btn-icon{border:1px solid #ffd8bf;background:#fff7f2;color:#ee4d2d;border-radius:8px;padding:0 10px;cursor:pointer;font-size:12px;font-weight:700;transition:0.2s}
+.btn-icon:hover{background:#ee4d2d;color:#fff}
+
+.toast-msg{position:fixed;bottom:24px;right:24px;background:#1f2937;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.2);opacity:0;pointer-events:none;transform:translateY(10px);transition:0.25s;z-index:999}
+.toast-msg.show{opacity:1;transform:translateY(0)}
+
+@media(max-width:640px){
+  .promo-banner{flex-direction:column;align-items:flex-start}
+  .search-form{flex-direction:column}
+  .search-form button{padding:11px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-container">
+    <a href="/" class="logo">SĂN SALE <span>247</span></a>
+    <nav class="nav">
+      <a href="/" class="active">Deal Hot</a>
+      <a href="/?platform=shopee">Shopee</a>
+      <a href="/?platform=lazada">Lazada</a>
+      <a href="/?type=voucher">Mã Giảm Giá</a>
+    </nav>
+    <a href="/admin" class="admin-menu-btn" title="Quản trị"><i class="fa-solid fa-gear"></i></a>
+  </div>
+</header>
+
+<div class="container">
+  <div class="promo-banner">
+    <div class="banner-content">
+      <h2>Săn Deal Xịn - Hoàn Tiền Cực Đã Mỗi Ngày</h2>
+      <p>Tổng hợp mã giảm giá Shopee & Lazada chọn lọc, cập nhật liên tục theo khung giờ vàng.</p>
+    </div>
+    <div class="banner-badge">GIẢM ĐẾN 50%+<br>FREESHIP XTRA</div>
+  </div>
+
+  <div class="flash-bar">
+    <span><i class="fa-solid fa-bolt"></i> FLASH SALE KHUNG GIỜ VÀNG ĐANG CHẠY</span>
+    <div class="countdown-box">
+      <span>Kết thúc sau:</span>
+      <span id="cd-h" class="time-unit">00</span>:
+      <span id="cd-m" class="time-unit">00</span>:
+      <span id="cd-s" class="time-unit">00</span>
+    </div>
+  </div>
+
+  <div class="search-box-wrap">
+    <form class="search-form" method="GET" action="/">
+      <input type="text" name="q" value="{{ q or '' }}" placeholder="Nhập tên sản phẩm hoặc mã giảm giá cần tìm...">
+      <button type="submit"><i class="fa-solid fa-magnifying-glass"></i> Tìm Deal</button>
+    </form>
+    <div class="categories">
+      <a href="/" class="cat-item {% if not active_cat %}on{% endif %}">Tất cả</a>
+      <a href="/?cat=dien-tu" class="cat-item {% if active_cat == 'dien-tu' %}on{% endif %}">Đồ điện tử</a>
+      <a href="/?cat=gia-dung" class="cat-item {% if active_cat == 'gia-dung' %}on{% endif %}">Nhà cửa & Đời sống</a>
+      <a href="/?cat=thoi-trang" class="cat-item {% if active_cat == 'thoi-trang' %}on{% endif %}">Thời trang</a>
+      <a href="/?cat=my-pham" class="cat-item {% if active_cat == 'my-pham' %}on{% endif %}">Làm đẹp</a>
+    </div>
+  </div>
+
+  <div class="grid">
+    {% if deals %}
+      {% for deal in deals %}
+      <div class="product-card" data-code="{{ deal.voucher_code or '' }}" data-url="{{ deal.aff_url or deal.url or '#' }}">
+        <div class="img-wrap">
+          {% if deal.is_hot %}<span class="badge-hot">HOT DEAL</span>{% endif %}
+          {% if deal.discount %}<span class="badge-discount">-{{ deal.discount }}%</span>{% endif %}
+          <img src="{{ deal.image_url or 'https://via.placeholder.com/300x240?text=San+Sale+247' }}" alt="{{ deal.title }}">
+        </div>
+        <div class="card-body">
+          <div class="product-title">{{ deal.title }}</div>
+          <div class="price-section">
+            <span class="current-price">{{ deal.sale_price }}</span>
+            {% if deal.original_price %}<span class="original-price">{{ deal.original_price }}</span>{% endif %}
+          </div>
+          <div class="meta-row">
+            <span class="sold-count">{{ deal.sold_text or 'Đang bán chạy' }}</span>
+            <span class="sold-count">{{ (deal.platform or 'Shopee')|upper }}</span>
+          </div>
+          {% if deal.voucher_code %}
+          <div class="voucher-tag"><i class="fa-solid fa-ticket"></i> Mã: {{ deal.voucher_code }}</div>
+          {% endif %}
+          <div class="card-actions">
+            <a href="/go/{{ deal.id }}" target="_blank" rel="nofollow sponsored noopener" class="btn-buy">
+              <i class="fa-solid fa-bag-shopping"></i> Mua Ngay
+            </a>
+            <button type="button" class="btn-icon" title="Copy mã giảm giá" onclick="copyDealCode(this)">
+              <i class="fa-regular fa-copy"></i>
+            </button>
+            <button type="button" class="btn-icon" title="Copy link chia sẻ" onclick="shareDealLink(this)">
+              <i class="fa-solid fa-share-nodes"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="product-card" data-code="SALE247-50K" data-url="https://s.shopee.vn/example">
+        <div class="img-wrap">
+          <span class="badge-hot">HOT DEAL</span>
+          <span class="badge-discount">-45%</span>
+          <img src="https://via.placeholder.com/300x240?text=Deal+Hot" alt="Sản phẩm mẫu">
+        </div>
+        <div class="card-body">
+          <div class="product-title">Tai nghe Bluetooth chống ồn chuẩn xịn, pin trâu dùng cả ngày</div>
+          <div class="price-section">
+            <span class="current-price">149.000đ</span>
+            <span class="original-price">269.000đ</span>
+          </div>
+          <div class="meta-row">
+            <span class="sold-count">Đã bán 1,8k</span>
+            <span class="sold-count">SHOPEE</span>
+          </div>
+          <div class="voucher-tag"><i class="fa-solid fa-ticket"></i> Mã: SALE247-50K</div>
+          <div class="card-actions">
+            <a href="https://s.shopee.vn/example" target="_blank" rel="nofollow sponsored noopener" class="btn-buy">
+              <i class="fa-solid fa-bag-shopping"></i> Mua Ngay
+            </a>
+            <button type="button" class="btn-icon" title="Copy mã giảm giá" onclick="copyDealCode(this)">
+              <i class="fa-regular fa-copy"></i>
+            </button>
+            <button type="button" class="btn-icon" title="Copy link chia sẻ" onclick="shareDealLink(this)">
+              <i class="fa-solid fa-share-nodes"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<div id="toast" class="toast-msg">Đã sao chép!</div>
+
+<script>
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function copyDealCode(btn) {
+  const card = btn.closest('.product-card');
+  const code = card.dataset.code || '';
+  if (!code) return showToast('Deal này áp dụng trực tiếp trên link!');
+  navigator.clipboard.writeText(code).then(() => showToast('Đã copy mã: ' + code));
+}
+
+function shareDealLink(btn) {
+  const card = btn.closest('.product-card');
+  const url = card.dataset.url || window.location.href;
+  navigator.clipboard.writeText(url).then(() => showToast('Đã copy link deal để chia sẻ!'));
+}
+
+const slots = [0, 9, 12, 15, 21];
+function updateCountdown() {
+  const now = new Date();
+  let target = new Date(now);
+  const nextHour = slots.find(h => h > now.getHours() || (h === now.getHours() && now.getMinutes() === 0 && now.getSeconds() === 0));
+  if (nextHour !== undefined) {
+    target.setHours(nextHour, 0, 0, 0);
+  } else {
+    target.setDate(target.getDate() + 1);
+    target.setHours(slots[0], 0, 0, 0);
+  }
+  const diff = Math.max(0, Math.floor((target - now) / 1000));
+  const h = String(Math.floor(diff / 3600)).padStart(2, '0');
+  const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+  const s = String(diff % 60).padStart(2, '0');
