@@ -1,12 +1,14 @@
 import os
 import re
-import time
-import uuid
+import csv
+import io
 import hmac
 import secrets
 import logging
 from datetime import timedelta
 from functools import wraps
+from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
+
 from flask import Flask, render_template, request, redirect, url_for, session, abort, g, render_template_string
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
@@ -14,7 +16,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
 import markupsafe
 from sqlalchemy import UniqueConstraint
-from seed_data import SAMPLE_FOODS
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("sansale247")
@@ -35,7 +36,7 @@ app.config.update(
     SESSION_COOKIE_SAMESITE='Lax',
     SESSION_COOKIE_SECURE=IS_PROD,
     PERMANENT_SESSION_LIFETIME=timedelta(days=7),
-    MAX_CONTENT_LENGTH=25*1024*1024,
+    MAX_CONTENT_LENGTH=25 * 1024 * 1024,
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
 )
 
@@ -63,10 +64,18 @@ ALLOWED_EXT = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 db = SQLAlchemy(app)
 
 DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/847/847969.png"
-DEFAULT_FOOD_IMAGE = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500"
+DEFAULT_DEAL_IMAGE = "https://cdn-icons-png.flaticon.com/512/3523/3523063.png"
 BRAND_AUTHOR = "San Sale 247"
 USERNAME_RE = re.compile(r'^[A-Za-z0-9_.]{3,30}$')
-CATEGORIES = ["Tất cả", "Công nghệ & Điện tử", "Thời trang & Mỹ phẩm", " Gia dụng", "Mã giảm giá & Voucher"]
+CATEGORIES = [
+    "Tất cả",
+    "Công nghệ & Điện tử",
+    "Thời trang & Mỹ phẩm",
+    "Gia dụng",
+    "Mã giảm giá & Voucher",
+]
+AFF_SUB_ID = os.environ.get('AFF_SUB_ID', 'sansale247')
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -77,23 +86,26 @@ class User(db.Model):
     avatar = db.Column(db.String(500), default=DEFAULT_AVATAR)
     role = db.Column(db.String(20), default="user")
 
+
 class Food(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     category = db.Column(db.String(100), default="Công nghệ & Điện tử")
-    time = db.Column(db.String(50), default="Hom nay")
+    time = db.Column(db.String(50), default="Hôm nay")
     servings = db.Column(db.String(50), default="Shopee / Lazada")
     difficulty = db.Column(db.String(50), default="Hot Deal")
     image = db.Column(db.String(500), nullable=False)
     aff_link = db.Column(db.String(1000), default="https://shopee.vn")
-    price = db.Column(db.String(50), default="0")
+    price = db.Column(db.String(50), default="Liên hệ")
     old_price = db.Column(db.String(50), default="")
     discount = db.Column(db.String(20), default="")
-    sold = db.Column(db.String(50), default="DA BAN 0")
+    sold = db.Column(db.String(50), default="Deal Hot")
     ingredients = db.Column(db.Text, nullable=False, default="")
     status = db.Column(db.String(20), default="approved")
     author_name = db.Column(db.String(100), default=BRAND_AUTHOR)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    clicks = db.Column(db.Integer, default=0)
+
 
 class RecipeStep(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -102,16 +114,19 @@ class RecipeStep(db.Model):
     description = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(500), nullable=True)
 
+
 class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     food_id = db.Column(db.Integer, db.ForeignKey('food.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
 
 class Favorite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     food_id = db.Column(db.Integer, db.ForeignKey('food.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     __table_args__ = (UniqueConstraint('user_id', 'food_id', name='uq_favorite_user_food'),)
+
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -122,17 +137,22 @@ class Comment(db.Model):
     content = db.Column(db.Text, nullable=False)
     rating = db.Column(db.Integer, nullable=True)
 
+
 @app.template_filter('nl2br')
 def nl2br_filter(s):
     if not s:
         return ""
     return markupsafe.Markup(str(markupsafe.escape(s)).replace('\n', '<br>\n'))
 
+
 def csrf_token():
     if '_csrf' not in session:
         session['_csrf'] = secrets.token_hex(32)
     return session['_csrf']
+
+
 app.jinja_env.globals['csrf_token'] = csrf_token
+
 
 @app.before_request
 def csrf_protect():
@@ -142,6 +162,7 @@ def csrf_protect():
         if not exp or not sent or not hmac.compare_digest(exp, sent):
             abort(400)
 
+
 @app.after_request
 def security_headers(resp):
     resp.headers.setdefault('X-Content-Type-Options', 'nosniff')
@@ -149,11 +170,13 @@ def security_headers(resp):
     resp.headers.setdefault('Referrer-Policy', 'strict-origin-when-cross-origin')
     return resp
 
+
 def get_current_user():
     if 'current_user' not in g:
         uid = session.get('user_id')
         g.current_user = User.query.get(uid) if uid else None
     return g.current_user
+
 
 @app.before_request
 def load_user():
@@ -162,9 +185,11 @@ def load_user():
         if not u:
             session.clear()
 
+
 @app.context_processor
 def inject_user():
     return {'current_user': get_current_user()}
+
 
 def login_required(view):
     @wraps(view)
@@ -174,51 +199,6 @@ def login_required(view):
         return view(*a, **k)
     return wrapped
 
-@app.route('/')
-def index():
-    query = request.args.get('q', '').strip()
-    cat = request.args.get('cat', 'Tất cả')
-    q = Food.query.filter_by(status='approved')
-    if cat and cat != 'Tất cả':
-        q = q.filter_by(category=cat)
-    if query:
-        q = q.filter(Food.name.ilike(f'%{query}%'))
-    foods = q.order_by(Food.id.desc()).all()
-    return render_template('index.html', foods=foods, categories=CATEGORIES, selected_cat=cat, query=query)
-
-@app.route('/guide')
-def guide():
-    return render_template('guide.html')
-
-@app.route('/flashsale')
-def flashsale():
-    query = request.args.get('q', '').strip()
-    cat = request.args.get('cat', 'Tất cả')
-    q = Food.query.filter_by(status='approved')
-    if cat and cat != 'Tất cả':
-        q = q.filter_by(category=cat)
-    if query:
-        q = q.filter(Food.name.ilike(f'%{query}%'))
-    foods = q.order_by(Food.id.desc()).all()
-    return render_template('flashsale.html', foods=foods, categories=CATEGORIES, selected_cat=cat, query=query)
-
-@app.route('/detail/<int:food_id>')
-def detail(food_id):
-    food = Food.query.get_or_404(food_id)
-    return render_template('detail.html', food=food)
-
-@app.route('/my-recipes')
-@login_required
-def my_recipes():
-    foods = Food.query.filter_by(author_id=get_current_user().id).order_by(Food.id.desc()).all()
-    return render_template('my_recipes.html', foods=foods)
-
-@app.route('/my-favorites')
-@login_required
-def my_favorites():
-    favs = Favorite.query.filter_by(user_id=get_current_user().id).all()
-    foods = [f.food for f in favs if f.food]
-    return render_template('my_favorites.html', foods=foods)
 
 def admin_required(view):
     @wraps(view)
@@ -229,201 +209,10 @@ def admin_required(view):
         return view(*a, **k)
     return wrapped
 
-def parse_price_str(s):
-    # Giữ nguyên đầy đủ số tiền, làm sạch ký tự lạ nhưng giữ giá trị chính xác hàng nghìn
-    s_clean = re.sub(r'[^\d]', '', str(s or ''))
-    if not s_clean:
-        return "0"
-    try:
-        return f"{int(s_clean):,}".replace(',', '.')
-    except:
-        return s_clean
 
-def clean_url(url_str, default="https://shopee.vn"):
-    u = str(url_str or "").strip()
-    if not u:
-        return default
-    if not u.startswith("http://") and not u.startswith("https://"):
-        u = "https://" + u
-    return u
-
-def parse_shopee_text(text):
-    lines = [l.strip() for l in text.strip().splitlines() if l.strip()]
-    if not lines:
-        return []
-    def split_l(l):
-        if '\t' in l: return [x.strip() for x in l.split('\t')]
-        if ';' in l and ',' not in l: return [x.strip() for x in l.split(';')]
-        return [x.strip().strip('"') for x in l.split(',')]
-    
-    first = split_l(lines[0])
-    has_h = any(re.search(r'tên|ten|name|giá|gia|price|link|ảnh|anh|img|bán|ban|sold|cat', x, re.I) for x in first)
-    heads = [x.lower() for x in first] if has_h else []
-    body = lines[1:] if has_h else lines
-    
-    def fi(*ks):
-        for i, h in enumerate(heads):
-            for k in ks:
-                if k in h: return i
-        return -1
-        
-    if has_h:
-        mi = {
-          'name': fi('tên', 'ten', 'name', 'title'),
-          'old': fi('gốc', 'old', 'giá gốc', 'gia goc'),
-          'price': fi('giá sale', 'gia sale', 'sale', 'giá', 'gia', 'price', 'giảm'),
-          'link': fi('link', 'url', 'aff', 'shopee', 'lazada'),
-          'img': fi('ảnh', 'anh', 'img', 'image', 'hình'),
-          'sold': fi('bán', 'ban', 'sold', 'đã bán'),
-          'cat': fi('cat', 'danh', 'loại', 'ngành', 'category')
-        }
-        if mi['name'] < 0: mi['name'] = 0
-    else:
-        # Cột chuẩn: 0: Tên | 1: Giá gốc | 2: Giá sale | 3: Link Affiliate | 4: Link Ảnh | 5: Đã bán | 6: Danh mục
-        mi = {'name': 0, 'old': 1, 'price': 2, 'link': 3, 'img': 4, 'sold': 5, 'cat': 6}
-        
-    out = []
-    for l in body:
-        c = split_l(l)
-        def g(k):
-            i = mi.get(k, -1)
-            return c[i] if 0 <= i < len(c) else ''
-            
-        name = g('name')
-        if not name: continue
-        
-        raw_price = g('price')
-        raw_old = g('old')
-        
-        cur = parse_price_str(raw_price) if raw_price else parse_price_str(raw_old)
-        old = parse_price_str(raw_old) if raw_old else cur
-        if old == "0": old = cur
-        if cur == "0": cur = old
-        
-        # Tính phần trăm giảm giá nếu có
-        disc = ""
-        try:
-            n_val = int(re.sub(r'[^\d]', '', cur))
-            o_val = int(re.sub(r'[^\d]', '', old))
-            if o_val > n_val and o_val > 0:
-                disc = f"-{round((o_val - n_val) / o_val * 100)}%"
-        except:
-            pass
-            
-        img_url = clean_url(g('img'), DEFAULT_FOOD_IMAGE)
-        aff_url = clean_url(g('link'), "https://shopee.vn")
-
-        out.append({
-          'name': name,
-          'price': cur,
-          'old_price': old,
-          'discount': disc,
-          'aff_link': aff_url,
-          'image': img_url,
-          'sold': f"ĐÃ BÁN {g('sold') or '0'}",
-          'category': g('cat') or 'Công nghệ & Điện tử'
-        })
-    return out
-
-@app.route('/login', methods=['GET','POST'])
-def login():
-    if request.method=='POST':
-        u = request.form.get('username','').strip()
-        p = request.form.get('password','')
-        user = User.query.filter_by(username=u).first()
-        if user and user.password and check_password_hash(user.password, p):
-            session['user_id']=user.id
-            session.permanent=True
-            nxt=request.args.get('next') or ('/admin' if user.role=='admin' else '/')
-            return redirect(nxt)
-        return "Sai tài khoản hoặc mật khẩu <a href='/login'>Thử lại</a>", 401
-    return render_template_string("""
-    <form method="post" style="max-width:360px;margin:60px auto;font-family:sans-serif">
-    <h3>Đăng nhập Admin</h3>
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input name="username" placeholder="admin" style="width:100%;padding:10px;margin:6px 0"><br>
-    <input name="password" type="password" placeholder="mật khẩu" style="width:100%;padding:10px;margin:6px 0"><br>
-    <button style="padding:10px 20px">Vào</button>
-    </form>""")
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect('/')
-
-@app.route('/admin')
-@admin_required
-def admin():
-    foods = Food.query.order_by(Food.id.desc()).limit(200).all()
-    return render_template('admin.html', foods=foods)
-
-@app.route('/admin/add', methods=['POST'])
-@admin_required
-def admin_add():
-    p_raw = request.form.get('price')
-    o_raw = request.form.get('old_price')
-    f = Food(
-      name=request.form.get('name','Deal hot')[:200],
-      price=parse_price_str(p_raw),
-      old_price=parse_price_str(o_raw) if o_raw else "",
-      discount=request.form.get('discount',''),
-      aff_link=clean_url(request.form.get('aff_link'), "https://shopee.vn"),
-      image=clean_url(request.form.get('image'), DEFAULT_FOOD_IMAGE),
-      sold=request.form.get('sold') or 'ĐÃ BÁN 0',
-      category=request.form.get('category') or 'Công nghệ & Điện tử',
-      ingredients='', status='approved', author_name=BRAND_AUTHOR,
-      author_id=get_current_user().id
-    )
-    db.session.add(f); db.session.commit()
-    return redirect('/admin')
-
-@app.route('/admin/import', methods=['POST'])
-@admin_required
-def admin_import():
-    text = request.form.get('paste','')
-    if 'file' in request.files and request.files['file'].filename:
-        text = request.files['file'].read().decode('utf-8', errors='ignore')
-    rows = parse_shopee_text(text)
-    for r in rows:
-        db.session.add(Food(ingredients='', status='approved', author_name=BRAND_AUTHOR, author_id=get_current_user().id, **r))
-    db.session.commit()
-    return redirect('/admin')
-
-@app.route('/admin/delete/<int:fid>', methods=['POST'])
-@admin_required
-def admin_delete(fid):
-    f = Food.query.get_or_404(fid)
-    db.session.delete(f); db.session.commit()
-    return redirect('/admin')
-
-def init_db():
-    with app.app_context():
-        db.create_all()
-        try:
-            with db.engine.connect() as c:
-                cols = [r[1] for r in c.exec_driver_sql("PRAGMA table_info(food)").fetchall()]
-                for col, default in [('aff_link', "'https://shopee.vn'"), ('price', "'0'"), ('old_price', "''"), ('discount', "''"), ('sold', "'DA BAN 0'")]:
-                    if col not in cols:
-                        c.exec_driver_sql(f"ALTER TABLE food ADD COLUMN {col} VARCHAR(1000) DEFAULT {default}")
-                        c.commit()
-        except Exception as e:
-            log.info(f"skip migrate: {e}")
-        admin_pass = os.environ.get('ADMIN_PASSWORD', 'admin123')
-        if not User.query.filter_by(username='admin').first():
-            db.session.add(User(username='admin', email='admin@sansale247.com', password=generate_password_hash(admin_pass), full_name='Quan Tri Vien', role='admin'))
-            db.session.commit()
-            log.info("Da tao admin.")
-        if Food.query.count() == 0:
-            try:
-                from seed_data import SAMPLE_FOODS as _S
-            except Exception:
-                _S = []
-            for item in _S:
-                db.session.add(Food(name=item.get('name', 'Deal hot'), category=item.get('category', 'Cong nghe'), time=item.get('time', 'Hom nay'), servings=item.get('servings', 'Shopee'), difficulty=item.get('difficulty', 'Hot'), image=item.get('image', DEFAULT_FOOD_IMAGE), ingredients=item.get('ingredients', ''), status='approved', author_name=BRAND_AUTHOR))
-            if _S:
-                db.session.commit()
-
-init_db()
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+def normalize_category(cat_str):
+    c = re.sub(r'\s+', ' ', str(cat_str or '').strip())
+    if not c:
+        return "Công nghệ & Điện tử"
+    low = c.lower()
+    if low in ("tất cả",
