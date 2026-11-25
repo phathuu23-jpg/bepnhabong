@@ -1,91 +1,144 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quản Trị Đăng Bài - Săn Sale 247</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản Trị Deal - Săn Sale 247</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-body{background:#f0f2f5;color:#333;padding:20px}
-.container{max-width:1000px;margin:0 auto;background:#fff;padding:25px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.06)}
-h2{margin-bottom:20px;color:#ee4d2d;display:flex;justify-content:space-between;align-items:center;font-size:22px}
-h2 a{font-size:14px;color:#555;text-decoration:none;background:#f0f2f5;padding:6px 12px;border-radius:8px}
-h3{border-left:4px solid #ee4d2d;padding-left:10px;margin:25px 0 15px 0;color:#222;font-size:16px}
-form{background:#f9f9fb;padding:20px;border-radius:12px;border:1px solid #eee}
-input, textarea, select{width:100%;padding:12px;margin:8px 0 14px 0;border:1px solid #ddd;border-radius:8px;font-size:14px;outline:none}
-input:focus, textarea:focus{border-color:#ee4d2d}
-button{background:#ee4d2d;color:white;border:none;padding:12px 24px;font-weight:bold;border-radius:8px;cursor:pointer;transition:0.2s}
-button:hover{background:#d73814}
-.row{display:flex;gap:15px}
-.row > div{flex:1}
-.item-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #eee;gap:15px}
-.item-thumb{width:50px;height:50px;object-fit:cover;border-radius:6px;border:1px solid #ddd}
-.item-info{flex:1;font-size:14px}
-.item-info b{color:#111}
-.del-btn{background:#ff4d4f;padding:8px 14px;font-size:12px}
-.del-btn:hover{background:#d9363e}
+body{background:#f4f6f8;color:#222;padding-bottom:60px}
+.topbar{background:linear-gradient(135deg,#ee4d2d,#ff7337);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.topbar a{color:#fff;text-decoration:none;font-weight:700;font-size:13px;background:rgba(255,255,255,0.18);padding:7px 13px;border-radius:8px}
+.topbar a:hover{background:#fff;color:#ee4d2d}
+.wrap{max-width:1100px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 3px 14px rgba(0,0,0,0.05);margin-bottom:22px;border:1px solid #eceef2}
+.card h2,.card h3{margin-bottom:14px;font-size:18px;color:#111}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.form-grid .full{grid-column:1 / -1}
+input,select,textarea{width:100%;padding:10px 12px;border:1.5px solid #e2e5ea;border-radius:9px;font-size:14px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#ee4d2d}
+textarea{min-height:84px;resize:vertical}
+.btn-primary{background:linear-gradient(135deg,#ee4d2d,#ff6a00);color:#fff;border:none;padding:11px 20px;border-radius:9px;font-weight:800;cursor:pointer;font-size:14px}
+.btn-primary:hover{filter:brightness(0.96)}
+.deal-item{border:1px solid #eceef2;border-radius:12px;padding:14px;margin-bottom:14px;background:#fcfcfd}
+.deal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.click-pill{background:#fff2f0;color:#cf1322;border:1px solid #ffccc7;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:800}
+.caption-box{width:100%;font-size:12.5px;background:#f7f8fa;color:#222;margin:8px 0}
+.actions-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn-sm{padding:7px 12px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid #d9dce2;background:#fff;color:#222;text-decoration:none}
+.btn-sm:hover{border-color:#ee4d2d;color:#ee4d2d}
+.btn-del{background:#fff1f0;color:#cf1322;border-color:#ffa39e}
+.btn-del:hover{background:#cf1322;color:#fff}
+.toast{position:fixed;bottom:20px;right:20px;background:#1f2937;color:#fff;padding:10px 15px;border-radius:9px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:0.25s}
+.toast.show{opacity:1}
 </style>
 </head>
 <body>
-<div class="container">
-    <h2>
-        <span><i class="fa-solid fa-gauge-high"></i> Bảng Quản Trị Đăng Bài</span>
-        <div>
-            <a href="/" target="_blank"><i class="fa-solid fa-house"></i> Trang chủ</a>
-            <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Thoát</a>
-        </div>
-    </h2>
-    
-    <h3>1. Đăng hàng loạt (Dán bảng Excel / Google Sheets)</h3>
-    <form method="post" action="/admin/import" enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <p style="font-size: 13px; color: #666; margin-bottom: 8px;">Dán theo thứ tự cột: <b>Tên sản phẩm | Giá gốc | Giá sale | Link Affiliate Shopee | Link Ảnh | Đã bán | Danh mục</b> hoặc tải file lên:</p>
-        <textarea name="paste" style="height:90px" placeholder="Ví dụ: Áo khoác nam	200000	99000	https://shopee.vn/abc	https://cf.shopee.vn/file/xyz	120	Thời trang & Mỹ phẩm"></textarea>
-        <input type="file" name="file" accept=".csv,.txt,.tsv" style="background:#fff">
-        <button type="submit"><i class="fa-solid fa-cloud-arrow-up"></i> Up Hàng Loạt Ngay</button>
-    </form>
-    
-    <h3>2. Thêm thủ công 1 sản phẩm</h3>
-    <form method="post" action="/admin/add">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input name="name" placeholder="Tên sản phẩm (Bắt buộc)" required>
-        <div class="row">
-            <div><input name="price" placeholder="Giá sale (vd: 99000)" required></div>
-            <div><input name="old_price" placeholder="Giá gốc (vd: 199000)"></div>
-            <div><input name="sold" placeholder="Đã bán (vd: 1200)"></div>
-        </div>
-        <input name="aff_link" placeholder="Link Affiliate Shopee của bạn (vd: https://shopee.vn/...)" required>
-        <input name="image" placeholder="Link Ảnh sản phẩm trực tiếp (vd: https://...)" required>
-        <select name="category">
-            <option value="Công nghệ & Điện tử">Công nghệ & Điện tử</option>
-            <option value="Thời trang & Mỹ phẩm">Thời trang & Mỹ phẩm</option>
-            <option value="Gia dụng">Gia dụng</option>
-            <option value="Mã giảm giá & Voucher">Mã giảm giá & Voucher</option>
-        </select>
-        <button type="submit"><i class="fa-solid fa-plus"></i> Đăng Sản Phẩm</button>
-    </form>
-
-    <h3>Danh sách sản phẩm đã đăng ({{ foods|length }})</h3>
-    <div style="max-height: 450px; overflow-y: auto;">
-        {% if foods %}
-            {% for f in foods %}
-            <div class="item-row">
-                <img src="{{ f.image }}" class="item-thumb" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500'">
-                <div class="item-info">
-                    <b>{{ f.name }}</b><br>
-                    <span style="color:#ee4d2d;font-weight:bold;">{{ f.price }}đ</span> {% if f.old_price %}<del style="color:#888;font-size:12px;">{{ f.old_price }}đ</del>{% endif %} | <span style="color:#fa8c16;">{{ f.sold }}</span><br>
-                    <a href="{{ f.aff_link }}" target="_blank" style="font-size:12px;color:#1890ff;word-break:break-all;"><i class="fa-solid fa-link"></i> {{ f.aff_link }}</a>
-                </div>
-                <form method="post" action="/admin/delete/{{ f.id }}" style="background:none;padding:0;border:none;margin:0;">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="del-btn" onclick="return confirm('Xóa món này nhé?');"><i class="fa-solid fa-trash"></i> Xóa</button>
-                </form>
-            </div>
-            {% endfor %}
-        {% else %}
-            <p style="color:#777;text-align:center;padding:30px;">Chưa có sản phẩm nào trong cơ sở dữ liệu.</p>
-        {% endif %}
-    </div>
+<div class="topbar">
+  <strong><i class="fa-solid fa-bolt"></i> SĂN SALE 247 — QUẢN TRỊ DEAL</strong>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <a href="/"><i class="fa-solid fa-house"></i> Trang chủ</a>
+    <a href="/export.csv"><i class="fa-solid fa-file-csv"></i> Xuất CSV</a>
+    <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+  </div>
 </div>
+
+<div class="wrap">
+  <div class="card">
+    <h2><i class="fa-solid fa-plus-circle"></i> Đăng Deal Mới</h2>
+    <form method="post" class="form-grid">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="create">
+      <div class="full">
+        <input type="text" name="name" placeholder="Tên sản phẩm / deal (VD: Tai nghe Bluetooth chống ồn...)" required>
+      </div>
+      <div>
+        <select name="category">
+          <option value="Công nghệ & Điện tử">Công nghệ & Điện tử</option>
+          <option value="Thời trang & Mỹ phẩm">Thời trang & Mỹ phẩm</option>
+          <option value="Gia dụng">Gia dụng</option>
+          <option value="Mã giảm giá & Voucher">Mã giảm giá & Voucher</option>
+        </select>
+      </div>
+      <div>
+        <select name="servings">
+          <option value="Shopee">Shopee</option>
+          <option value="Lazada">Lazada</option>
+          <option value="Shopee / Lazada">Shopee / Lazada</option>
+        </select>
+      </div>
+      <div>
+        <input type="text" name="price" placeholder="Giá sale (VD: 149.000đ)" required>
+      </div>
+      <div>
+        <input type="text" name="old_price" placeholder="Giá gốc (VD: 269.000đ)">
+      </div>
+      <div>
+        <input type="text" name="discount" placeholder="% giảm (VD: 45%)">
+      </div>
+      <div>
+        <input type="text" name="difficulty" placeholder="Nhãn / Mã (VD: HOT DEAL | Mã: SALE50K)">
+      </div>
+      <div class="full">
+        <input type="text" name="aff_link" placeholder="Link Affiliate Shopee / Lazada" required>
+      </div>
+      <div class="full">
+        <input type="text" name="image" placeholder="Link ảnh sản phẩm (để trống sẽ dùng ảnh mặc định)">
+      </div>
+      <div class="full">
+        <textarea name="ingredients" placeholder="Mã giảm giá & ghi chú áp dụng (VD: Mã: SALE50K, giảm thêm 50k đơn từ 200k)"></textarea>
+      </div>
+      <div class="full">
+        <button type="submit" class="btn-primary"><i class="fa-solid fa-paper-plane"></i> Đăng Deal Ngay</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3><i class="fa-solid fa-list"></i> Danh Sách Deal ({{ enriched|length }})</h3>
+    {% for row in enriched %}
+    <div class="deal-item">
+      <div class="deal-head">
+        <div>
+          <strong>#{{ row.obj.id }} — {{ row.obj.name }}</strong><br>
+          <small style="color:#666;">Danh mục: {{ row.obj.category }} | Sàn: {{ row.obj.servings }} | Giá: <b style="color:#ee4d2d;">{{ row.obj.price }}</b></small>
+        </div>
+        <span class="click-pill"><i class="fa-solid fa-mouse-pointer"></i> {{ row.obj.clicks or 0 }} lượt click</span>
+      </div>
+      <div style="font-size:12px;color:#444;word-break:break-all;">
+        <b>Link Aff tự động gắn SubID:</b> <a href="{{ row.aff_url }}" target="_blank" rel="noopener">{{ row.aff_url }}</a>
+      </div>
+      <textarea class="caption-box" rows="5" readonly>{{ row.caption }}</textarea>
+      <div class="actions-row">
+        <button type="button" class="btn-sm" onclick="copyCaption(this)"><i class="fa-regular fa-copy"></i> Copy Caption Đăng Bài</button>
+        <a href="/go/{{ row.obj.id }}" target="_blank" class="btn-sm"><i class="fa-solid fa-arrow-up-right-from-square"></i> Test Link Chuyển Hướng</a>
+        <form method="post" style="display:inline;" onsubmit="return confirm('Xóa deal #{{ row.obj.id }}?');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="deal_id" value="{{ row.obj.id }}">
+          <button type="submit" class="btn-sm btn-del"><i class="fa-solid fa-trash"></i> Xóa</button>
+        </form>
+      </div>
+    </div>
+    {% else %}
+    <p style="color:#666;">Chưa có deal nào. Hãy đăng deal đầu tiên ở form phía trên.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<div id="toast" class="toast">Đã sao chép!</div>
+<script>
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+function copyCaption(btn) {
+  const box = btn.closest('.deal-item').querySelector('.caption-box');
+  navigator.clipboard.writeText(box.value).then(() => showToast('Đã copy caption sẵn sàng đăng bài!'));
+}
+</script>
 </body>
 </html>
